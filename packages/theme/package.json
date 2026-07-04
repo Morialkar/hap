@@ -1,0 +1,6 @@
+{
+  "name": "@hap/theme",
+  "version": "0.0.0",
+  "private": true,
+  "description": "HAP design system: Tabler SCSS base (green dark theme lands R1-D6)"
+}

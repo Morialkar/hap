@@ -1,0 +1,5 @@
+// 1. Load Tabler (Bootstrap 5 design system)
+@use "@tabler/core/scss/tabler";
+
+// 2. HAP theme overrides (packages/theme — green dark theme lands R1-D6)
+@use "../../../../packages/theme/src/index";
