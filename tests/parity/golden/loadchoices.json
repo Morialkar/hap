@@ -1,0 +1,3232 @@
+{
+  "auteur": [
+    {
+      "id": "12",
+      "nom": "",
+      "prenom": "Auteur inconnu",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-17 18:33:39",
+      "updated_at": "2013-03-17 18:33:39"
+    },
+    {
+      "id": "190",
+      "nom": "",
+      "prenom": "Frères des Écoles Chrétiennes",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-22 00:40:15",
+      "updated_at": "2014-09-22 00:40:15"
+    },
+    {
+      "id": "207",
+      "nom": "",
+      "prenom": "École Normale Jacques-Cartier",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-30 17:32:38",
+      "updated_at": "2014-09-30 17:32:38"
+    },
+    {
+      "id": "195",
+      "nom": " Sir, Dawson",
+      "prenom": "John William",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-22 21:42:46",
+      "updated_at": "2014-09-22 21:42:46"
+    },
+    {
+      "id": "82",
+      "nom": "André",
+      "prenom": "Frédéric",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-16 15:52:25",
+      "updated_at": "2013-05-16 15:52:25"
+    },
+    {
+      "id": "139",
+      "nom": "Andrews",
+      "prenom": "William Eusebius",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-27 16:54:41",
+      "updated_at": "2014-01-27 16:54:41"
+    },
+    {
+      "id": "52",
+      "nom": "Archambault",
+      "prenom": "Louis Misaël",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 17:45:13",
+      "updated_at": "2013-04-01 17:45:13"
+    },
+    {
+      "id": "108",
+      "nom": "Archambault",
+      "prenom": "Joseph Louis",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-26 17:15:42",
+      "updated_at": "2013-09-26 17:15:42"
+    },
+    {
+      "id": "78",
+      "nom": "Aubert de Gaspé",
+      "prenom": "Philippe",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-26 17:51:52",
+      "updated_at": "2013-04-26 17:51:52"
+    },
+    {
+      "id": "33",
+      "nom": "Auger",
+      "prenom": "Joseph Cyrille",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 17:32:58",
+      "updated_at": "2013-03-20 17:32:58"
+    },
+    {
+      "id": "116",
+      "nom": "Ayotte",
+      "prenom": "P.V.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 19:34:10",
+      "updated_at": "2013-10-02 19:34:10"
+    },
+    {
+      "id": "56",
+      "nom": "Babonneau",
+      "prenom": "F. M.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 18:36:25",
+      "updated_at": "2013-04-01 18:36:25"
+    },
+    {
+      "id": "4",
+      "nom": "Badeaux",
+      "prenom": "Jean-Baptiste",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-13 15:24:32",
+      "updated_at": "2013-03-13 15:24:32"
+    },
+    {
+      "id": "70",
+      "nom": "Barnard",
+      "prenom": "Édouard-André",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-05 15:08:42",
+      "updated_at": "2013-04-05 15:08:42"
+    },
+    {
+      "id": "84",
+      "nom": "Barré",
+      "prenom": "S.M.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-16 17:11:07",
+      "updated_at": "2013-05-16 17:11:07"
+    },
+    {
+      "id": "191",
+      "nom": "Barthélemy",
+      "prenom": "Jean-Jacques",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-22 00:45:15",
+      "updated_at": "2014-09-22 00:45:15"
+    },
+    {
+      "id": "94",
+      "nom": "Baunard",
+      "prenom": "Louis",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-07-22 15:32:39",
+      "updated_at": "2013-07-22 15:32:39"
+    },
+    {
+      "id": "30",
+      "nom": "Beaubien",
+      "prenom": "Louis",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 16:57:22",
+      "updated_at": "2013-03-20 16:57:22"
+    },
+    {
+      "id": "42",
+      "nom": "Beaubien",
+      "prenom": "Charles-Philippe",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-22 19:28:57",
+      "updated_at": "2013-03-22 19:28:57"
+    },
+    {
+      "id": "172",
+      "nom": "Beaubien",
+      "prenom": "Charles F.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 03:39:45",
+      "updated_at": "2014-08-06 03:39:45"
+    },
+    {
+      "id": "28",
+      "nom": "Beauchamp",
+      "prenom": "Jean-Joseph",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 19:50:23",
+      "updated_at": "2013-03-18 19:50:23"
+    },
+    {
+      "id": "211",
+      "nom": "Beaudet",
+      "prenom": "Louis",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-10-02 21:51:07",
+      "updated_at": "2014-10-02 21:51:07"
+    },
+    {
+      "id": "194",
+      "nom": "Beaudry",
+      "prenom": "Hercule",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-22 14:26:30",
+      "updated_at": "2014-09-22 14:26:30"
+    },
+    {
+      "id": "49",
+      "nom": "Bédard",
+      "prenom": "Marie Hercule",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 16:20:13",
+      "updated_at": "2013-04-01 16:20:13"
+    },
+    {
+      "id": "189",
+      "nom": "Bellerose",
+      "prenom": "L.H.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-21 19:56:20",
+      "updated_at": "2014-09-21 19:56:20"
+    },
+    {
+      "id": "171",
+      "nom": "Benoit",
+      "prenom": "Emmanuel-Persillier",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 03:36:06",
+      "updated_at": "2014-08-06 03:36:06"
+    },
+    {
+      "id": "68",
+      "nom": "Bessette",
+      "prenom": "Isidore",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-02 01:43:13",
+      "updated_at": "2013-04-02 01:43:13"
+    },
+    {
+      "id": "128",
+      "nom": "Bibaud",
+      "prenom": "François-Maximillien",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-12-09 04:45:39",
+      "updated_at": "2013-12-09 04:45:39"
+    },
+    {
+      "id": "213",
+      "nom": "Blain de St-Aubin",
+      "prenom": "Emmanuel",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-10-03 21:45:32",
+      "updated_at": "2014-10-03 21:45:32"
+    },
+    {
+      "id": "180",
+      "nom": "Blondin",
+      "prenom": "Alphonse ",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 20:41:52",
+      "updated_at": "2014-08-06 20:41:52"
+    },
+    {
+      "id": "123",
+      "nom": "Bonin",
+      "prenom": "Joseph",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-11-24 15:16:53",
+      "updated_at": "2013-11-24 15:16:53"
+    },
+    {
+      "id": "69",
+      "nom": "Bonneau",
+      "prenom": "B.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-02 02:05:13",
+      "updated_at": "2013-04-02 02:05:13"
+    },
+    {
+      "id": "122",
+      "nom": "Bonneau",
+      "prenom": "Jean-Marie",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-11-24 15:11:40",
+      "updated_at": "2013-11-24 15:11:40"
+    },
+    {
+      "id": "202",
+      "nom": "Boucher de Boucherville",
+      "prenom": "Georges",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-25 17:58:43",
+      "updated_at": "2014-09-25 17:58:43"
+    },
+    {
+      "id": "34",
+      "nom": "Bourassa",
+      "prenom": "Gustave",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 17:38:32",
+      "updated_at": "2013-03-20 17:38:32"
+    },
+    {
+      "id": "74",
+      "nom": "Bourassa",
+      "prenom": "Napoléon",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-12 15:14:53",
+      "updated_at": "2013-04-12 15:14:53"
+    },
+    {
+      "id": "216",
+      "nom": "Bourduas",
+      "prenom": "C.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-10-05 20:19:06",
+      "updated_at": "2014-10-05 20:19:06"
+    },
+    {
+      "id": "38",
+      "nom": "Bouthillier-Chavigny",
+      "prenom": "Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 19:38:21",
+      "updated_at": "2013-03-20 19:38:21"
+    },
+    {
+      "id": "117",
+      "nom": "Bran",
+      "prenom": "Télesphore",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 20:00:10",
+      "updated_at": "2013-10-02 20:00:10"
+    },
+    {
+      "id": "101",
+      "nom": "Brunet",
+      "prenom": "Louis-Alexandre",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-11 15:41:50",
+      "updated_at": "2013-09-11 15:41:50"
+    },
+    {
+      "id": "90",
+      "nom": "Buies",
+      "prenom": "Arthur",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-26 16:18:22",
+      "updated_at": "2013-05-26 16:18:22"
+    },
+    {
+      "id": "215",
+      "nom": "C.",
+      "prenom": "Bourduas",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-10-05 20:18:24",
+      "updated_at": "2014-10-05 20:18:24"
+    },
+    {
+      "id": "19",
+      "nom": "C.N.D.",
+      "prenom": "Soeur Sainte-Colette",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 17:18:46",
+      "updated_at": "2013-03-18 17:18:46"
+    },
+    {
+      "id": "95",
+      "nom": "C.N.D.",
+      "prenom": "Soeur Sainte-Léonide",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-10 14:40:43",
+      "updated_at": "2013-09-10 14:40:43"
+    },
+    {
+      "id": "99",
+      "nom": "C.N.D.",
+      "prenom": "Mère Saint-Victor",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-11 15:24:25",
+      "updated_at": "2013-09-11 15:24:25"
+    },
+    {
+      "id": "40",
+      "nom": "Cartier",
+      "prenom": "George-Étienne",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-22 18:22:01",
+      "updated_at": "2013-03-22 18:22:01"
+    },
+    {
+      "id": "66",
+      "nom": "Casgrain",
+      "prenom": "Eugène ",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-02 01:32:12",
+      "updated_at": "2013-04-02 01:32:12"
+    },
+    {
+      "id": "158",
+      "nom": "Chamilly de Lorimier",
+      "prenom": "Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-22 21:51:00",
+      "updated_at": "2014-03-22 21:51:00"
+    },
+    {
+      "id": "53",
+      "nom": "Chapais",
+      "prenom": "Jean-Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 17:51:54",
+      "updated_at": "2013-04-01 17:51:54"
+    },
+    {
+      "id": "71",
+      "nom": "Chapleau",
+      "prenom": "Joseph-Adolphe",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-05 15:28:09",
+      "updated_at": "2013-04-05 15:28:09"
+    },
+    {
+      "id": "121",
+      "nom": "Charmetant",
+      "prenom": "Félix",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-11-24 14:58:54",
+      "updated_at": "2013-11-24 14:58:54"
+    },
+    {
+      "id": "130",
+      "nom": "Chauveau",
+      "prenom": "Pierre-Joseph-Olivier",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-16 19:09:33",
+      "updated_at": "2014-01-16 19:09:33"
+    },
+    {
+      "id": "96",
+      "nom": "Cherrier",
+      "prenom": "Côme Séraphin",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-10 15:09:27",
+      "updated_at": "2013-09-10 15:09:27"
+    },
+    {
+      "id": "20",
+      "nom": "Choquette",
+      "prenom": "Ernest",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 17:32:37",
+      "updated_at": "2013-03-18 17:32:37"
+    },
+    {
+      "id": "127",
+      "nom": "Cockburn",
+      "prenom": "G.F.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-12-09 03:30:29",
+      "updated_at": "2013-12-09 03:30:29"
+    },
+    {
+      "id": "11",
+      "nom": "Collaborateur, Senécal",
+      "prenom": "Eusèbe",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-17 17:46:12",
+      "updated_at": "2013-03-17 17:46:12"
+    },
+    {
+      "id": "209",
+      "nom": "Collège Sainte-Marie, Montréal",
+      "prenom": "",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-10-01 18:16:46",
+      "updated_at": "2014-10-01 18:16:46"
+    },
+    {
+      "id": "103",
+      "nom": "Collin de Placy",
+      "prenom": "Jacques Albin Simon",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-26 14:47:46",
+      "updated_at": "2013-09-26 14:47:46"
+    },
+    {
+      "id": "97",
+      "nom": "Congrégation",
+      "prenom": "Dames de Saint-Anne",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-11 14:56:06",
+      "updated_at": "2013-09-11 14:56:06"
+    },
+    {
+      "id": "98",
+      "nom": "Congrégation",
+      "prenom": "Dames de Sainte-Anne de Saint-Damien de Bedford",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-11 15:01:31",
+      "updated_at": "2013-09-11 15:01:31"
+    },
+    {
+      "id": "133",
+      "nom": "Coquerelle",
+      "prenom": "Rousset",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-19 16:24:50",
+      "updated_at": "2014-01-19 16:24:50"
+    },
+    {
+      "id": "217",
+      "nom": "Cros",
+      "prenom": "L.J.M.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2016-01-31 15:29:15",
+      "updated_at": "2016-01-31 15:29:15"
+    },
+    {
+      "id": "203",
+      "nom": "Cuoq",
+      "prenom": "Jean-André",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-26 18:25:20",
+      "updated_at": "2014-09-26 18:25:20"
+    },
+    {
+      "id": "105",
+      "nom": "Daniaud",
+      "prenom": "J.-M.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-26 15:59:20",
+      "updated_at": "2013-09-26 15:59:20"
+    },
+    {
+      "id": "181",
+      "nom": "Daniel",
+      "prenom": "François",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-07 01:15:06",
+      "updated_at": "2014-08-07 01:15:06"
+    },
+    {
+      "id": "175",
+      "nom": "Dansereau",
+      "prenom": "Clément Arthur",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 16:26:04",
+      "updated_at": "2014-08-06 16:26:04"
+    },
+    {
+      "id": "176",
+      "nom": "Dansereau",
+      "prenom": "Clément Arthur",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 16:32:58",
+      "updated_at": "2014-08-06 16:32:58"
+    },
+    {
+      "id": "76",
+      "nom": "Daoust",
+      "prenom": "Charles-Roger",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-12 17:32:44",
+      "updated_at": "2013-04-12 17:32:44"
+    },
+    {
+      "id": "14",
+      "nom": "Dauth",
+      "prenom": "Gaspard",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 15:54:13",
+      "updated_at": "2013-03-18 15:54:13"
+    },
+    {
+      "id": "22",
+      "nom": "David",
+      "prenom": "Laurent-Olivier",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 18:55:06",
+      "updated_at": "2013-03-18 18:55:06"
+    },
+    {
+      "id": "178",
+      "nom": "David",
+      "prenom": "Félicien",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 19:47:38",
+      "updated_at": "2014-08-06 19:47:38"
+    },
+    {
+      "id": "24",
+      "nom": "Davidson",
+      "prenom": "Peers",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 19:10:18",
+      "updated_at": "2013-03-18 19:10:18"
+    },
+    {
+      "id": "212",
+      "nom": "Dawson",
+      "prenom": "John William ",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-10-03 21:38:43",
+      "updated_at": "2014-10-03 21:38:43"
+    },
+    {
+      "id": "89",
+      "nom": "De Goesbriand",
+      "prenom": "Louis",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-26 16:01:23",
+      "updated_at": "2013-05-26 16:01:23"
+    },
+    {
+      "id": "206",
+      "nom": "de Lorimier",
+      "prenom": "Claude Nicolas Guillaume",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-30 17:11:08",
+      "updated_at": "2014-09-30 17:11:08"
+    },
+    {
+      "id": "140",
+      "nom": "de Sainte-Suzanne",
+      "prenom": "Frère Anicet",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-29 15:39:30",
+      "updated_at": "2014-01-29 15:39:30"
+    },
+    {
+      "id": "201",
+      "nom": "Decker",
+      "prenom": "John Wright",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-23 15:08:05",
+      "updated_at": "2014-09-23 15:08:05"
+    },
+    {
+      "id": "129",
+      "nom": "DeGuise",
+      "prenom": "Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-16 18:13:44",
+      "updated_at": "2014-01-16 18:13:44"
+    },
+    {
+      "id": "149",
+      "nom": "Dessane",
+      "prenom": "Antoine",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-24 17:55:40",
+      "updated_at": "2014-02-24 17:55:40"
+    },
+    {
+      "id": "6",
+      "nom": "Dollier de Casson",
+      "prenom": "François",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-17 16:46:48",
+      "updated_at": "2013-03-17 16:46:48"
+    },
+    {
+      "id": "156",
+      "nom": "Dominique",
+      "prenom": "Soulé",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-22 21:46:54",
+      "updated_at": "2014-03-22 21:46:54"
+    },
+    {
+      "id": "107",
+      "nom": "Dorion",
+      "prenom": "Joseph-Hercule",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-26 16:24:10",
+      "updated_at": "2013-09-26 16:24:10"
+    },
+    {
+      "id": "182",
+      "nom": "Doutre",
+      "prenom": "Gonzalve",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-11 04:37:57",
+      "updated_at": "2014-08-11 04:37:57"
+    },
+    {
+      "id": "21",
+      "nom": "Drolet",
+      "prenom": "Gustave-Adolphe",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 17:38:48",
+      "updated_at": "2013-03-18 17:38:48"
+    },
+    {
+      "id": "43",
+      "nom": "Duchaussoy",
+      "prenom": "Paul",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-22 19:32:44",
+      "updated_at": "2013-03-22 19:32:44"
+    },
+    {
+      "id": "13",
+      "nom": "Dugas",
+      "prenom": "Georges",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-17 19:00:22",
+      "updated_at": "2013-03-17 19:00:22"
+    },
+    {
+      "id": "119",
+      "nom": "Dunn",
+      "prenom": "Oscar",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 20:24:35",
+      "updated_at": "2013-10-02 20:24:35"
+    },
+    {
+      "id": "64",
+      "nom": "Dupuy",
+      "prenom": "Paul",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-02 00:31:42",
+      "updated_at": "2013-04-02 00:31:42"
+    },
+    {
+      "id": "32",
+      "nom": "Emmanuel-Persillier",
+      "prenom": "Benoit",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 17:18:06",
+      "updated_at": "2013-03-20 17:18:06"
+    },
+    {
+      "id": "16",
+      "nom": "F.C.S.P.",
+      "prenom": "Religieuse",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 16:46:21",
+      "updated_at": "2013-03-18 16:46:21"
+    },
+    {
+      "id": "187",
+      "nom": "Faillon",
+      "prenom": "Étienne Michel",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-21 01:29:58",
+      "updated_at": "2014-09-21 01:29:58"
+    },
+    {
+      "id": "39",
+      "nom": "Faucher de Saint-Maurice",
+      "prenom": "Narcisse-Henri-Édouard",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 19:44:36",
+      "updated_at": "2013-03-20 19:44:36"
+    },
+    {
+      "id": "72",
+      "nom": "Feige",
+      "prenom": "François",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-05 16:14:22",
+      "updated_at": "2013-04-05 16:14:22"
+    },
+    {
+      "id": "151",
+      "nom": "François",
+      "prenom": "Daniel",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-24 18:10:52",
+      "updated_at": "2014-02-24 18:10:52"
+    },
+    {
+      "id": "81",
+      "nom": "Frère de Sainte-Suzanne",
+      "prenom": "Anicet",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-16 15:43:19",
+      "updated_at": "2013-05-16 15:43:19"
+    },
+    {
+      "id": "159",
+      "nom": "G.",
+      "prenom": "C.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-22 22:41:44",
+      "updated_at": "2014-03-22 22:41:44"
+    },
+    {
+      "id": "198",
+      "nom": "Genand",
+      "prenom": "J.A.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-23 13:36:08",
+      "updated_at": "2014-09-23 13:36:08"
+    },
+    {
+      "id": "205",
+      "nom": "Gérin",
+      "prenom": "Elzéar",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-30 16:01:38",
+      "updated_at": "2014-09-30 16:01:38"
+    },
+    {
+      "id": "15",
+      "nom": "Gill",
+      "prenom": "Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 16:17:56",
+      "updated_at": "2013-03-18 16:17:56"
+    },
+    {
+      "id": "45",
+      "nom": "Gill",
+      "prenom": "Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-22 19:40:32",
+      "updated_at": "2013-03-22 19:40:32"
+    },
+    {
+      "id": "58",
+      "nom": "Girouard",
+      "prenom": "Désiré",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 19:06:53",
+      "updated_at": "2013-04-01 19:06:53"
+    },
+    {
+      "id": "200",
+      "nom": "Gonnet",
+      "prenom": "Louis",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-23 14:27:56",
+      "updated_at": "2014-09-23 14:27:56"
+    },
+    {
+      "id": "197",
+      "nom": "Grenier",
+      "prenom": "Georges ",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-23 13:23:04",
+      "updated_at": "2014-09-23 13:23:04"
+    },
+    {
+      "id": "115",
+      "nom": "Guay",
+      "prenom": "Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 19:29:35",
+      "updated_at": "2013-10-02 19:29:35"
+    },
+    {
+      "id": "144",
+      "nom": "Guérin",
+      "prenom": "H.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-19 16:52:14",
+      "updated_at": "2014-02-19 16:52:14"
+    },
+    {
+      "id": "48",
+      "nom": "Guihot",
+      "prenom": "Julien-Marie",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 16:02:24",
+      "updated_at": "2013-04-01 16:02:24"
+    },
+    {
+      "id": "46",
+      "nom": "Henriot",
+      "prenom": "Constant",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 15:38:03",
+      "updated_at": "2013-04-01 15:38:03"
+    },
+    {
+      "id": "145",
+      "nom": "Holmes",
+      "prenom": "Jean",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-19 18:35:01",
+      "updated_at": "2014-02-19 18:35:01"
+    },
+    {
+      "id": "177",
+      "nom": "Huguet-Latour",
+      "prenom": "Louis-Adolphe",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 17:38:38",
+      "updated_at": "2014-08-06 17:38:38"
+    },
+    {
+      "id": "9",
+      "nom": "Jacquemin",
+      "prenom": "Joseph",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-17 17:11:22",
+      "updated_at": "2013-03-17 17:11:22"
+    },
+    {
+      "id": "61",
+      "nom": "Janvier",
+      "prenom": "Pierre Désiré",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 21:36:46",
+      "updated_at": "2013-04-01 21:36:46"
+    },
+    {
+      "id": "143",
+      "nom": "Jenkins",
+      "prenom": "Edward",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-04 20:58:02",
+      "updated_at": "2014-02-04 20:58:02"
+    },
+    {
+      "id": "23",
+      "nom": "Johnston",
+      "prenom": "Wyatt Galt",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 19:04:54",
+      "updated_at": "2013-03-18 19:04:54"
+    },
+    {
+      "id": "142",
+      "nom": "Jung",
+      "prenom": "Mathias",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-02 01:09:41",
+      "updated_at": "2014-02-02 01:09:41"
+    },
+    {
+      "id": "112",
+      "nom": "L'Épine",
+      "prenom": "Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 18:40:18",
+      "updated_at": "2013-10-02 18:40:18"
+    },
+    {
+      "id": "93",
+      "nom": "Labelle",
+      "prenom": "Antoine",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-07-22 14:58:11",
+      "updated_at": "2013-07-22 14:58:11"
+    },
+    {
+      "id": "47",
+      "nom": "Labine",
+      "prenom": "Gustave",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 15:48:41",
+      "updated_at": "2013-04-01 15:48:41"
+    },
+    {
+      "id": "25",
+      "nom": "Lachapelle",
+      "prenom": "Emmanuel-Persillier",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 19:17:36",
+      "updated_at": "2013-03-18 19:17:36"
+    },
+    {
+      "id": "57",
+      "nom": "Lachapelle",
+      "prenom": "Séverin",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 18:47:33",
+      "updated_at": "2013-04-01 18:47:33"
+    },
+    {
+      "id": "135",
+      "nom": "Lafitau",
+      "prenom": "Joseph-François",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-19 17:40:21",
+      "updated_at": "2014-01-19 17:40:21"
+    },
+    {
+      "id": "131",
+      "nom": "Laflèche",
+      "prenom": "Louis-François Richer",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-17 16:28:28",
+      "updated_at": "2014-01-17 16:28:28"
+    },
+    {
+      "id": "192",
+      "nom": "Lafontaine",
+      "prenom": "Louis-Hippolyte",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-22 14:08:04",
+      "updated_at": "2014-09-22 14:08:04"
+    },
+    {
+      "id": "120",
+      "nom": "Lagacé",
+      "prenom": "Pierre",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-11-24 05:17:50",
+      "updated_at": "2013-11-24 05:17:50"
+    },
+    {
+      "id": "162",
+      "nom": "Lamontagne",
+      "prenom": "Jérémie",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-30 01:05:00",
+      "updated_at": "2014-03-30 01:05:00"
+    },
+    {
+      "id": "125",
+      "nom": "Langelier",
+      "prenom": "Jean-Chrysostome",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-11-24 15:39:17",
+      "updated_at": "2013-11-24 15:39:17"
+    },
+    {
+      "id": "173",
+      "nom": "Laporte",
+      "prenom": "S.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 14:46:17",
+      "updated_at": "2014-08-06 14:46:17"
+    },
+    {
+      "id": "113",
+      "nom": "Lareau",
+      "prenom": "Edmond",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 19:01:52",
+      "updated_at": "2013-10-02 19:01:52"
+    },
+    {
+      "id": "186",
+      "nom": "Larocque",
+      "prenom": "Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-20 21:31:02",
+      "updated_at": "2014-09-20 21:31:02"
+    },
+    {
+      "id": "174",
+      "nom": "Lavigerie",
+      "prenom": "Charles Martial",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 15:58:10",
+      "updated_at": "2014-08-06 15:58:10"
+    },
+    {
+      "id": "36",
+      "nom": "Laviolette",
+      "prenom": "Camille",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 19:01:17",
+      "updated_at": "2013-03-20 19:01:17"
+    },
+    {
+      "id": "59",
+      "nom": "Leblond de Brumath",
+      "prenom": "Adrien",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 19:51:06",
+      "updated_at": "2013-04-01 19:51:06"
+    },
+    {
+      "id": "75",
+      "nom": "Lefebvre de Bellefeuille",
+      "prenom": "Edouard",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-12 17:00:32",
+      "updated_at": "2013-04-12 17:00:32"
+    },
+    {
+      "id": "199",
+      "nom": "Légaré",
+      "prenom": "Joseph-Magloire",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-23 14:05:25",
+      "updated_at": "2014-09-23 14:05:25"
+    },
+    {
+      "id": "179",
+      "nom": "Lenoir dit Rolland",
+      "prenom": "Joseph",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-06 20:14:51",
+      "updated_at": "2014-08-06 20:14:51"
+    },
+    {
+      "id": "188",
+      "nom": "Lespérance",
+      "prenom": "John",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-21 19:00:17",
+      "updated_at": "2014-09-21 19:00:17"
+    },
+    {
+      "id": "50",
+      "nom": "Lippen",
+      "prenom": "Bernard",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 16:29:04",
+      "updated_at": "2013-04-01 16:29:04"
+    },
+    {
+      "id": "126",
+      "nom": "Lonclas",
+      "prenom": "Alphonse",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-12-09 03:11:20",
+      "updated_at": "2013-12-09 03:11:20"
+    },
+    {
+      "id": "17",
+      "nom": "Loranger",
+      "prenom": "Louis-Joseph",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 17:05:07",
+      "updated_at": "2013-03-18 17:05:07"
+    },
+    {
+      "id": "165",
+      "nom": "Loranger",
+      "prenom": "Thomas Jean-Jacques",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-30 02:21:20",
+      "updated_at": "2014-03-30 02:21:20"
+    },
+    {
+      "id": "44",
+      "nom": "MacCarthy",
+      "prenom": "E.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-22 19:35:38",
+      "updated_at": "2013-03-22 19:35:38"
+    },
+    {
+      "id": "62",
+      "nom": "Mainville",
+      "prenom": "Moïse",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 22:01:26",
+      "updated_at": "2013-04-01 22:01:26"
+    },
+    {
+      "id": "63",
+      "nom": "Mann",
+      "prenom": "William",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 22:06:19",
+      "updated_at": "2013-04-01 22:06:19"
+    },
+    {
+      "id": "51",
+      "nom": "Martineau",
+      "prenom": "Mathias",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 16:39:12",
+      "updated_at": "2013-04-01 16:39:12"
+    },
+    {
+      "id": "109",
+      "nom": "Martineau",
+      "prenom": "Flavien",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-26 17:19:03",
+      "updated_at": "2013-09-26 17:19:03"
+    },
+    {
+      "id": "163",
+      "nom": "Martineau",
+      "prenom": "J.M.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-30 02:10:19",
+      "updated_at": "2014-03-30 02:10:19"
+    },
+    {
+      "id": "146",
+      "nom": "Meilleur",
+      "prenom": "Jean-Baptiste ",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-19 18:52:42",
+      "updated_at": "2014-02-19 18:52:42"
+    },
+    {
+      "id": "196",
+      "nom": "Mercier",
+      "prenom": "Honoré",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-23 13:12:51",
+      "updated_at": "2014-09-23 13:12:51"
+    },
+    {
+      "id": "104",
+      "nom": "Mgr de Ségur",
+      "prenom": "",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-26 15:39:10",
+      "updated_at": "2013-09-26 15:39:10"
+    },
+    {
+      "id": "100",
+      "nom": "Mgr. Landriot",
+      "prenom": "Jean François Anne Thomas",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-11 15:36:10",
+      "updated_at": "2013-09-11 15:36:10"
+    },
+    {
+      "id": "67",
+      "nom": "Mgr. Soulé",
+      "prenom": "Dominique Clément",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-02 01:38:55",
+      "updated_at": "2013-04-02 01:38:55"
+    },
+    {
+      "id": "150",
+      "nom": "Mignault",
+      "prenom": "Alfred",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-24 18:03:11",
+      "updated_at": "2014-02-24 18:03:11"
+    },
+    {
+      "id": "161",
+      "nom": "Mignault",
+      "prenom": "P.M.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-29 23:53:29",
+      "updated_at": "2014-03-29 23:53:29"
+    },
+    {
+      "id": "65",
+      "nom": "Mondou",
+      "prenom": "Siméon",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-02 01:23:09",
+      "updated_at": "2013-04-02 01:23:09"
+    },
+    {
+      "id": "86",
+      "nom": "Morissette",
+      "prenom": "Joseph-Ferdinand",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-26 15:02:46",
+      "updated_at": "2013-05-26 15:02:46"
+    },
+    {
+      "id": "184",
+      "nom": "Mousseau",
+      "prenom": "Joseph-Alfred",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-26 19:54:45",
+      "updated_at": "2014-08-26 19:54:45"
+    },
+    {
+      "id": "31",
+      "nom": "Nantel",
+      "prenom": "Guillaume-Alphonse",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 17:09:30",
+      "updated_at": "2013-03-20 17:09:30"
+    },
+    {
+      "id": "111",
+      "nom": "Narbonne-Lara",
+      "prenom": "Joseph Édouard d'A. de",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 18:30:19",
+      "updated_at": "2013-10-02 18:30:19"
+    },
+    {
+      "id": "118",
+      "nom": "Nercam",
+      "prenom": "André",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 20:10:01",
+      "updated_at": "2013-10-02 20:10:01"
+    },
+    {
+      "id": "134",
+      "nom": "Orsonnens",
+      "prenom": "Éraste d'Odet",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-19 16:48:02",
+      "updated_at": "2014-01-19 16:48:02"
+    },
+    {
+      "id": "91",
+      "nom": "P.B.",
+      "prenom": "F.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-07-22 14:05:01",
+      "updated_at": "2013-07-22 14:05:01"
+    },
+    {
+      "id": "8",
+      "nom": "Pampalon",
+      "prenom": "Pierre J.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-17 16:56:28",
+      "updated_at": "2013-03-17 16:56:28"
+    },
+    {
+      "id": "164",
+      "nom": "Panet",
+      "prenom": "Jean-Claude",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-30 02:18:53",
+      "updated_at": "2014-03-30 02:18:53"
+    },
+    {
+      "id": "153",
+      "nom": "Paré",
+      "prenom": "L.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-24 18:27:03",
+      "updated_at": "2014-02-24 18:27:03"
+    },
+    {
+      "id": "154",
+      "nom": "Pelletier",
+      "prenom": "Romain-Octave",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-24 18:41:06",
+      "updated_at": "2014-02-24 18:41:06"
+    },
+    {
+      "id": "124",
+      "nom": "Pernin",
+      "prenom": "Pierre",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-11-24 15:31:35",
+      "updated_at": "2013-11-24 15:31:35"
+    },
+    {
+      "id": "160",
+      "nom": "Picard",
+      "prenom": "Eustache",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-22 23:19:26",
+      "updated_at": "2014-03-22 23:19:26"
+    },
+    {
+      "id": "183",
+      "nom": "Piperni",
+      "prenom": "R.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-25 22:06:05",
+      "updated_at": "2014-08-25 22:06:05"
+    },
+    {
+      "id": "214",
+      "nom": "Poirier",
+      "prenom": "Pascal",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-10-05 20:06:59",
+      "updated_at": "2014-10-05 20:06:59"
+    },
+    {
+      "id": "138",
+      "nom": "Poutré",
+      "prenom": "Félix",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-19 18:23:56",
+      "updated_at": "2014-01-19 18:23:56"
+    },
+    {
+      "id": "18",
+      "nom": "Prévost",
+      "prenom": "Léandre Coyteux",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 17:10:59",
+      "updated_at": "2013-03-18 17:10:59"
+    },
+    {
+      "id": "87",
+      "nom": "Prieur",
+      "prenom": "François-Xavier",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-26 15:37:31",
+      "updated_at": "2013-05-26 15:37:31"
+    },
+    {
+      "id": "77",
+      "nom": "Proulx",
+      "prenom": "Jean-Baptiste ",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-26 16:28:23",
+      "updated_at": "2013-04-26 16:28:23"
+    },
+    {
+      "id": "132",
+      "nom": "Rambau",
+      "prenom": "Alfred-Xavier",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-19 16:20:14",
+      "updated_at": "2014-01-19 16:20:14"
+    },
+    {
+      "id": "148",
+      "nom": "Rameau de Saint-Père",
+      "prenom": "Edme",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-24 17:14:12",
+      "updated_at": "2014-02-24 17:14:12"
+    },
+    {
+      "id": "147",
+      "nom": "Ramière",
+      "prenom": "Henri",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-19 19:02:00",
+      "updated_at": "2014-02-19 19:02:00"
+    },
+    {
+      "id": "193",
+      "nom": "Rapp",
+      "prenom": "Mgr.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-22 14:20:20",
+      "updated_at": "2014-09-22 14:20:20"
+    },
+    {
+      "id": "169",
+      "nom": "Raymond",
+      "prenom": "Joseph-Sabin",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-04-12 16:35:43",
+      "updated_at": "2014-04-12 16:35:43"
+    },
+    {
+      "id": "136",
+      "nom": "Regourd",
+      "prenom": "Louis",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-19 17:48:52",
+      "updated_at": "2014-01-19 17:48:52"
+    },
+    {
+      "id": "27",
+      "nom": "Roblot",
+      "prenom": "Adelbertus",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 19:39:58",
+      "updated_at": "2013-03-18 19:39:58"
+    },
+    {
+      "id": "80",
+      "nom": "Rousseau",
+      "prenom": "Pierre",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-26 18:54:20",
+      "updated_at": "2013-04-26 18:54:20"
+    },
+    {
+      "id": "26",
+      "nom": "Rousselot",
+      "prenom": "Victor",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 19:23:38",
+      "updated_at": "2013-03-18 19:23:38"
+    },
+    {
+      "id": "37",
+      "nom": "Royal",
+      "prenom": "Joseph",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 19:12:17",
+      "updated_at": "2013-03-20 19:12:17"
+    },
+    {
+      "id": "141",
+      "nom": "Saint-Jérôme",
+      "prenom": "Mère",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-30 20:45:40",
+      "updated_at": "2014-01-30 20:45:40"
+    },
+    {
+      "id": "88",
+      "nom": "Sicotte",
+      "prenom": "Louis-Wilfrid",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-26 15:55:49",
+      "updated_at": "2013-05-26 15:55:49"
+    },
+    {
+      "id": "73",
+      "nom": "Smalley",
+      "prenom": "Julia",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-12 14:45:21",
+      "updated_at": "2013-04-12 14:45:21"
+    },
+    {
+      "id": "102",
+      "nom": "Société",
+      "prenom": "Notre-Dame des Anges",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-11 15:57:22",
+      "updated_at": "2013-09-11 15:57:22"
+    },
+    {
+      "id": "114",
+      "nom": "Société",
+      "prenom": "Saint-Vincent de Paul",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 19:25:56",
+      "updated_at": "2013-10-02 19:25:56"
+    },
+    {
+      "id": "167",
+      "nom": "Soeurs de la charité de la Providence",
+      "prenom": "",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-04-12 14:15:55",
+      "updated_at": "2014-04-12 14:15:55"
+    },
+    {
+      "id": "157",
+      "nom": "Soulé",
+      "prenom": "Dominique",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-22 21:47:42",
+      "updated_at": "2014-03-22 21:47:42"
+    },
+    {
+      "id": "210",
+      "nom": "Stieneberg",
+      "prenom": "L.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-10-01 18:36:00",
+      "updated_at": "2014-10-01 18:36:00"
+    },
+    {
+      "id": "168",
+      "nom": "Sulte",
+      "prenom": "Benjamin",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-04-12 14:49:31",
+      "updated_at": "2014-04-12 14:49:31"
+    },
+    {
+      "id": "5",
+      "nom": "Surgères, de La Rochefoucaud",
+      "prenom": "François",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-17 16:20:20",
+      "updated_at": "2013-03-17 16:20:20"
+    },
+    {
+      "id": "110",
+      "nom": "Sylvain",
+      "prenom": "Adrien",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-10-02 18:22:58",
+      "updated_at": "2013-10-02 18:22:58"
+    },
+    {
+      "id": "79",
+      "nom": "Taché",
+      "prenom": "Louis-Hyppolite",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-26 18:35:59",
+      "updated_at": "2013-04-26 18:35:59"
+    },
+    {
+      "id": "83",
+      "nom": "Taché",
+      "prenom": "Joseph-Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-16 16:14:07",
+      "updated_at": "2013-05-16 16:14:07"
+    },
+    {
+      "id": "170",
+      "nom": "Taché",
+      "prenom": "Alexandre Antonin",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-04-12 18:57:02",
+      "updated_at": "2014-04-12 18:57:02"
+    },
+    {
+      "id": "35",
+      "nom": "Taillon",
+      "prenom": "Louis-Olivier",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-20 18:15:20",
+      "updated_at": "2013-03-20 18:15:20"
+    },
+    {
+      "id": "185",
+      "nom": "Taillon",
+      "prenom": "Wilfrid, Sir",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-08-26 20:41:19",
+      "updated_at": "2014-08-26 20:41:19"
+    },
+    {
+      "id": "41",
+      "nom": "Tanguay",
+      "prenom": "Cyprien",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-22 18:49:01",
+      "updated_at": "2013-03-22 18:49:01"
+    },
+    {
+      "id": "60",
+      "nom": "Tardivel",
+      "prenom": "Jules-Paul ",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 20:07:54",
+      "updated_at": "2013-04-01 20:07:54"
+    },
+    {
+      "id": "55",
+      "nom": "Tassé",
+      "prenom": "Joseph",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 18:18:38",
+      "updated_at": "2013-04-01 18:18:38"
+    },
+    {
+      "id": "29",
+      "nom": "Testard de Montygny",
+      "prenom": "Benjamin- Antoine",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-18 20:06:18",
+      "updated_at": "2013-03-18 20:06:18"
+    },
+    {
+      "id": "85",
+      "nom": "Thibault",
+      "prenom": "Charles",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-05-16 17:17:36",
+      "updated_at": "2013-05-16 17:17:36"
+    },
+    {
+      "id": "54",
+      "nom": "Thiboutot",
+      "prenom": "Arthur",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-04-01 18:06:24",
+      "updated_at": "2013-04-01 18:06:24"
+    },
+    {
+      "id": "106",
+      "nom": "Trudel",
+      "prenom": "François-Xavier-Anselme",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-09-26 16:13:22",
+      "updated_at": "2013-09-26 16:13:22"
+    },
+    {
+      "id": "155",
+      "nom": "Trudel",
+      "prenom": "Eugène H.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-22 21:27:14",
+      "updated_at": "2014-03-22 21:27:14"
+    },
+    {
+      "id": "208",
+      "nom": "Union Saint-Pierre de Montréal",
+      "prenom": "",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-10-01 15:22:36",
+      "updated_at": "2014-10-01 15:22:36"
+    },
+    {
+      "id": "152",
+      "nom": "Valade",
+      "prenom": "François-Xavier",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-02-24 18:25:50",
+      "updated_at": "2014-02-24 18:25:50"
+    },
+    {
+      "id": "166",
+      "nom": "Verreau",
+      "prenom": "Hospice Anthelme",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-03-30 02:23:58",
+      "updated_at": "2014-03-30 02:23:58"
+    },
+    {
+      "id": "137",
+      "nom": "Viger",
+      "prenom": "Jacques",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-01-19 18:03:16",
+      "updated_at": "2014-01-19 18:03:16"
+    },
+    {
+      "id": "10",
+      "nom": "Villeneuve",
+      "prenom": "George",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-03-17 17:36:08",
+      "updated_at": "2013-03-17 17:36:08"
+    },
+    {
+      "id": "204",
+      "nom": "Wayrand",
+      "prenom": "Oswald",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2014-09-26 18:32:59",
+      "updated_at": "2014-09-26 18:32:59"
+    },
+    {
+      "id": "92",
+      "nom": "Wells",
+      "prenom": "George H.",
+      "naissance": "0000-00-00",
+      "deces": "0000-00-00",
+      "lien": null,
+      "created_at": "2013-07-22 14:26:59",
+      "updated_at": "2013-07-22 14:26:59"
+    }
+  ],
+  "type": [
+    {
+      "id": "1",
+      "nom": "Livre",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "2",
+      "nom": "Journal",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "3",
+      "nom": "Brochure",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "4",
+      "nom": "Album",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "5",
+      "nom": "Recueil",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "6",
+      "nom": "Fascicule",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "7",
+      "nom": "Catalogue",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "8",
+      "nom": "Périodique",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "9",
+      "nom": "Registre",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "10",
+      "nom": "Almanach",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "11",
+      "nom": "Feuillet Musical",
+      "created_at": null,
+      "updated_at": null
+    }
+  ],
+  "categorie": [
+    {
+      "id": "1",
+      "nom": "Litterature",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "2",
+      "nom": "Biographie",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "3",
+      "nom": "Education",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "4",
+      "nom": "Histoire",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "5",
+      "nom": "Généalogie",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "6",
+      "nom": "Religieux",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "7",
+      "nom": "Droit & Législation",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "8",
+      "nom": "Science",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "9",
+      "nom": "Arts",
+      "created_at": null,
+      "updated_at": null
+    }
+  ],
+  "editeur": [
+    {
+      "id": "3",
+      "nom": "Eusèbe Senécal, imprimeur-éditeur",
+      "created_at": "2013-03-13 15:31:04",
+      "updated_at": "2013-03-13 15:31:04"
+    },
+    {
+      "id": "4",
+      "nom": "E. Senécal & cie, imprimeurs-éditeurs",
+      "created_at": "2013-03-17 17:02:22",
+      "updated_at": "2013-03-17 17:02:22"
+    },
+    {
+      "id": "5",
+      "nom": "Eusèbe Senécal & cie",
+      "created_at": "2013-03-17 17:13:19",
+      "updated_at": "2013-03-17 17:13:19"
+    },
+    {
+      "id": "6",
+      "nom": "Eusèbe Senécal & cie;D. & J. Sadlier & co.",
+      "created_at": "2013-03-17 17:30:38",
+      "updated_at": "2013-03-17 17:30:38"
+    },
+    {
+      "id": "7",
+      "nom": "Eusèbe Senécal & cie., imprimeurs-éditeurs",
+      "created_at": "2013-03-17 17:38:54",
+      "updated_at": "2013-03-17 17:38:54"
+    },
+    {
+      "id": "8",
+      "nom": "Senécal",
+      "created_at": "2013-03-17 18:28:59",
+      "updated_at": "2013-03-17 18:28:59"
+    },
+    {
+      "id": "9",
+      "nom": "J.-A.Langlais & Fils, libraire-éditeurs",
+      "created_at": "2013-03-17 18:37:05",
+      "updated_at": "2013-03-17 18:37:05"
+    },
+    {
+      "id": "10",
+      "nom": "Eusèbe Senécal et cie, imprimeurs",
+      "created_at": "2013-03-18 18:43:43",
+      "updated_at": "2013-03-18 18:43:43"
+    },
+    {
+      "id": "11",
+      "nom": "Eusèbe Senécal & cie, imprimeurs",
+      "created_at": "2013-03-18 18:44:58",
+      "updated_at": "2013-03-18 18:44:58"
+    },
+    {
+      "id": "12",
+      "nom": "Eusebe Senécal & Cie, editors & publishers",
+      "created_at": "2013-03-18 19:28:44",
+      "updated_at": "2013-03-18 19:28:44"
+    },
+    {
+      "id": "13",
+      "nom": "Frères des écoles chrétiennes",
+      "created_at": "2013-03-18 19:42:37",
+      "updated_at": "2013-03-18 19:42:37"
+    },
+    {
+      "id": "14",
+      "nom": "Eusèbe Senécal & fils, imprimeurs",
+      "created_at": "2013-03-18 19:52:14",
+      "updated_at": "2013-03-18 19:52:14"
+    },
+    {
+      "id": "15",
+      "nom": "Librairie Saint-Joseph, Cadieux & Derome",
+      "created_at": "2013-03-18 20:08:04",
+      "updated_at": "2013-03-18 20:08:04"
+    },
+    {
+      "id": "16",
+      "nom": "Eusèbe Senécal & fils, imprimeurs-éditeurs",
+      "created_at": "2013-03-20 17:20:32",
+      "updated_at": "2013-03-20 17:20:32"
+    },
+    {
+      "id": "17",
+      "nom": "Edouard Delpit",
+      "created_at": "2013-03-20 18:45:30",
+      "updated_at": "2013-03-20 18:45:30"
+    },
+    {
+      "id": "18",
+      "nom": "Eusebus Senecal et filli, typographi",
+      "created_at": "2013-04-01 17:05:14",
+      "updated_at": "2013-04-01 17:05:14"
+    },
+    {
+      "id": "19",
+      "nom": "J.A. Langlais, libraire-éditeur",
+      "created_at": "2013-04-01 17:54:10",
+      "updated_at": "2013-04-01 17:54:10"
+    },
+    {
+      "id": "20",
+      "nom": "Cadieux & Derome, libraires",
+      "created_at": "2013-04-01 18:49:53",
+      "updated_at": "2013-04-01 18:49:53"
+    },
+    {
+      "id": "21",
+      "nom": "Eusèbe Senécal & fils",
+      "created_at": "2013-04-01 19:32:32",
+      "updated_at": "2013-04-01 19:32:32"
+    },
+    {
+      "id": "22",
+      "nom": "Printed and published by Eusèbe Senécal & fils",
+      "created_at": "2013-04-01 19:46:34",
+      "updated_at": "2013-04-01 19:46:34"
+    },
+    {
+      "id": "23",
+      "nom": "Granger frères libraires",
+      "created_at": "2013-04-01 19:52:42",
+      "updated_at": "2013-04-01 19:52:42"
+    },
+    {
+      "id": "24",
+      "nom": "Eusèbe Senécal & fils, printers",
+      "created_at": "2013-04-01 22:08:33",
+      "updated_at": "2013-04-01 22:08:33"
+    },
+    {
+      "id": "25",
+      "nom": "Eusèbe Senécal & fils, imprimeurs et relieurs",
+      "created_at": "2013-04-02 00:33:50",
+      "updated_at": "2013-04-02 00:33:50"
+    },
+    {
+      "id": "26",
+      "nom": "M.A.Keroack, libraire",
+      "created_at": "2013-04-02 02:06:55",
+      "updated_at": "2013-04-02 02:06:55"
+    },
+    {
+      "id": "27",
+      "nom": "St.Joseph Library, Cadieux & Derome",
+      "created_at": "2013-04-12 15:09:07",
+      "updated_at": "2013-04-12 15:09:07"
+    },
+    {
+      "id": "28",
+      "nom": "E.Senécal & fils, printers and publishers",
+      "created_at": "2013-04-12 15:53:33",
+      "updated_at": "2013-04-12 15:53:33"
+    },
+    {
+      "id": "29",
+      "nom": "Imprimé et publié par Eusèbe Senécal & fils",
+      "created_at": "2013-04-12 17:02:29",
+      "updated_at": "2013-04-12 17:02:29"
+    },
+    {
+      "id": "30",
+      "nom": "Printed by Eusèbe Senécal & fils",
+      "created_at": "2013-04-12 17:08:09",
+      "updated_at": "2013-04-12 17:08:09"
+    },
+    {
+      "id": "31",
+      "nom": "Eusèbe Senécal & fils, publishers",
+      "created_at": "2013-05-16 14:54:08",
+      "updated_at": "2013-05-16 14:54:08"
+    },
+    {
+      "id": "32",
+      "nom": "Eusebio Senecal &figli",
+      "created_at": "2013-07-22 14:30:23",
+      "updated_at": "2013-07-22 14:30:23"
+    },
+    {
+      "id": "33",
+      "nom": "Lefebvre de Bellefeuille, Édouard",
+      "created_at": "2013-09-11 15:13:35",
+      "updated_at": "2013-09-11 15:13:35"
+    },
+    {
+      "id": "34",
+      "nom": "E. Senécal et fils, imprimeurs-éditeurs",
+      "created_at": "2013-09-11 15:59:29",
+      "updated_at": "2013-09-11 15:59:29"
+    },
+    {
+      "id": "35",
+      "nom": "Eusèbe Senécal, printer-editor",
+      "created_at": "2013-09-26 15:53:36",
+      "updated_at": "2013-09-26 15:53:36"
+    },
+    {
+      "id": "36",
+      "nom": "Eusèbe Senécal, printer and publisher.",
+      "created_at": "2013-09-26 16:57:46",
+      "updated_at": "2013-09-26 16:57:46"
+    },
+    {
+      "id": "37",
+      "nom": "Eusèbe Senécal, imprimeur",
+      "created_at": "2013-10-02 18:45:35",
+      "updated_at": "2013-10-02 18:45:35"
+    },
+    {
+      "id": "38",
+      "nom": "Imprimerie de Senécal et frère",
+      "created_at": "2013-12-09 03:13:16",
+      "updated_at": "2013-12-09 03:13:16"
+    },
+    {
+      "id": "39",
+      "nom": "C.Senécal",
+      "created_at": "2013-12-09 03:24:28",
+      "updated_at": "2013-12-09 03:24:28"
+    },
+    {
+      "id": "40",
+      "nom": "Senécal & Daniel",
+      "created_at": "2013-12-09 04:29:49",
+      "updated_at": "2013-12-09 04:29:49"
+    },
+    {
+      "id": "41",
+      "nom": "des presses à vapeur deSenécal, Daniel et compagnie",
+      "created_at": "2014-01-15 16:45:37",
+      "updated_at": "2014-01-15 16:45:37"
+    },
+    {
+      "id": "42",
+      "nom": "imprimé et publié par Eusèbe Senécal",
+      "created_at": "2014-01-16 19:11:54",
+      "updated_at": "2014-01-16 19:11:54"
+    },
+    {
+      "id": "43",
+      "nom": "Eusèbe Senécal, imprimeur-relieur et éditeur",
+      "created_at": "2014-01-17 16:54:08",
+      "updated_at": "2014-01-17 16:54:08"
+    },
+    {
+      "id": "44",
+      "nom": "Printed and published by Eusebe Senecal",
+      "created_at": "2014-01-17 17:08:38",
+      "updated_at": "2014-01-17 17:08:38"
+    },
+    {
+      "id": "45",
+      "nom": "imprimé par Senécal & Daniel",
+      "created_at": "2014-01-19 16:22:14",
+      "updated_at": "2014-01-19 16:22:14"
+    },
+    {
+      "id": "46",
+      "nom": "Typographie de Senécal et Daniel",
+      "created_at": "2014-01-19 16:40:53",
+      "updated_at": "2014-01-19 16:40:53"
+    },
+    {
+      "id": "47",
+      "nom": "Typographie de Senécal, Daniel et compagnie",
+      "created_at": "2014-01-19 17:43:26",
+      "updated_at": "2014-01-19 17:43:26"
+    },
+    {
+      "id": "48",
+      "nom": "Senécal et Daniel, imprimeurs",
+      "created_at": "2014-01-19 18:05:19",
+      "updated_at": "2014-01-19 18:05:19"
+    },
+    {
+      "id": "49",
+      "nom": "imprimerie de Ch. Senécal",
+      "created_at": "2014-01-19 18:10:03",
+      "updated_at": "2014-01-19 18:10:03"
+    },
+    {
+      "id": "50",
+      "nom": "Tehonaristorarakon E. Senekar nok Roienha",
+      "created_at": "2014-01-19 18:16:23",
+      "updated_at": "2014-01-19 18:16:23"
+    },
+    {
+      "id": "51",
+      "nom": "Imprimé pour l'auteur par E. Senécal",
+      "created_at": "2014-01-19 18:25:59",
+      "updated_at": "2014-01-19 18:25:59"
+    },
+    {
+      "id": "52",
+      "nom": "des presses à vapeur de la Minerve",
+      "created_at": "2014-01-20 15:39:39",
+      "updated_at": "2014-01-20 15:39:39"
+    },
+    {
+      "id": "53",
+      "nom": "Eusèbe Senécal",
+      "created_at": "2014-01-27 15:53:42",
+      "updated_at": "2014-01-27 15:53:42"
+    },
+    {
+      "id": "54",
+      "nom": "Frères des écoles chrétiennes",
+      "created_at": "2014-01-27 16:24:42",
+      "updated_at": "2014-01-27 16:24:42"
+    },
+    {
+      "id": "55",
+      "nom": "C.O. Beauchemin et Valois",
+      "created_at": "2014-01-27 16:28:36",
+      "updated_at": "2014-01-27 16:28:36"
+    },
+    {
+      "id": "56",
+      "nom": "Fabre et Gravel, libraires-éditeurs",
+      "created_at": "2014-01-27 16:40:47",
+      "updated_at": "2014-01-27 16:40:47"
+    },
+    {
+      "id": "57",
+      "nom": "Imprimerie d'Eusèbe Senécal",
+      "created_at": "2014-01-27 16:41:32",
+      "updated_at": "2014-01-27 16:41:32"
+    },
+    {
+      "id": "58",
+      "nom": "Beauchemin et Payette, Booksellers",
+      "created_at": "2014-01-27 16:56:17",
+      "updated_at": "2014-01-27 16:56:17"
+    },
+    {
+      "id": "59",
+      "nom": "Beauchemin et Payette, libraires",
+      "created_at": "2014-01-28 19:07:04",
+      "updated_at": "2014-01-28 19:07:04"
+    },
+    {
+      "id": "60",
+      "nom": "Charles Payette, libraire-éditeur",
+      "created_at": "2014-01-28 19:13:17",
+      "updated_at": "2014-01-28 19:13:17"
+    },
+    {
+      "id": "61",
+      "nom": "St.Joseph Library, Cadieux & Derome",
+      "created_at": "2014-01-29 15:25:08",
+      "updated_at": "2014-01-29 15:25:08"
+    },
+    {
+      "id": "62",
+      "nom": "C. Senécal, printer",
+      "created_at": "2014-01-30 20:59:25",
+      "updated_at": "2014-01-30 20:59:25"
+    },
+    {
+      "id": "63",
+      "nom": "Typographie Eusèbe Senécal",
+      "created_at": "2014-02-02 00:54:50",
+      "updated_at": "2014-02-02 00:54:50"
+    },
+    {
+      "id": "64",
+      "nom": "Imprimé par Eusèbe Senécal",
+      "created_at": "2014-02-02 01:23:38",
+      "updated_at": "2014-02-02 01:23:38"
+    },
+    {
+      "id": "65",
+      "nom": "Published by J.B. Rolland, bookseller",
+      "created_at": "2014-02-04 20:50:21",
+      "updated_at": "2014-02-04 20:50:21"
+    },
+    {
+      "id": "66",
+      "nom": "J.B.Rolland & Son",
+      "created_at": "2014-02-04 20:56:07",
+      "updated_at": "2014-02-04 20:56:07"
+    },
+    {
+      "id": "67",
+      "nom": "Dawson Brothers, publishers",
+      "created_at": "2014-02-04 21:00:11",
+      "updated_at": "2014-02-04 21:00:11"
+    },
+    {
+      "id": "68",
+      "nom": "J.B.Rolland & fils, libraires-éditeurs",
+      "created_at": "2014-02-05 20:40:35",
+      "updated_at": "2014-02-05 20:40:35"
+    },
+    {
+      "id": "69",
+      "nom": "Granger Frères, libraires-éditeurs",
+      "created_at": "2014-02-19 15:27:17",
+      "updated_at": "2014-02-19 15:27:17"
+    },
+    {
+      "id": "70",
+      "nom": "J.B. Rolland & fils, libraires",
+      "created_at": "2014-02-19 16:53:56",
+      "updated_at": "2014-02-19 16:53:56"
+    },
+    {
+      "id": "71",
+      "nom": "Fabre & Gravel, libraires",
+      "created_at": "2014-02-19 18:46:47",
+      "updated_at": "2014-02-19 18:46:47"
+    },
+    {
+      "id": "72",
+      "nom": "non-inscrit",
+      "created_at": "2014-02-19 18:55:16",
+      "updated_at": "2014-02-19 18:55:16"
+    },
+    {
+      "id": "73",
+      "nom": "C.O.Beauchemin & Valois, éditeurs",
+      "created_at": "2014-02-24 14:38:52",
+      "updated_at": "2014-02-24 14:38:52"
+    },
+    {
+      "id": "74",
+      "nom": "Beauchemin & Payette, libraires-éditeurs",
+      "created_at": "2014-02-24 15:09:32",
+      "updated_at": "2014-02-24 15:09:32"
+    },
+    {
+      "id": "75",
+      "nom": "J.A.Langlais",
+      "created_at": "2014-03-22 22:47:06",
+      "updated_at": "2014-03-22 22:47:06"
+    },
+    {
+      "id": "76",
+      "nom": "Printed by Eusebe Senecal",
+      "created_at": "2014-03-22 22:55:59",
+      "updated_at": "2014-03-22 22:55:59"
+    },
+    {
+      "id": "77",
+      "nom": "Belford brothers, publishers, Toronto",
+      "created_at": "2014-09-21 19:02:22",
+      "updated_at": "2014-09-21 19:02:22"
+    },
+    {
+      "id": "78",
+      "nom": "Imprimerie Royale, Paris",
+      "created_at": "2014-09-22 00:47:46",
+      "updated_at": "2014-09-22 00:47:46"
+    },
+    {
+      "id": "79",
+      "nom": "Librairie Hachette, Paris",
+      "created_at": "2014-09-23 14:32:22",
+      "updated_at": "2014-09-23 14:32:22"
+    },
+    {
+      "id": "80",
+      "nom": "Eusebe Senecal & Co.",
+      "created_at": "2014-09-23 15:14:14",
+      "updated_at": "2014-09-23 15:14:14"
+    }
+  ],
+  "imprimeur": [
+    {
+      "id": "2",
+      "nom": "Eusèbe Senécal, imprimeur-éditeur",
+      "created_at": "2013-03-13 15:31:40",
+      "updated_at": "2013-03-13 15:31:40"
+    },
+    {
+      "id": "3",
+      "nom": "E.Senécal & cie, imprimeurs-éditeurs",
+      "created_at": "2013-03-17 17:06:47",
+      "updated_at": "2013-03-17 17:06:47"
+    },
+    {
+      "id": "4",
+      "nom": "Eusèbe Senécal & cie",
+      "created_at": "2013-03-17 17:13:36",
+      "updated_at": "2013-03-17 17:13:36"
+    },
+    {
+      "id": "5",
+      "nom": "Eusèbe Senécal & cie. ; D.& J. Sadlier& Co.",
+      "created_at": "2013-03-17 17:31:43",
+      "updated_at": "2013-03-17 17:31:43"
+    },
+    {
+      "id": "6",
+      "nom": "Eusèbe Senécal & cie., imprimeurs-éditeurs",
+      "created_at": "2013-03-17 17:39:28",
+      "updated_at": "2013-03-17 17:39:28"
+    },
+    {
+      "id": "7",
+      "nom": "Senécal",
+      "created_at": "2013-03-17 18:30:10",
+      "updated_at": "2013-03-17 18:30:10"
+    },
+    {
+      "id": "8",
+      "nom": "Eusèbe Senécal & cie, imprimeurs",
+      "created_at": "2013-03-18 18:44:29",
+      "updated_at": "2013-03-18 18:44:29"
+    },
+    {
+      "id": "9",
+      "nom": "G. Vekeman, printer-editor",
+      "created_at": "2013-03-18 19:29:24",
+      "updated_at": "2013-03-18 19:29:24"
+    },
+    {
+      "id": "10",
+      "nom": "Eusèbe Senécal, imprimeur",
+      "created_at": "2013-03-18 19:43:11",
+      "updated_at": "2013-03-18 19:43:11"
+    },
+    {
+      "id": "11",
+      "nom": "Eusèbe Senécal & fils, imprimeurs",
+      "created_at": "2013-03-18 19:52:42",
+      "updated_at": "2013-03-18 19:52:42"
+    },
+    {
+      "id": "12",
+      "nom": "Eusèbe Senécal & fils, imprimeurs-éditeurs",
+      "created_at": "2013-03-20 17:21:26",
+      "updated_at": "2013-03-20 17:21:26"
+    },
+    {
+      "id": "13",
+      "nom": "Eusèbe Senécal & fils",
+      "created_at": "2013-03-22 19:25:08",
+      "updated_at": "2013-03-22 19:25:08"
+    },
+    {
+      "id": "14",
+      "nom": "Eusebus Senecal et filli, typographi",
+      "created_at": "2013-04-01 17:27:26",
+      "updated_at": "2013-04-01 17:27:26"
+    },
+    {
+      "id": "15",
+      "nom": "E.Senécal & fils",
+      "created_at": "2013-04-01 17:55:07",
+      "updated_at": "2013-04-01 17:55:07"
+    },
+    {
+      "id": "16",
+      "nom": "Eusèbe Senécal & fils",
+      "created_at": "2013-04-01 19:32:53",
+      "updated_at": "2013-04-01 19:32:53"
+    },
+    {
+      "id": "17",
+      "nom": "Printed and Published by Eusèbe Senécal & fils",
+      "created_at": "2013-04-01 19:47:05",
+      "updated_at": "2013-04-01 19:47:05"
+    },
+    {
+      "id": "18",
+      "nom": "Eusèbe Senécal & fils, printers",
+      "created_at": "2013-04-01 22:08:59",
+      "updated_at": "2013-04-01 22:08:59"
+    },
+    {
+      "id": "19",
+      "nom": "Eusèbe Senécal & fils, imprimeurs et relieurs",
+      "created_at": "2013-04-02 00:34:50",
+      "updated_at": "2013-04-02 00:34:50"
+    },
+    {
+      "id": "20",
+      "nom": "E.Senécal & fils, printers and publishers",
+      "created_at": "2013-04-12 15:52:43",
+      "updated_at": "2013-04-12 15:52:43"
+    },
+    {
+      "id": "21",
+      "nom": "E. Senécal & fils, imprimeurs",
+      "created_at": "2013-04-12 16:52:26",
+      "updated_at": "2013-04-12 16:52:26"
+    },
+    {
+      "id": "22",
+      "nom": "Imprimé et publié par Eusèbe Senécal & fils",
+      "created_at": "2013-04-12 17:02:59",
+      "updated_at": "2013-04-12 17:02:59"
+    },
+    {
+      "id": "23",
+      "nom": "Printed by Eusèbe Senécal & fils",
+      "created_at": "2013-04-12 17:08:34",
+      "updated_at": "2013-04-12 17:08:34"
+    },
+    {
+      "id": "24",
+      "nom": "Eusèbe Senécal & Fils, publishers",
+      "created_at": "2013-05-16 14:55:41",
+      "updated_at": "2013-05-16 14:55:41"
+    },
+    {
+      "id": "25",
+      "nom": "Eusebio Senecal & figli",
+      "created_at": "2013-07-22 14:30:45",
+      "updated_at": "2013-07-22 14:30:45"
+    },
+    {
+      "id": "26",
+      "nom": "E. Senécal et fils,imprimeurs-éditeurs",
+      "created_at": "2013-09-11 16:00:16",
+      "updated_at": "2013-09-11 16:00:16"
+    },
+    {
+      "id": "27",
+      "nom": "Eusèbe Senécal, printer-editor",
+      "created_at": "2013-09-26 15:54:05",
+      "updated_at": "2013-09-26 15:54:05"
+    },
+    {
+      "id": "28",
+      "nom": "E. Senécal & cie, imprimeurs",
+      "created_at": "2013-09-26 16:40:04",
+      "updated_at": "2013-09-26 16:40:04"
+    },
+    {
+      "id": "29",
+      "nom": "Eusèbe Senécal, printer and publisher",
+      "created_at": "2013-09-26 16:58:15",
+      "updated_at": "2013-09-26 16:58:15"
+    },
+    {
+      "id": "30",
+      "nom": "Eusèbe Senécal, imprimeur",
+      "created_at": "2013-10-02 18:46:08",
+      "updated_at": "2013-10-02 18:46:08"
+    },
+    {
+      "id": "31",
+      "nom": "imprimerie de Senécal et frère",
+      "created_at": "2013-12-09 03:13:46",
+      "updated_at": "2013-12-09 03:13:46"
+    },
+    {
+      "id": "32",
+      "nom": "C.Senécal",
+      "created_at": "2013-12-09 03:24:44",
+      "updated_at": "2013-12-09 03:24:44"
+    },
+    {
+      "id": "33",
+      "nom": "Senécal & Daniel",
+      "created_at": "2013-12-09 04:30:11",
+      "updated_at": "2013-12-09 04:30:11"
+    },
+    {
+      "id": "34",
+      "nom": "des presses à vapeur de Senécal, Daniel et compagnie",
+      "created_at": "2014-01-15 16:46:16",
+      "updated_at": "2014-01-15 16:46:16"
+    },
+    {
+      "id": "35",
+      "nom": "imprimé et publié par Eusèbe Senécal",
+      "created_at": "2014-01-16 19:12:21",
+      "updated_at": "2014-01-16 19:12:21"
+    },
+    {
+      "id": "36",
+      "nom": "Eusèbe Senécal, imprimeur-relieur et éditeur",
+      "created_at": "2014-01-17 16:54:39",
+      "updated_at": "2014-01-17 16:54:39"
+    },
+    {
+      "id": "37",
+      "nom": "Printed and published by Eusebe Senecal",
+      "created_at": "2014-01-17 17:09:06",
+      "updated_at": "2014-01-17 17:09:06"
+    },
+    {
+      "id": "38",
+      "nom": "imprimé par Senécal & Daniel",
+      "created_at": "2014-01-19 16:22:37",
+      "updated_at": "2014-01-19 16:22:37"
+    },
+    {
+      "id": "39",
+      "nom": "Typographie de Senécal et Daniel",
+      "created_at": "2014-01-19 16:41:16",
+      "updated_at": "2014-01-19 16:41:16"
+    },
+    {
+      "id": "40",
+      "nom": "Typographie de Senécal, Daniel et compagnie",
+      "created_at": "2014-01-19 17:43:52",
+      "updated_at": "2014-01-19 17:43:52"
+    },
+    {
+      "id": "41",
+      "nom": "Senécal et Daniel, imprimeurs",
+      "created_at": "2014-01-19 18:05:41",
+      "updated_at": "2014-01-19 18:05:41"
+    },
+    {
+      "id": "42",
+      "nom": "imprimerie de Ch.Senécal",
+      "created_at": "2014-01-19 18:10:27",
+      "updated_at": "2014-01-19 18:10:27"
+    },
+    {
+      "id": "43",
+      "nom": "Téhonaristorarakon E. Senekar nok Roienha",
+      "created_at": "2014-01-19 18:17:14",
+      "updated_at": "2014-01-19 18:17:14"
+    },
+    {
+      "id": "44",
+      "nom": "Imprimé pour l'auteur par E. Senécal",
+      "created_at": "2014-01-19 18:26:22",
+      "updated_at": "2014-01-19 18:26:22"
+    },
+    {
+      "id": "45",
+      "nom": "des presses à vapeur de la Minerve",
+      "created_at": "2014-01-20 15:39:58",
+      "updated_at": "2014-01-20 15:39:58"
+    },
+    {
+      "id": "46",
+      "nom": "Eusèbe Senécal",
+      "created_at": "2014-01-27 15:53:58",
+      "updated_at": "2014-01-27 15:53:58"
+    },
+    {
+      "id": "47",
+      "nom": "Typographie d'Eusèbe Senécal",
+      "created_at": "2014-01-27 16:29:27",
+      "updated_at": "2014-01-27 16:29:27"
+    },
+    {
+      "id": "48",
+      "nom": "Imprimerie d'Eusèbe Senécal",
+      "created_at": "2014-01-27 16:42:10",
+      "updated_at": "2014-01-27 16:42:10"
+    },
+    {
+      "id": "49",
+      "nom": "E. Senécal, printer",
+      "created_at": "2014-01-27 16:57:07",
+      "updated_at": "2014-01-27 16:57:07"
+    },
+    {
+      "id": "50",
+      "nom": "C.Senécal, printer",
+      "created_at": "2014-01-30 20:59:41",
+      "updated_at": "2014-01-30 20:59:41"
+    },
+    {
+      "id": "51",
+      "nom": "Imprimé par Eusèbe Senécal",
+      "created_at": "2014-02-02 01:24:12",
+      "updated_at": "2014-02-02 01:24:12"
+    },
+    {
+      "id": "52",
+      "nom": "E. Senécal, imprimeur",
+      "created_at": "2014-02-19 16:55:01",
+      "updated_at": "2014-02-19 16:55:01"
+    },
+    {
+      "id": "53",
+      "nom": "Imp.E.Senécal",
+      "created_at": "2014-02-24 15:06:36",
+      "updated_at": "2014-02-24 15:06:36"
+    },
+    {
+      "id": "54",
+      "nom": "Printed by Eusebe Senecal",
+      "created_at": "2014-03-22 22:56:51",
+      "updated_at": "2014-03-22 22:56:51"
+    },
+    {
+      "id": "55",
+      "nom": "inconnu",
+      "created_at": "2014-07-10 22:23:36",
+      "updated_at": "2014-07-10 22:23:36"
+    },
+    {
+      "id": "56",
+      "nom": "Eusèbe Senécal, imprimeur-relieur",
+      "created_at": "2014-09-21 19:03:57",
+      "updated_at": "2014-09-21 19:03:57"
+    },
+    {
+      "id": "57",
+      "nom": "Eusebe Senecal & Co.",
+      "created_at": "2014-09-23 15:14:33",
+      "updated_at": "2014-09-23 15:14:33"
+    }
+  ],
+  "localisation": [
+    {
+      "id": "1",
+      "nom": "Bibliothèque et Archives nationales du Québec (BAnQ)",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "2",
+      "nom": "Bibliothèque Université du Québec à Montréal(UQAM) Virtuose.",
+      "created_at": "2014-03-22 21:24:28",
+      "updated_at": "2014-03-22 21:24:28"
+    },
+    {
+      "id": "3",
+      "nom": "Bibliothèque Université du Québec à Trois-Rivières (UQTR)",
+      "created_at": "2014-03-22 22:40:16",
+      "updated_at": "2014-03-22 22:40:16"
+    },
+    {
+      "id": "4",
+      "nom": "HathiTrust Digital Library",
+      "created_at": "2014-03-28 18:00:35",
+      "updated_at": "2014-03-28 18:00:35"
+    },
+    {
+      "id": "5",
+      "nom": "Wikipedia",
+      "created_at": "2014-03-28 18:09:50",
+      "updated_at": "2014-03-28 18:09:50"
+    },
+    {
+      "id": "6",
+      "nom": "Bibliothèque Université du Québec en Abitibi-Témiscamingue (UQAT)",
+      "created_at": "2014-04-12 13:19:10",
+      "updated_at": "2014-04-12 13:19:10"
+    },
+    {
+      "id": "7",
+      "nom": "Bibliothèque Université du Québec à Rimouski",
+      "created_at": "2014-04-12 14:18:09",
+      "updated_at": "2014-04-12 14:18:09"
+    },
+    {
+      "id": "8",
+      "nom": "Bibliothèque Université de Sherbrooke",
+      "created_at": "2014-04-12 16:29:05",
+      "updated_at": "2014-04-12 16:29:05"
+    },
+    {
+      "id": "9",
+      "nom": "Bibliothèque Université MgGill",
+      "created_at": "2014-08-06 14:50:16",
+      "updated_at": "2014-08-06 14:50:16"
+    },
+    {
+      "id": "10",
+      "nom": "Bibliothèque Université McGill",
+      "created_at": "2014-08-07 01:18:33",
+      "updated_at": "2014-08-07 01:18:33"
+    },
+    {
+      "id": "11",
+      "nom": "John Basset Memorial Library, Bishop's University",
+      "created_at": "2014-08-11 03:54:45",
+      "updated_at": "2014-08-11 03:54:45"
+    },
+    {
+      "id": "12",
+      "nom": "Bibliothèque de L'Université Queen's",
+      "created_at": "2014-08-25 22:11:29",
+      "updated_at": "2014-08-25 22:11:29"
+    },
+    {
+      "id": "13",
+      "nom": "Bibliothèque de L'Université de Montréal",
+      "created_at": "2014-09-21 18:45:36",
+      "updated_at": "2014-09-21 18:45:36"
+    },
+    {
+      "id": "14",
+      "nom": " University of Michigan,Mirlyn Catalog",
+      "created_at": "2014-09-23 15:10:20",
+      "updated_at": "2014-09-23 15:10:20"
+    },
+    {
+      "id": "15",
+      "nom": "Bibliothèque Université Laval, catalogue Ariane",
+      "created_at": "2014-09-25 18:00:51",
+      "updated_at": "2014-09-25 18:00:51"
+    },
+    {
+      "id": "16",
+      "nom": "Université du Québec à Chicoutimi",
+      "created_at": "2014-09-26 01:43:46",
+      "updated_at": "2014-09-26 01:43:46"
+    },
+    {
+      "id": "17",
+      "nom": "Université du Québec en Outaouais (UQO)",
+      "created_at": "2014-09-26 02:06:06",
+      "updated_at": "2014-09-26 02:06:06"
+    },
+    {
+      "id": "18",
+      "nom": "Bibliothèque de L'University of Manitoba",
+      "created_at": "2014-09-30 01:09:19",
+      "updated_at": "2014-09-30 01:09:19"
+    },
+    {
+      "id": "19",
+      "nom": "Toronto Public Library",
+      "created_at": "2014-09-30 16:09:19",
+      "updated_at": "2014-09-30 16:09:19"
+    },
+    {
+      "id": "20",
+      "nom": "University of British Columbia (UBC)",
+      "created_at": "2014-10-05 20:08:48",
+      "updated_at": "2014-10-05 20:08:48"
+    },
+    {
+      "id": "21",
+      "nom": "University of Alberta",
+      "created_at": "2016-01-25 23:53:12",
+      "updated_at": "2016-01-25 23:53:12"
+    },
+    {
+      "id": "22",
+      "nom": "Bibliothèque de la McMaster University, Hamilton,Ont.",
+      "created_at": "2016-01-31 15:32:41",
+      "updated_at": "2016-01-31 15:32:41"
+    },
+    {
+      "id": "23",
+      "nom": "archive.org",
+      "created_at": "2016-01-31 17:28:18",
+      "updated_at": "2016-01-31 17:28:18"
+    }
+  ],
+  "frequence": [
+    {
+      "id": "1",
+      "nom": "Hebdomadaire",
+      "created_at": "2014-07-09 02:27:04",
+      "updated_at": "2014-07-09 02:27:04"
+    },
+    {
+      "id": "2",
+      "nom": "mensuel",
+      "created_at": "2014-07-10 01:28:17",
+      "updated_at": "2014-07-10 01:28:17"
+    },
+    {
+      "id": "3",
+      "nom": "mensuel",
+      "created_at": "2014-09-26 00:52:08",
+      "updated_at": "2014-09-26 00:52:08"
+    },
+    {
+      "id": "4",
+      "nom": "inconnue",
+      "created_at": "2014-09-30 16:16:14",
+      "updated_at": "2014-09-30 16:16:14"
+    }
+  ]
+}
