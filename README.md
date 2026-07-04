@@ -12,14 +12,57 @@ See [PLAN.md](PLAN.md) for the full architecture record and release plan.
 
 ## Architecture
 
-- **API:** Laravel 11 / PHP 8.3+ / PostgreSQL 16 + PostGIS
+- **API:** Laravel 12 / PHP 8.4+ / PostgreSQL 16 + PostGIS
 - **Client:** React + TypeScript / TanStack Router + Query / Tabler UI
 - **Desktop (R3):** Tauri 2 wrapper (planned)
 - **License:** AGPL-3.0
 
 ## Quickstart
 
-> R1-A1 not yet landed — instructions will be added once the dev stack is scaffolded.
+### Prerequisites
+- Docker + Docker Compose v2
+- pnpm ≥ 9
+- PHP 8.4+ + Composer 2 (for local artisan commands; optional if using Docker only)
+
+### 1. Clone & install JS dependencies
+
+```bash
+git clone git@github.com:Morialkar/hap.git
+cd hap
+pnpm install
+```
+
+### 2. Configure the API
+
+```bash
+cp apps/api/.env.example apps/api/.env
+# Generate app key (or let the Docker entrypoint do it):
+php apps/api/artisan key:generate
+```
+
+### 3. Start the dev stack
+
+```bash
+cd docker
+cp .env.example .env          # adjust ports if needed
+docker compose up --build -d
+docker compose exec app php artisan migrate
+```
+
+### 4. Verify
+
+```bash
+curl http://localhost:8080/api/v1/ping
+# → {"status":"ok","service":"Heritage Archives Patrimoine API","version":"1"}
+```
+
+### 5. Run API tests (from repo root)
+
+```bash
+cd apps/api && ./vendor/bin/pest
+```
+
+Mailpit UI: http://localhost:8025
 
 ## License
 

@@ -1,0 +1,6 @@
+{
+  "name": "@hap/export",
+  "version": "0.0.0",
+  "private": true,
+  "description": "HAP exporters: CSV, PDF, Markdown vault (R2/R3)"
+}
