@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+.output/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Private data — never in any repo
+*.sql
+!docker/schema.sql
+!docker/empty-seed.sql
+
+# Laravel runtime
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+storage/logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# macOS
+.DS_Store
