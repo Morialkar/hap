@@ -136,11 +136,18 @@ function Workspaces() {
                           key={table.id}
                           className="list-group-item d-flex justify-content-between align-items-center"
                         >
-                          <span>{table.name}</span>
+                          <Link
+                            to="/tables/$databaseId/$tableId"
+                            params={{ databaseId: database.id, tableId: table.id }}
+                            className="fw-medium text-decoration-none text-dark"
+                          >
+                            <i className="ti ti-table me-2 text-muted" aria-hidden="true" />
+                            {table.name}
+                          </Link>
                           <Link
                             to="/builder/$databaseId/$tableId"
                             params={{ databaseId: database.id, tableId: table.id }}
-                            className="btn btn-sm btn-outline-primary"
+                            className="btn btn-sm btn-outline-secondary"
                           >
                             {t('workspaces.builder.action')}
                           </Link>

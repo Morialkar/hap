@@ -14,6 +14,7 @@ import { Route as PingRouteImport } from './routes/ping'
 import { Route as NotFoundRouteImport } from './routes/not-found'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TablesDatabaseIdTableIdRouteImport } from './routes/tables.$databaseId.$tableId'
 import { Route as BuilderDatabaseIdTableIdRouteImport } from './routes/builder.$databaseId.$tableId'
 
 const WorkspacesRoute = WorkspacesRouteImport.update({
@@ -41,6 +42,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TablesDatabaseIdTableIdRoute = TablesDatabaseIdTableIdRouteImport.update({
+  id: '/tables/$databaseId/$tableId',
+  path: '/tables/$databaseId/$tableId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BuilderDatabaseIdTableIdRoute =
   BuilderDatabaseIdTableIdRouteImport.update({
     id: '/builder/$databaseId/$tableId',
@@ -55,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/ping': typeof PingRoute
   '/workspaces': typeof WorkspacesRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
+  '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -63,6 +70,7 @@ export interface FileRoutesByTo {
   '/ping': typeof PingRoute
   '/workspaces': typeof WorkspacesRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
+  '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -72,6 +80,7 @@ export interface FileRoutesById {
   '/ping': typeof PingRoute
   '/workspaces': typeof WorkspacesRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
+  '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -82,6 +91,7 @@ export interface FileRouteTypes {
     | '/ping'
     | '/workspaces'
     | '/builder/$databaseId/$tableId'
+    | '/tables/$databaseId/$tableId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -90,6 +100,7 @@ export interface FileRouteTypes {
     | '/ping'
     | '/workspaces'
     | '/builder/$databaseId/$tableId'
+    | '/tables/$databaseId/$tableId'
   id:
     | '__root__'
     | '/'
@@ -98,6 +109,7 @@ export interface FileRouteTypes {
     | '/ping'
     | '/workspaces'
     | '/builder/$databaseId/$tableId'
+    | '/tables/$databaseId/$tableId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -107,6 +119,7 @@ export interface RootRouteChildren {
   PingRoute: typeof PingRoute
   WorkspacesRoute: typeof WorkspacesRoute
   BuilderDatabaseIdTableIdRoute: typeof BuilderDatabaseIdTableIdRoute
+  TablesDatabaseIdTableIdRoute: typeof TablesDatabaseIdTableIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -146,6 +159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tables/$databaseId/$tableId': {
+      id: '/tables/$databaseId/$tableId'
+      path: '/tables/$databaseId/$tableId'
+      fullPath: '/tables/$databaseId/$tableId'
+      preLoaderRoute: typeof TablesDatabaseIdTableIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/builder/$databaseId/$tableId': {
       id: '/builder/$databaseId/$tableId'
       path: '/builder/$databaseId/$tableId'
@@ -163,6 +183,7 @@ const rootRouteChildren: RootRouteChildren = {
   PingRoute: PingRoute,
   WorkspacesRoute: WorkspacesRoute,
   BuilderDatabaseIdTableIdRoute: BuilderDatabaseIdTableIdRoute,
+  TablesDatabaseIdTableIdRoute: TablesDatabaseIdTableIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
