@@ -6,6 +6,7 @@ import {
   useSensors,
   MouseSensor,
   TouchSensor,
+  useDroppable,
   type DragStartEvent,
   type DragEndEvent,
   type DragOverEvent,
@@ -37,6 +38,22 @@ interface View {
     columnCount: number;
     columns: string[][];
   } | null;
+}
+
+interface DroppableColumnProps {
+  id: string;
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+function DroppableColumn({ id, children, className, style }: DroppableColumnProps) {
+  const { setNodeRef } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className={className} style={style}>
+      {children}
+    </div>
+  );
 }
 
 export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
@@ -446,7 +463,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                     </div>
                     <div className="card-body p-2" style={{ minHeight: '400px' }}>
                       <SortableContext items={unassigned} strategy={verticalListSortingStrategy}>
-                        <div id="unassigned" className="vstack gap-2 h-100" style={{ minHeight: '380px' }}>
+                        <DroppableColumn id="unassigned" className="vstack gap-2 h-100" style={{ minHeight: '380px' }}>
                           {unassigned.length === 0 ? (
                             <div className="text-center py-4 text-muted small">
                               {t('layout.unassignedFields.empty')}
@@ -457,7 +474,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                               return field ? <LayoutFieldItem key={id} field={field} /> : null;
                             })
                           )}
-                        </div>
+                        </DroppableColumn>
                       </SortableContext>
                     </div>
                   </div>
@@ -481,7 +498,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                               style={{ minHeight: '350px', backgroundColor: 'var(--bs-light-bg-subtle)' }}
                             >
                               <SortableContext items={colItems} strategy={verticalListSortingStrategy}>
-                                <div
+                                <DroppableColumn
                                   id={`column-${colIdx}`}
                                   className="vstack gap-2 h-100"
                                   style={{ minHeight: '330px' }}
@@ -496,7 +513,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                                       return field ? <LayoutFieldItem key={id} field={field} /> : null;
                                     })
                                   )}
-                                </div>
+                                </DroppableColumn>
                               </SortableContext>
                             </div>
                           </div>
