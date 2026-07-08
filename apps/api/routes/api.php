@@ -18,6 +18,9 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('databases', DatabaseController::class);
     Route::apiResource('tables', TableController::class);
     Route::apiResource('fields', FieldController::class);
+    
+    Route::get('fields/{field}/preview-impact', [FieldController::class, 'previewImpact']);
+    Route::get('fields/{field}/confirmation-token', [FieldController::class, 'generateConfirmationToken']);
 });
 
 Route::get('/user', function (Request $request) {
