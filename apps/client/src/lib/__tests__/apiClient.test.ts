@@ -76,7 +76,11 @@ describe('ApiClient', () => {
     await expect(apiClient.get('/test')).rejects.toThrow('Unauthorized');
     expect(redirectUrl).toContain('/login?returnTo=');
 
-    window.location = originalLocation;
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('should throw error on non-OK response', async () => {
