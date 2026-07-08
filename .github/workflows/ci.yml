@@ -1,5 +1,7 @@
 name: CI
 
+# See docs/CONVENTIONS.md for project conventions (naming, structure, testing, i18n)
+
 on:
   push:
     branches: [main]
