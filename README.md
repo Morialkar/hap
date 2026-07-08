@@ -1,5 +1,7 @@
 # Heritage Archives Patrimoine (HAP)
 
+[![CI](https://github.com/Morialkar/hap/actions/workflows/ci.yml/badge.svg)](https://github.com/Morialkar/hap/actions/workflows/ci.yml)
+
 > A platform for cataloguing and preserving literary and cultural heritage collections.
 
 HAP is an open-source, self-hostable web application for building structured heritage databases — works, authors, periodicals, and any other collection you define. It is the modern successor to the 2012 Éusèbe Sénécal literary heritage database.

@@ -9,6 +9,11 @@
   "scripts": {
     "dev": "pnpm --filter apps/client dev",
     "build": "pnpm --filter apps/client build",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8"
   }
 }
