@@ -10,6 +10,7 @@ use App\Models\Field;
 use App\Models\Record;
 use App\Models\Table;
 use App\Services\RecordLinkService;
+use App\Services\RecordQueryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -17,19 +18,37 @@ class RecordController extends Controller
 {
     public function __construct(
         private FieldTypeRegistry $fieldTypeRegistry,
-        private RecordLinkService $recordLinkService
+        private RecordLinkService $recordLinkService,
+        private RecordQueryService $recordQueryService
     ) {}
 
     public function index(Request $request): JsonResponse
     {
         $tableId = $request->query('table_id');
-        $query = Record::query();
-
-        if ($tableId) {
-            $query->where('table_id', $tableId);
+        
+        if (!$tableId) {
+            return response()->json([
+                'error' => 'table_id parameter is required',
+            ], 400);
         }
 
-        return response()->json(RecordResource::collection($query->latest()->get()));
+        $table = Table::findOrFail($tableId);
+
+        $params = [
+            'search' => $request->query('search'),
+            'filters' => $request->query('filters') ? json_decode($request->query('filters'), true) : [],
+            'sort' => $request->query('sort'),
+            'sort_dir' => $request->query('sort_dir', 'asc'),
+            'per_page' => $request->query('per_page', 20),
+            'cursor' => $request->query('cursor'),
+        ];
+
+        $result = $this->recordQueryService->queryRecords($table, $params);
+
+        return response()->json([
+            'data' => RecordResource::collection($result['data']),
+            'pagination' => $result['pagination'],
+        ]);
     }
 
     public function store(StoreRecordRequest $request): JsonResponse

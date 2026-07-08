@@ -15,7 +15,7 @@ class Database extends Model
     protected $keyType = 'uuid';
     public $incrementing = false;
 
-    protected $fillable = ['name', 'workspace_id'];
+    protected $fillable = ['name', 'workspace_id', 'locale'];
 
     protected static function boot()
     {

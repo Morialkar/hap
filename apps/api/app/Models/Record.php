@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Symfony\Component\Uid\Ulid;
 
@@ -40,5 +41,15 @@ class Record extends Model
     public function table(): BelongsTo
     {
         return $this->belongsTo(Table::class);
+    }
+
+    public function linksFrom(): HasMany
+    {
+        return $this->hasMany(RecordLink::class, 'from_record');
+    }
+
+    public function linksTo(): HasMany
+    {
+        return $this->hasMany(RecordLink::class, 'to_record');
     }
 }
