@@ -21,10 +21,13 @@ class StoreDatabaseRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($this->workspace_id) {
-            \App\Models\Workspace::firstOrCreate(
-                ['id' => $this->workspace_id],
-                ['name' => 'Auto Workspace']
-            );
+            $exists = \App\Models\Workspace::where('id', $this->workspace_id)->exists();
+            if (!$exists) {
+                $workspace = new \App\Models\Workspace();
+                $workspace->id = $this->workspace_id;
+                $workspace->name = 'Auto Workspace';
+                $workspace->save();
+            }
         }
     }
 
