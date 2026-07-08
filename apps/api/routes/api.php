@@ -23,6 +23,9 @@ Route::prefix('v1')->group(function () {
     
     Route::get('fields/{field}/preview-impact', [FieldController::class, 'previewImpact']);
     Route::get('fields/{field}/confirmation-token', [FieldController::class, 'generateConfirmationToken']);
+    
+    Route::get('records/{record}/referencing-records', [RecordController::class, 'referencingRecords']);
+    Route::post('records/{record}/reassign-links', [RecordController::class, 'reassignLinks']);
 });
 
 Route::get('/user', function (Request $request) {

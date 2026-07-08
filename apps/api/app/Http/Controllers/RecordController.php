@@ -9,13 +9,15 @@ use App\Http\Resources\RecordResource;
 use App\Models\Field;
 use App\Models\Record;
 use App\Models\Table;
+use App\Services\RecordLinkService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class RecordController extends Controller
 {
     public function __construct(
-        private FieldTypeRegistry $fieldTypeRegistry
+        private FieldTypeRegistry $fieldTypeRegistry,
+        private RecordLinkService $recordLinkService
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -50,6 +52,9 @@ class RecordController extends Controller
             'version' => 1,
         ]);
 
+        // Sync record links for reference fields
+        $this->recordLinkService->syncLinks($record);
+
         return response()->json(new RecordResource($record), 201);
     }
 
@@ -77,14 +82,51 @@ class RecordController extends Controller
             'version' => $record->version + 1,
         ]);
 
+        // Sync record links for reference fields
+        $this->recordLinkService->syncLinks($record);
+
         return response()->json(new RecordResource($record));
     }
 
     public function destroy(Record $record): JsonResponse
     {
+        // Check if record is referenced by other records
+        $referenceCounts = $this->recordLinkService->getReferenceCounts($record);
+        
+        if ($referenceCounts['total'] > 0) {
+            return response()->json([
+                'error' => 'Cannot delete record that is referenced by other records',
+                'reference_counts' => $referenceCounts,
+            ], 409);
+        }
+
         $record->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function referencingRecords(Request $request, Record $record): JsonResponse
+    {
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 20);
+
+        $result = $this->recordLinkService->getReferencingRecords($record, $page, $perPage);
+
+        return response()->json($result);
+    }
+
+    public function reassignLinks(Request $request, Record $record): JsonResponse
+    {
+        $toRecordId = $request->input('to_record_id');
+        $toRecord = Record::findOrFail($toRecordId);
+
+        $this->recordLinkService->reassignLinks($record, $toRecord);
+
+        return response()->json([
+            'message' => 'Links reassigned successfully',
+            'from_record' => $record->id,
+            'to_record' => $toRecord->id,
+        ]);
     }
 
     private function validateRecordData(Table $table, array $data): array

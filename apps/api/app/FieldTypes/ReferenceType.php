@@ -71,6 +71,10 @@ class ReferenceType implements FieldTypeInterface
             return false;
         }
 
-        return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value) === 1;
+        // Accept both UUIDs and ULIDs
+        $uuidPattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
+        $ulidPattern = '/^[0-9A-HJKMNP-TV-Z]{26}$/i';
+
+        return preg_match($uuidPattern, $value) === 1 || preg_match($ulidPattern, $value) === 1;
     }
 }
