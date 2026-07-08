@@ -47,9 +47,10 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   const [newViewName, setNewViewName] = useState('');
   const [columnCount, setColumnCount] = useState<number>(1);
   
-  // Columns state: array of columns (each is array of field IDs)
-  const [columns, setColumns] = useState<string[][]>([[]]);
-  const [unassigned, setUnassigned] = useState<string[]>([]);
+  // Unified state for all drag-and-drop containers
+  const [layoutItems, setLayoutItems] = useState<Record<string, string[]>>({
+    unassigned: [],
+  });
   
   // Dragging states
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -80,10 +81,11 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   // Sync state with selected view layout config
   useEffect(() => {
     if (!selectedView) {
-      // No view selected, reset to all fields in column 1
       setColumnCount(1);
-      setColumns([fields.map((f) => f.id)]);
-      setUnassigned([]);
+      setLayoutItems({
+        unassigned: [],
+        'column-0': fields.map((f) => f.id),
+      });
       return;
     }
 
@@ -93,7 +95,11 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
     if (config && config.columns && typeof config.columnCount === 'number') {
       setColumnCount(config.columnCount);
       
-      // Load saved columns, filtering out any deleted fields
+      const newItems: Record<string, string[]> = {
+        unassigned: [],
+      };
+
+      // Load columns
       const loadedColumns = config.columns.map((col) =>
         col.filter((id) => fieldIdsMap.has(id))
       );
@@ -102,42 +108,60 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
       while (loadedColumns.length < config.columnCount) {
         loadedColumns.push([]);
       }
-      // Truncate if excess columns
       if (loadedColumns.length > config.columnCount) {
         loadedColumns.splice(config.columnCount);
       }
 
+      loadedColumns.forEach((col, idx) => {
+        newItems[`column-${idx}`] = col;
+      });
+
       // Find any fields in table that are not placed in columns
       const placedIds = new Set(loadedColumns.flat());
-      const loadedUnassigned = fields
+      newItems.unassigned = fields
         .map((f) => f.id)
         .filter((id) => !placedIds.has(id));
 
-      setColumns(loadedColumns);
-      setUnassigned(loadedUnassigned);
+      setLayoutItems(newItems);
     } else {
-      // Default layout: 1 column with all fields, no unassigned
       setColumnCount(1);
-      setColumns([fields.map((f) => f.id)]);
-      setUnassigned([]);
+      setLayoutItems({
+        unassigned: [],
+        'column-0': fields.map((f) => f.id),
+      });
     }
   }, [selectedView, fields]);
 
   // Change columns count handler
   const handleColumnCountChange = (newCount: number) => {
     setColumnCount(newCount);
-    setColumns((prev) => {
-      const next = [...prev];
-      while (next.length < newCount) {
-        next.push([]);
-      }
-      if (next.length > newCount) {
-        // Merge excess columns back to the last column
-        const excess = next.splice(newCount);
-        if (next.length > 0 && excess.length > 0) {
-          next[next.length - 1] = [...next[next.length - 1], ...excess.flat()];
+    setLayoutItems((prev) => {
+      const next = { ...prev };
+      
+      // Ensure all columns exist up to newCount
+      for (let i = 0; i < newCount; i++) {
+        if (!next[`column-${i}`]) {
+          next[`column-${i}`] = [];
         }
       }
+
+      // Merge excess columns back to the new last column
+      const excessItems: string[] = [];
+      Object.keys(next).forEach((key) => {
+        if (key.startsWith('column-')) {
+          const colIdx = parseInt(key.replace('column-', ''), 10);
+          if (colIdx >= newCount) {
+            excessItems.push(...next[key]);
+            delete next[key];
+          }
+        }
+      });
+
+      if (excessItems.length > 0 && newCount > 0) {
+        const lastColKey = `column-${newCount - 1}`;
+        next[lastColKey] = [...(next[lastColKey] || []), ...excessItems];
+      }
+
       return next;
     });
   };
@@ -187,22 +211,15 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Drag and Drop helpers
+  // Drag and Drop settings
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } })
   );
 
   const getContainer = (id: string): string => {
-    if (unassigned.includes(id) || id === 'unassigned') {
-      return 'unassigned';
-    }
-    for (let i = 0; i < columns.length; i++) {
-      if (columns[i].includes(id) || id === `column-${i}`) {
-        return `column-${i}`;
-      }
-    }
-    return '';
+    if (layoutItems[id]) return id;
+    return Object.keys(layoutItems).find((key) => layoutItems[key].includes(id)) || '';
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -223,42 +240,26 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
       return;
     }
 
-    setColumns((prevCols) => {
-      const nextCols = prevCols.map((c) => [...c]);
-      setUnassigned((prevUnassigned) => {
-        const nextUnassigned = [...prevUnassigned];
+    setLayoutItems((prev) => {
+      const activeItems = prev[activeContainer] || [];
+      const overItems = prev[overContainer] || [];
 
-        // Remove item from source
-        if (activeContainer === 'unassigned') {
-          const idx = nextUnassigned.indexOf(activeIdStr);
-          if (idx !== -1) nextUnassigned.splice(idx, 1);
-        } else {
-          const colIdx = parseInt(activeContainer.replace('column-', ''), 10);
-          const idx = nextCols[colIdx].indexOf(activeIdStr);
-          if (idx !== -1) nextCols[colIdx].splice(idx, 1);
-        }
+      const overIndex = overItems.indexOf(overIdStr);
 
-        // Insert item into destination
-        if (overContainer === 'unassigned') {
-          const idx = nextUnassigned.indexOf(overIdStr);
-          if (idx !== -1) {
-            nextUnassigned.splice(idx, 0, activeIdStr);
-          } else {
-            nextUnassigned.push(activeIdStr);
-          }
-        } else {
-          const colIdx = parseInt(overContainer.replace('column-', ''), 10);
-          const idx = nextCols[colIdx].indexOf(overIdStr);
-          if (idx !== -1) {
-            nextCols[colIdx].splice(idx, 0, activeIdStr);
-          } else {
-            nextCols[colIdx].push(activeIdStr);
-          }
-        }
+      let newIndex = overItems.length;
+      if (overIndex !== -1) {
+        newIndex = overIndex;
+      }
 
-        return nextUnassigned;
-      });
-      return nextCols;
+      return {
+        ...prev,
+        [activeContainer]: activeItems.filter((item) => item !== activeIdStr),
+        [overContainer]: [
+          ...overItems.slice(0, newIndex),
+          activeIdStr,
+          ...overItems.slice(newIndex)
+        ]
+      };
     });
   };
 
@@ -277,30 +278,25 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
     if (!activeContainer || !overContainer) return;
 
     if (activeContainer === overContainer) {
-      // Reordering within same container
-      if (activeContainer === 'unassigned') {
-        setUnassigned((prev) => {
-          const oldIndex = prev.indexOf(activeIdStr);
-          const newIndex = prev.indexOf(overIdStr);
-          return arrayMove(prev, oldIndex, newIndex);
-        });
-      } else {
-        const colIdx = parseInt(activeContainer.replace('column-', ''), 10);
-        setColumns((prev) => {
-          const next = prev.map((c) => [...c]);
-          const oldIndex = next[colIdx].indexOf(activeIdStr);
-          const newIndex = next[colIdx].indexOf(overIdStr);
-          next[colIdx] = arrayMove(next[colIdx], oldIndex, newIndex);
-          return next;
-        });
-      }
+      setLayoutItems((prev) => {
+        const items = prev[activeContainer] || [];
+        const oldIndex = items.indexOf(activeIdStr);
+        const newIndex = items.indexOf(overIdStr);
+        return {
+          ...prev,
+          [activeContainer]: arrayMove(items, oldIndex, newIndex),
+        };
+      });
     }
   };
 
   const handleSave = () => {
+    const colsArray = Array.from({ length: columnCount }).map(
+      (_, idx) => layoutItems[`column-${idx}`] || []
+    );
     saveLayoutMutation.mutate({
       columnCount,
-      columns,
+      columns: colsArray,
     });
   };
 
@@ -322,6 +318,11 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   }, [fields]);
 
   const activeField = activeId ? fieldMap.get(activeId) : null;
+
+  const unassigned = layoutItems.unassigned || [];
+  const columns = Array.from({ length: columnCount }).map(
+    (_, idx) => layoutItems[`column-${idx}`] || []
+  );
 
   if (viewsQuery.isLoading) {
     return (
