@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\RecordController;
@@ -10,6 +11,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    Route::post('login', [AuthController::class, 'login'])->middleware(\Illuminate\Session\Middleware\StartSession::class);
+    Route::post('logout', [AuthController::class, 'logout'])->middleware(\Illuminate\Session\Middleware\StartSession::class);
+    Route::get('user', function (Request $request) {
+        return $request->user();
+    })->middleware([\Illuminate\Session\Middleware\StartSession::class, 'auth:sanctum']);
+
     Route::apiResource('views', ViewController::class);
     // Upload routes
     Route::post('uploads', [UploadController::class, 'store']);
@@ -44,7 +51,3 @@ Route::prefix('v1')->group(function () {
     Route::get('fields/{field}/preview-impact', [FieldController::class, 'previewImpact']);
     Route::get('fields/{field}/confirmation-token', [FieldController::class, 'generateConfirmationToken']);
 });
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
