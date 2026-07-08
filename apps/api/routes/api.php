@@ -19,13 +19,23 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('databases', DatabaseController::class);
     Route::apiResource('tables', TableController::class);
     Route::apiResource('fields', FieldController::class);
-    Route::apiResource('records', RecordController::class);
+    
+    // Record routes - defined explicitly to avoid conflicts
+    Route::get('records/trash', [RecordController::class, 'trash']);
+    Route::get('records', [RecordController::class, 'index']);
+    Route::post('records', [RecordController::class, 'store']);
+    Route::get('records/{record}', [RecordController::class, 'show']);
+    Route::put('records/{record}', [RecordController::class, 'update']);
+    Route::delete('records/{record}', [RecordController::class, 'destroy']);
+    Route::get('records/{record}/referencing-records', [RecordController::class, 'referencingRecords']);
+    Route::post('records/{record}/reassign-links', [RecordController::class, 'reassignLinks']);
+    Route::get('records/{record}/history', [RecordController::class, 'history']);
+    Route::post('records/{record}/restore-version', [RecordController::class, 'restoreVersion']);
+    Route::post('records/{recordWithTrashed}/restore', [RecordController::class, 'restore']);
+    Route::delete('records/{recordWithTrashed}/purge', [RecordController::class, 'purge']);
     
     Route::get('fields/{field}/preview-impact', [FieldController::class, 'previewImpact']);
     Route::get('fields/{field}/confirmation-token', [FieldController::class, 'generateConfirmationToken']);
-    
-    Route::get('records/{record}/referencing-records', [RecordController::class, 'referencingRecords']);
-    Route::post('records/{record}/reassign-links', [RecordController::class, 'reassignLinks']);
 });
 
 Route::get('/user', function (Request $request) {
