@@ -107,6 +107,16 @@ jobs:
           DB_USERNAME: hap
           DB_PASSWORD: secret
 
+      - name: Run Property-Based Tests
+        run: cd apps/api && php vendor/bin/pest --group property-based
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_DATABASE: hap
+          DB_USERNAME: hap
+          DB_PASSWORD: secret
+
   client-tests:
     name: Client Tests
     runs-on: ubuntu-latest
