@@ -150,7 +150,7 @@ test('user can list records filtered by table', function () {
         ->getJson('/api/v1/records?table_id=' . $table->id);
 
     $response->assertStatus(200)
-        ->assertJsonCount(1);
+        ->assertJsonCount(1, 'data');
 });
 
 test('user can update record', function () {
@@ -243,5 +243,5 @@ test('soft-deleted records are excluded from list', function () {
         ->getJson('/api/v1/records?table_id=' . $table->id);
 
     $response->assertStatus(200)
-        ->assertJsonCount(0);
+        ->assertJsonCount(0, 'data');
 });

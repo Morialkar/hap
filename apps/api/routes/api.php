@@ -4,10 +4,15 @@ use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\TableController;
+use App\Http\Controllers\UploadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    // Upload routes
+    Route::post('uploads', [UploadController::class, 'store']);
+    Route::get('uploads/{hash}', [UploadController::class, 'show']);
+    Route::get('uploads/{hash}/thumbnail', [UploadController::class, 'showThumbnail']);
     Route::get('/ping', function () {
         return response()->json([
             'status' => 'ok',
