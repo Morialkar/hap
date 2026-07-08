@@ -35,10 +35,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Laravel Pint
-        run: cd apps/api && ./vendor/bin/pint --test
+        run: cd apps/api && php vendor/bin/pint --test
 
       - name: Larastan
-        run: cd apps/api && ./vendor/bin/phpstan analyse --memory-limit=512M --no-progress
+        run: cd apps/api && php vendor/bin/phpstan analyse --memory-limit=512M --no-progress
 
       - name: ESLint
         run: cd apps/client && pnpm exec eslint .
@@ -93,7 +93,7 @@ jobs:
           DB_PASSWORD: secret
 
       - name: Run Pest
-        run: cd apps/api && ./vendor/bin/pest
+        run: cd apps/api && php vendor/bin/pest
         env:
           DB_CONNECTION: pgsql
           DB_HOST: localhost
