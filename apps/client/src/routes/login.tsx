@@ -17,7 +17,7 @@ function Login() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && location.pathname === '/login') {
       const returnTo = location.searchStr ? new URLSearchParams(location.searchStr).get('returnTo') : null;
       navigate({ to: (returnTo as any) || '/' });
     }

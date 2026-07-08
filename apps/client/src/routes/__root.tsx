@@ -17,9 +17,11 @@ function RootLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isLoginPage = location.pathname === '/login';
+
   // Redirect to login if not authenticated
-  if (!isLoading && !isAuthenticated) {
-    const returnTo = location.searchStr ? new URLSearchParams(location.searchStr).get('returnTo') : null;
+  if (!isLoading && !isAuthenticated && !isLoginPage) {
+    const returnTo = location.pathname !== '/' ? location.pathname : null;
     navigate({ to: '/login', search: returnTo ? { returnTo } : undefined });
     return null;
   }
@@ -30,6 +32,10 @@ function RootLayout() {
         <LoadingSpinner size="lg" />
       </div>
     );
+  }
+
+  if (isLoginPage) {
+    return <Outlet />;
   }
 
   const handleLogout = async () => {
