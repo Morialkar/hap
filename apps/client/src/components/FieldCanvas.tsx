@@ -9,6 +9,7 @@ import {
   useSensor,
   useSensors,
   useDroppable,
+  useDndContext,
   type SensorDescriptor,
   type SensorOptions,
 } from '@dnd-kit/core';
@@ -195,6 +196,7 @@ export function FieldCanvas({
   onRemove,
 }: Omit<FieldCanvasProps, 'onAdd' | 'onReorder'>) {
   const { t } = useI18n();
+  const { active, over } = useDndContext();
 
   const orderedFields = useMemo(
     () => [...fields].sort((a, b) => a.position - b.position),
@@ -202,6 +204,16 @@ export function FieldCanvas({
   );
 
   const fieldIds = useMemo(() => orderedFields.map((f) => f.id), [orderedFields]);
+
+  const insertIndex = useMemo(() => {
+    if (!active || !over) return -1;
+    if (over.id === 'canvas' || over.id === 'canvas-empty') return orderedFields.length;
+    const idx = orderedFields.findIndex((f) => f.id === over.id);
+    return idx === -1 ? orderedFields.length : idx;
+  }, [active, over, orderedFields]);
+
+  const isDraggingFromPalette = active?.data.current?.source === 'palette';
+  const showPlaceholder = isDraggingFromPalette && insertIndex !== -1;
 
   return (
     <div className="card h-100">
@@ -216,16 +228,29 @@ export function FieldCanvas({
           <EmptyCanvas>{t('builder.canvas.empty')}</EmptyCanvas>
         ) : (
           <SortableContext items={fieldIds} strategy={verticalListSortingStrategy}>
-            <DroppableCanvasList id="canvas" className="list-group list-group-flush">
-              {orderedFields.map((field) => (
-                <SortableFieldItem
-                  key={field.id}
-                  field={field}
-                  isSelected={field.id === selectedId}
-                  onSelect={() => onSelect(field.id)}
-                  onRemove={() => onRemove(field.id)}
-                />
+            <DroppableCanvasList id="canvas" className="list-group list-group-flush p-2">
+              {orderedFields.map((field, idx) => (
+                <div key={field.id}>
+                  {showPlaceholder && idx === insertIndex && (
+                    <div className="border border-primary border-dashed rounded p-3 my-2 text-bg-light text-primary text-center small fw-semibold">
+                      <i className="ti ti-download me-1" aria-hidden="true" />
+                      {t('builder.palette.dragHint')}
+                    </div>
+                  )}
+                  <SortableFieldItem
+                    field={field}
+                    isSelected={field.id === selectedId}
+                    onSelect={() => onSelect(field.id)}
+                    onRemove={() => onRemove(field.id)}
+                  />
+                </div>
               ))}
+              {showPlaceholder && insertIndex === orderedFields.length && (
+                <div className="border border-primary border-dashed rounded p-3 my-2 text-bg-light text-primary text-center small fw-semibold">
+                  <i className="ti ti-download me-1" aria-hidden="true" />
+                  {t('builder.palette.dragHint')}
+                </div>
+              )}
             </DroppableCanvasList>
           </SortableContext>
         )}
