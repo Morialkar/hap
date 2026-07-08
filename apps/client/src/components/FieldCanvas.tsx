@@ -53,7 +53,7 @@ export function BuilderDndProvider({ fields, onAdd, onReorder, children }: Build
   );
 
   const findInsertIndex = (overId: string | undefined): number => {
-    if (!overId) return orderedFields.length;
+    if (!overId || overId === 'canvas' || overId === 'canvas-empty') return orderedFields.length;
     const index = orderedFields.findIndex((f) => f.id === overId);
     return index === -1 ? orderedFields.length : index;
   };
@@ -179,6 +179,15 @@ function EmptyCanvas({ children }: { children: React.ReactNode }) {
   );
 }
 
+function DroppableCanvasList({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) {
+  const { setNodeRef } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className={className} style={{ minHeight: '300px' }}>
+      {children}
+    </div>
+  );
+}
+
 export function FieldCanvas({
   fields,
   selectedId,
@@ -202,12 +211,12 @@ export function FieldCanvas({
           {t('builder.saveDraft.label')}
         </span>
       </div>
-      <div className="card-body p-0" role="list" aria-label={t('builder.canvas.title')}>
+      <div className="card-body p-0" role="list" aria-label={t('builder.canvas.title')} style={{ minHeight: '300px' }}>
         {orderedFields.length === 0 ? (
           <EmptyCanvas>{t('builder.canvas.empty')}</EmptyCanvas>
         ) : (
           <SortableContext items={fieldIds} strategy={verticalListSortingStrategy}>
-            <div className="list-group list-group-flush">
+            <DroppableCanvasList id="canvas" className="list-group list-group-flush">
               {orderedFields.map((field) => (
                 <SortableFieldItem
                   key={field.id}
@@ -217,7 +226,7 @@ export function FieldCanvas({
                   onRemove={() => onRemove(field.id)}
                 />
               ))}
-            </div>
+            </DroppableCanvasList>
           </SortableContext>
         )}
       </div>
