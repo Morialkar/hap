@@ -10,6 +10,7 @@ import { FieldCanvas, BuilderDndProvider } from '../components/FieldCanvas';
 import { FieldOptionPanel } from '../components/FieldOptionPanel';
 import { DestructiveChangeModal } from '../components/DestructiveChangeModal';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { CardLayoutBuilder } from '../components/CardLayoutBuilder';
 
 export const Route = createFileRoute('/builder/$databaseId/$tableId')({
   component: StructureBuilder,
@@ -80,6 +81,7 @@ function StructureBuilder() {
 
   const [fields, setFields] = useState<BuilderField[]>([]);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'structure' | 'layout'>('structure');
   const initializedRef = useRef(false);
   const [pendingAction, setPendingAction] = useState<{
     fieldId: string;
@@ -341,49 +343,83 @@ function StructureBuilder() {
             {databaseQuery.data?.name} → {tableQuery.data?.name}
           </p>
         </div>
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={handleSaveAll}
-          disabled={saveFieldMutation.isPending}
-        >
-          <i className="ti ti-device-floppy me-1" />
-          {t('common.save')}
-        </button>
+        {activeTab === 'structure' && (
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleSaveAll}
+            disabled={saveFieldMutation.isPending}
+          >
+            <i className="ti ti-device-floppy me-1" />
+            {t('common.save')}
+          </button>
+        )}
       </div>
 
-      <BuilderDndProvider fields={fields} onAdd={handleAdd} onReorder={handleReorder}>
-      <div className="row g-3" style={{ minHeight: '70vh' }}>
-        <div className="col-md-3">
-          <FieldPalette onAdd={handleAdd} />
+      <div className="card mb-3">
+        <div className="card-header p-0">
+          <ul className="nav nav-tabs card-header-tabs m-0">
+            <li className="nav-item">
+              <button
+                type="button"
+                className={`nav-link border-0 py-3 px-4 ${activeTab === 'structure' ? 'active fw-bold' : ''}`}
+                onClick={() => setActiveTab('structure')}
+              >
+                <i className="ti ti-stack-2 me-1" aria-hidden="true" />
+                {t('builder.tabs.structure')}
+              </button>
+            </li>
+            <li className="nav-item">
+              <button
+                type="button"
+                className={`nav-link border-0 py-3 px-4 ${activeTab === 'layout' ? 'active fw-bold' : ''}`}
+                onClick={() => setActiveTab('layout')}
+                data-testid="layout-tab"
+              >
+                <i className="ti ti-layout-board me-1" aria-hidden="true" />
+                {t('builder.tabs.layout')}
+              </button>
+            </li>
+          </ul>
         </div>
+      </div>
 
-        <div className="col-md-5">
-          <FieldCanvas
-            fields={fields}
-            selectedId={selectedFieldId}
-            onSelect={setSelectedFieldId}
-            onRemove={handleRemove}
-          />
-        </div>
+      {activeTab === 'structure' ? (
+        <BuilderDndProvider fields={fields} onAdd={handleAdd} onReorder={handleReorder}>
+        <div className="row g-3" style={{ minHeight: '70vh' }}>
+          <div className="col-md-3">
+            <FieldPalette onAdd={handleAdd} />
+          </div>
 
-        <div className="col-md-4">
-          {selectedField ? (
-            <FieldOptionPanel
-              field={selectedField}
-              availableTables={availableTables}
-              onChange={handleFieldChange}
+          <div className="col-md-5">
+            <FieldCanvas
+              fields={fields}
+              selectedId={selectedFieldId}
+              onSelect={setSelectedFieldId}
+              onRemove={handleRemove}
             />
-          ) : (
-            <div className="card h-100">
-              <div className="card-body text-center text-muted">
-                {t('builder.canvas.empty')}
+          </div>
+
+          <div className="col-md-4">
+            {selectedField ? (
+              <FieldOptionPanel
+                field={selectedField}
+                availableTables={availableTables}
+                onChange={handleFieldChange}
+              />
+            ) : (
+              <div className="card h-100">
+                <div className="card-body text-center text-muted">
+                  {t('builder.canvas.empty')}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
-      </BuilderDndProvider>
+        </BuilderDndProvider>
+      ) : (
+        <CardLayoutBuilder tableId={tableId} fields={fields} />
+      )}
 
       {pendingAction && (
         <DestructiveChangeModal
