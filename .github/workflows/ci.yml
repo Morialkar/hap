@@ -7,6 +7,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_performance:
+        description: 'Run performance benchmark'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   lint:
@@ -166,3 +173,76 @@ jobs:
 
       - name: Build client
         run: cd apps/client && pnpm exec vite build
+
+  performance:
+    name: Performance Benchmark
+    runs-on: ubuntu-latest
+    if: github.event.inputs.run_performance == 'true'
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4-alpine
+        env:
+          POSTGRES_DB: hap
+          POSTGRES_USER: hap
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo, pdo_pgsql
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: cd apps/api && composer install --no-interaction --prefer-dist
+
+      - name: Copy .env
+        run: cd apps/api && cp .env.example .env
+
+      - name: Generate app key
+        run: cd apps/api && php artisan key:generate
+
+      - name: Run migrations
+        run: cd apps/api && php artisan migrate --force
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_DATABASE: hap
+          DB_USERNAME: hap
+          DB_PASSWORD: secret
+
+      - name: Run scale seeder (reduced for CI)
+        run: cd apps/api && SCALE_RECORD_COUNT=1000 php artisan db:seed --class=ScaleFixtureSeeder
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_DATABASE: hap
+          DB_USERNAME: hap
+          DB_PASSWORD: secret
+
+      - name: Run performance benchmark
+        run: cd apps/api && php artisan app:benchmark-performance
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_DATABASE: hap
+          DB_USERNAME: hap
+          DB_PASSWORD: secret
+
+      - name: Upload performance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report
+          path: apps/api/docs/PERFORMANCE.md
