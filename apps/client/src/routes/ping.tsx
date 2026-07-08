@@ -1,10 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { httpClient } from '../lib/httpClient'
+import { createFileRoute } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
+import { httpClient } from '../lib/httpClient';
 
 export const Route = createFileRoute('/ping')({
   component: PingPage,
-})
+});
 
 interface PingResponse {
   status: string;
@@ -17,7 +17,7 @@ function PingPage() {
     queryKey: ['ping'],
     queryFn: () => httpClient.get<PingResponse>('/ping'),
     refetchInterval: 10_000,
-  })
+  });
 
   return (
     <div>
@@ -53,5 +53,5 @@ function PingPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

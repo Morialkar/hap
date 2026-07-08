@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
   component: HomePage,
-})
+});
 
 function HomePage() {
   return (
@@ -11,7 +11,8 @@ function HomePage() {
         <div className="col-auto">
           <h1 className="page-title">Heritage Archives Patrimoine</h1>
           <p className="text-secondary mt-1">
-            Open-source platform for cataloguing and preserving literary and cultural heritage collections.
+            Open-source platform for cataloguing and preserving literary and cultural heritage
+            collections.
           </p>
         </div>
       </div>
@@ -29,5 +30,5 @@ function HomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

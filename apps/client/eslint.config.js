@@ -1,7 +1,7 @@
-import js from '@eslint/js'
-import tseslint from '@typescript-eslint/eslint-plugin'
-import tsParser from '@typescript-eslint/parser'
-import prettierConfig from 'eslint-config-prettier'
+import js from '@eslint/js';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import prettierConfig from 'eslint-config-prettier';
 
 export default [
   js.configs.recommended,
@@ -36,4 +36,4 @@ export default [
   {
     ignores: ['dist', 'eslint.config.js'],
   },
-]
+];

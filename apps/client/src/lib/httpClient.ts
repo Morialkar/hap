@@ -1,7 +1,6 @@
 import type { ApiClient } from '@hap/core';
 
-const getBase = (): string =>
-  window.__APP__?.apiBase ?? '/api/v1';
+const getBase = (): string => window.__APP__?.apiBase ?? '/api/v1';
 
 const request = async <T>(method: string, path: string, body?: unknown): Promise<T> => {
   const res = await fetch(`${getBase()}${path}`, {
@@ -9,9 +8,7 @@ const request = async <T>(method: string, path: string, body?: unknown): Promise
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      ...(window.__APP__?.csrfToken
-        ? { 'X-XSRF-TOKEN': window.__APP__.csrfToken }
-        : {}),
+      ...(window.__APP__?.csrfToken ? { 'X-XSRF-TOKEN': window.__APP__.csrfToken } : {}),
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });

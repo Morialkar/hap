@@ -47,7 +47,7 @@ jobs:
         run: cd apps/client && pnpm exec eslint .
 
       - name: Prettier check
-        run: pnpm exec prettier --check .
+        run: cd apps/client && pnpm exec prettier --check .
 
   api-tests:
     name: API Tests
