@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Database;
+use App\Models\Field;
+use App\Models\Table;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Route::model('database', Database::class);
+        Route::model('table', Table::class);
+        Route::model('field', Field::class);
     }
 }
