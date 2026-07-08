@@ -5,10 +5,12 @@ use App\Http\Controllers\FieldController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\ViewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    Route::apiResource('views', ViewController::class);
     // Upload routes
     Route::post('uploads', [UploadController::class, 'store']);
     Route::get('uploads/{hash}', [UploadController::class, 'show']);
