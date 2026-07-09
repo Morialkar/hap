@@ -10,6 +10,7 @@ import { RecordDetailView } from '../components/RecordDetailView';
 import { RecordHistoryPanel } from '../components/RecordHistoryPanel';
 import { DeleteReassignModal } from '../components/DeleteReassignModal';
 import { TrashManagerModal } from '../components/TrashManagerModal';
+import { CsvImportModal } from '../components/CsvImportModal';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
 import { PageActions, PageHeader } from '../components/ui/PageHeader';
@@ -70,6 +71,7 @@ function TableRecordsPage() {
   // Modals & Panels State
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isTrashOpen, setIsTrashOpen] = useState(false);
+  const [isCsvImportOpen, setIsCsvImportOpen] = useState(false);
   const [deleteConflictConfig, setDeleteConflictConfig] = useState<{
     recordId: string;
     conflictData: any;
@@ -292,6 +294,15 @@ function TableRecordsPage() {
         description={t('records.title')}
         actions={
           <PageActions>
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => setIsCsvImportOpen(true)}
+                data-testid="csv-import-btn"
+              >
+                <i className="ti ti-file-import me-1" aria-hidden="true" />
+                Importer CSV
+              </button>
               <button
                 type="button"
                 className="btn btn-outline-secondary"
@@ -745,6 +756,19 @@ function TableRecordsPage() {
           onDeleteConflict={(id, counts) =>
             setDeleteConflictConfig({ recordId: id, conflictData: counts })
           }
+        />
+      )}
+
+      {isCsvImportOpen && (
+        <CsvImportModal
+          tableId={tableId}
+          fields={fields}
+          onClose={() => setIsCsvImportOpen(false)}
+          onImported={() => {
+            queryClient.invalidateQueries({ queryKey: ['records'] });
+            queryClient.invalidateQueries({ queryKey: ['fields'] });
+            showToast('Import CSV terminé');
+          }}
         />
       )}
     </div>

@@ -64,6 +64,53 @@ function mockRoutes(page: import('@playwright/test').Page) {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(tables[0]) });
   });
 
+  page.route(/.*\/api\/v1\/tables\/[^/?]+\/csv-import\/dry-run$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        detected_encoding: 'UTF-8',
+        delimiter: ',',
+        headers: ['Titre', 'Année'],
+        row_count: 3,
+        accepted_count: 2,
+        rejected_count: 1,
+        warnings: [],
+        accepted_rows: [
+          { row: 2, data: { Titre: 'L’Étranger', Année: 1942 } },
+          { row: 3, data: { Titre: 'Chéri', Année: 1920 } },
+        ],
+        rejected_rows: [{ row: 4, errors: { Année: ['Value must be a number'] } }],
+      }),
+    });
+  });
+
+  page.route(/.*\/api\/v1\/tables\/[^/?]+\/csv-import$/, async (route) => {
+    records.push(
+      { id: 'csv-rec-1', table_id: 'tbl-1', data: { Titre: 'L’Étranger', Année: 1942 }, version: 1 },
+      { id: 'csv-rec-2', table_id: 'tbl-1', data: { Titre: 'Chéri', Année: 1920 }, version: 1 },
+    );
+
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        detected_encoding: 'UTF-8',
+        delimiter: ',',
+        headers: ['Titre', 'Année'],
+        row_count: 3,
+        accepted_count: 2,
+        rejected_count: 1,
+        warnings: [],
+        accepted_rows: [
+          { row: 2, record_id: 'csv-rec-1', data: { Titre: 'L’Étranger', Année: 1942 } },
+          { row: 3, record_id: 'csv-rec-2', data: { Titre: 'Chéri', Année: 1920 } },
+        ],
+        rejected_rows: [{ row: 4, errors: { Année: ['Value must be a number'] } }],
+      }),
+    });
+  });
+
   page.route('**/api/v1/fields**', async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fields) });
   });
@@ -256,6 +303,28 @@ test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
       'Record lookup failed',
       { timeout: 15_000 },
     );
+  });
+
+  test('imports csv with accents and reports one rejected row', async ({ page }) => {
+    await page.getByTestId('csv-import-btn').click();
+
+    await page.getByTestId('csv-file-input').setInputFiles({
+      name: 'ouvrages.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from('Titre,Année\nL’Étranger,1942\nChéri,1920\nBad Row,not-a-number\n', 'utf8'),
+    });
+
+    await expect(page.getByTestId('csv-map-field-Titre')).toBeVisible();
+    await page.getByTestId('csv-dry-run-btn').click();
+
+    const report = page.getByTestId('csv-dry-run-report');
+    await expect(report).toContainText('3 lignes');
+    await expect(report).toContainText('1 rejetées');
+    await expect(page.getByTestId('csv-rejected-rows')).toContainText('Ligne 4');
+
+    await page.getByTestId('csv-import-submit').click();
+    await expect(page.getByText('Import CSV terminé')).toBeVisible();
+    await expect(page.getByText('L’Étranger')).toBeVisible();
   });
 
   test('deletes a referenced record with reassignment, restores/purges from trash', async ({ page }) => {

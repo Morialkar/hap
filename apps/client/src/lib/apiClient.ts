@@ -58,6 +58,29 @@ class ApiClient {
     });
   }
 
+  async postForm<T>(endpoint: string, data: FormData): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      body: data,
+      credentials: 'include',
+    });
+
+    if (response.status === 401) {
+      const returnTo = window.location.pathname + window.location.search;
+      window.location.href = `/login?returnTo=${encodeURIComponent(returnTo)}`;
+      throw new Error('Unauthorized');
+    }
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw new ApiError(error.message || 'Request failed', response.status, error);
+    }
+
+    return await response.json().catch(() => undefined) as T;
+  }
+
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PUT',

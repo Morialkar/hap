@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CsvImportController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\RecordController;
@@ -30,6 +31,8 @@ Route::prefix('v1')->group(function () {
         Route::post('databases/{database}/export-template', [TemplateController::class, 'export']);
         Route::post('workspaces/{workspace}/install-template', [TemplateController::class, 'install']);
         Route::apiResource('tables', TableController::class);
+        Route::post('tables/{table}/csv-import/dry-run', [CsvImportController::class, 'dryRun']);
+        Route::post('tables/{table}/csv-import', [CsvImportController::class, 'import']);
         Route::apiResource('fields', FieldController::class);
 
         // Record routes - defined explicitly to avoid conflicts

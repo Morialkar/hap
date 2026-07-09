@@ -2,34 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\FieldTypes\FieldTypeRegistry;
 use App\Http\Requests\StoreRecordRequest;
 use App\Http\Requests\UpdateRecordRequest;
 use App\Http\Resources\RecordResource;
-use App\Models\Field;
 use App\Models\Record;
 use App\Models\RecordActivityLog;
 use App\Models\Table;
 use App\Services\RecordActivityService;
 use App\Services\RecordLinkService;
 use App\Services\RecordQueryService;
+use App\Services\RecordValidationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class RecordController extends Controller
 {
     public function __construct(
-        private FieldTypeRegistry $fieldTypeRegistry,
         private RecordLinkService $recordLinkService,
         private RecordQueryService $recordQueryService,
-        private RecordActivityService $recordActivityService
+        private RecordActivityService $recordActivityService,
+        private RecordValidationService $recordValidationService
     ) {}
 
     public function index(Request $request): JsonResponse
     {
         $tableId = $request->query('table_id');
-        
-        if (!$tableId) {
+
+        if (! $tableId) {
             return response()->json([
                 'error' => 'table_id parameter is required',
             ], 400);
@@ -60,8 +59,8 @@ class RecordController extends Controller
         $data = $request->validated()['data'];
 
         // Validate against field-type registry
-        $validationResult = $this->validateRecordData($table, $data);
-        if (!$validationResult['valid']) {
+        $validationResult = $this->recordValidationService->validate($table, $data);
+        if (! $validationResult['valid']) {
             return response()->json([
                 'error' => 'Validation failed',
                 'errors' => $validationResult['errors'],
@@ -70,7 +69,7 @@ class RecordController extends Controller
 
         $record = Record::create([
             'table_id' => $table->id,
-            'data' => $this->normalizeRecordData($table, $data),
+            'data' => $this->recordValidationService->normalize($table, $data),
             'version' => 1,
         ]);
 
@@ -91,7 +90,7 @@ class RecordController extends Controller
     public function update(UpdateRecordRequest $request, Record $record): JsonResponse
     {
         $data = $request->validated()['data'];
-        $table = $record->table;
+        $table = Table::findOrFail($record->table_id);
 
         // Optimistic concurrency check
         $clientVersion = $request->input('version');
@@ -104,8 +103,8 @@ class RecordController extends Controller
         }
 
         // Validate against field-type registry
-        $validationResult = $this->validateRecordData($table, $data);
-        if (!$validationResult['valid']) {
+        $validationResult = $this->recordValidationService->validate($table, $data);
+        if (! $validationResult['valid']) {
             return response()->json([
                 'error' => 'Validation failed',
                 'errors' => $validationResult['errors'],
@@ -113,7 +112,7 @@ class RecordController extends Controller
         }
 
         $oldData = $record->data;
-        $newData = $this->normalizeRecordData($table, $data);
+        $newData = $this->recordValidationService->normalize($table, $data);
 
         $record->update([
             'data' => $newData,
@@ -133,7 +132,7 @@ class RecordController extends Controller
     {
         // Check if record is referenced by other records
         $referenceCounts = $this->recordLinkService->getReferenceCounts($record);
-        
+
         if ($referenceCounts['total'] > 0) {
             return response()->json([
                 'error' => 'Cannot delete record that is referenced by other records',
@@ -251,7 +250,7 @@ class RecordController extends Controller
     {
         // Check if record is referenced by other records
         $referenceCounts = $this->recordLinkService->getReferenceCounts($recordWithTrashed);
-        
+
         if ($referenceCounts['total'] > 0) {
             return response()->json([
                 'error' => 'Cannot purge record that is referenced by other records',
@@ -262,57 +261,5 @@ class RecordController extends Controller
         $recordWithTrashed->forceDelete();
 
         return response()->json(null, 204);
-    }
-
-    private function validateRecordData(Table $table, array $data): array
-    {
-        $errors = [];
-        $fields = $table->fields;
-        $fieldMap = $fields->keyBy('name');
-
-        // Check for unknown fields
-        foreach (array_keys($data) as $fieldName) {
-            if (!isset($fieldMap[$fieldName])) {
-                $errors[$fieldName][] = 'Unknown field';
-            }
-        }
-
-        // Validate each field
-        foreach ($fields as $field) {
-            $fieldName = $field->name;
-            $value = $data[$fieldName] ?? null;
-
-            $fieldType = $this->fieldTypeRegistry->get($field->type);
-            $options = $field->options ?? [];
-
-            $result = $fieldType->validate($value, $options);
-            if (!$result['valid']) {
-                $errors[$fieldName][] = $result['error'];
-            }
-        }
-
-        return [
-            'valid' => empty($errors),
-            'errors' => $errors,
-        ];
-    }
-
-    private function normalizeRecordData(Table $table, array $data): array
-    {
-        $normalized = [];
-        $fields = $table->fields;
-        $fieldMap = $fields->keyBy('name');
-
-        foreach ($data as $fieldName => $value) {
-            if (isset($fieldMap[$fieldName])) {
-                $field = $fieldMap[$fieldName];
-                $fieldType = $this->fieldTypeRegistry->get($field->type);
-                $options = $field->options ?? [];
-
-                $normalized[$fieldName] = $fieldType->serialize($value, $options);
-            }
-        }
-
-        return $normalized;
     }
 }
