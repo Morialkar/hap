@@ -28,7 +28,7 @@ function mockRoutes(page: import('@playwright/test').Page) {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(tables[0]) });
   });
 
-  page.route('**/api/v1/tables**', async (route) => {
+  page.route(/.*\/api\/v1\/tables(?:\?.*)?$/, async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(tables) });
   });
 
@@ -74,7 +74,7 @@ test.describe('Card Layout Builder', () => {
   });
 
   test('switches tabs and creates a new layout view', async ({ page }) => {
-    await expect(page.locator('h2')).toContainText('Éditeur de structure');
+    await expect(page.getByRole('heading', { level: 1, name: 'Ouvrages' })).toBeVisible();
 
     // Click the layout/disposition tab
     const layoutTab = page.locator('[data-testid="layout-tab"]');

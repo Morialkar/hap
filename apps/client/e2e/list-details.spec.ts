@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 const mockUser = { id: '00000000-0000-0000-0000-000000000000', name: 'Test User', email: 'test@example.com' };
 
@@ -187,7 +188,7 @@ test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
 
     // 2. Sorting by column
     const titleHeader = page.locator('[data-testid="sort-header-Titre"]');
-    await titleHeader.click();
+    await titleHeader.getByRole('button').click();
     await expect(titleHeader.locator('.ti-chevron-up')).toBeVisible();
 
     // 3. Grouping by field
@@ -222,6 +223,30 @@ test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
     const detailPanel = page.locator('[data-testid="detail-view"]');
     await expect(detailPanel).toBeVisible();
     await expect(detailPanel.locator('.text-muted', { hasText: '--' })).toHaveCount(2);
+  });
+
+  test('empty state offers a direct path to create the first record', async ({ page }) => {
+    records = [];
+    await page.reload();
+
+    const emptyState = page.getByTestId('records-empty-state');
+    await expect(emptyState).toBeVisible();
+    await expect(emptyState).toContainText('Aucune fiche pour le moment');
+    await emptyState.getByRole('button', { name: 'Ajouter une fiche' }).click();
+    await expect(page.getByRole('heading', { level: 2, name: 'Ajouter une fiche' })).toBeVisible();
+  });
+
+  test('list and detail views have no detectable accessibility violations', async ({ page }) => {
+    await expect(page.getByRole('heading', { level: 1, name: 'Ouvrages' })).toBeVisible();
+
+    const listResults = await new AxeBuilder({ page }).analyze();
+    expect(listResults.violations).toEqual([]);
+
+    await page.click('[data-testid="record-row-rec-1"]');
+    await expect(page.getByTestId('detail-view')).toBeVisible();
+
+    const detailResults = await new AxeBuilder({ page }).analyze();
+    expect(detailResults.violations).toEqual([]);
   });
 
   test('shows an explicit error when record details cannot be loaded', async ({ page }) => {

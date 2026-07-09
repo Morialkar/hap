@@ -1,6 +1,6 @@
-// HAP Theme — custom overrides slot (R1-D6: green dark theme)
-// Tabler base is imported upstream in apps/client/src/styles/tabler.scss
-// so node_modules resolution works correctly from the consuming app.
-//
-// Add variable overrides here before they are forwarded to apps/client.
-
+// HAP design system. This package contains only original HAP code and Tabler imports.
+@use '@tabler/core/scss/tabler';
+@use 'tokens';
+@use 'accents';
+@use 'shell';
+@use 'records';

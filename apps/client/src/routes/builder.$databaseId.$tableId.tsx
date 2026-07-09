@@ -10,6 +10,9 @@ import { FieldCanvas, BuilderDndProvider } from '../components/FieldCanvas';
 import { FieldOptionPanel } from '../components/FieldOptionPanel';
 import { DestructiveChangeModal } from '../components/DestructiveChangeModal';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { EmptyState } from '../components/ui/EmptyState';
+import { PageActions, PageHeader } from '../components/ui/PageHeader';
+import { SurfaceCard } from '../components/ui/SurfaceCard';
 import { CardLayoutBuilder } from '../components/CardLayoutBuilder';
 
 export const Route = createFileRoute('/builder/$databaseId/$tableId')({
@@ -335,28 +338,29 @@ function StructureBuilder() {
   }
 
   return (
-    <div className="container-fluid py-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <div>
-          <h2>{t('builder.title')}</h2>
-          <p className="text-muted mb-0">
-            {databaseQuery.data?.name} → {tableQuery.data?.name}
-          </p>
-        </div>
-        {activeTab === 'structure' && (
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleSaveAll}
-            disabled={saveFieldMutation.isPending}
-          >
-            <i className="ti ti-device-floppy me-1" />
-            {t('common.save')}
-          </button>
-        )}
-      </div>
+    <div>
+      <PageHeader
+        pretitle={databaseQuery.data?.name}
+        title={tableQuery.data?.name}
+        description={t('builder.title')}
+        actions={
+          activeTab === 'structure' ? (
+            <PageActions>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSaveAll}
+                disabled={saveFieldMutation.isPending}
+              >
+                <i className="ti ti-device-floppy me-1" aria-hidden="true" />
+                {t('common.save')}
+              </button>
+            </PageActions>
+          ) : undefined
+        }
+      />
 
-      <div className="card mb-3">
+      <SurfaceCard className="mb-3">
         <div className="card-header p-0">
           <ul className="nav nav-tabs card-header-tabs m-0">
             <li className="nav-item">
@@ -382,7 +386,7 @@ function StructureBuilder() {
             </li>
           </ul>
         </div>
-      </div>
+      </SurfaceCard>
 
       {activeTab === 'structure' ? (
         <BuilderDndProvider fields={fields} onAdd={handleAdd} onReorder={handleReorder}>
@@ -408,11 +412,9 @@ function StructureBuilder() {
                 onChange={handleFieldChange}
               />
             ) : (
-              <div className="card h-100">
-                <div className="card-body text-center text-muted">
-                  {t('builder.canvas.empty')}
-                </div>
-              </div>
+              <SurfaceCard className="h-100">
+                <EmptyState icon="forms" title={t('builder.canvas.empty')} />
+              </SurfaceCard>
             )}
           </div>
         </div>

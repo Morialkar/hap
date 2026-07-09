@@ -11,6 +11,9 @@ import { RecordHistoryPanel } from '../components/RecordHistoryPanel';
 import { DeleteReassignModal } from '../components/DeleteReassignModal';
 import { TrashManagerModal } from '../components/TrashManagerModal';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { EmptyState } from '../components/ui/EmptyState';
+import { PageActions, PageHeader } from '../components/ui/PageHeader';
+import { SurfaceCard } from '../components/ui/SurfaceCard';
 
 export const Route = createFileRoute('/tables/$databaseId/$tableId')({
   component: TableRecordsPage,
@@ -273,7 +276,7 @@ function TableRecordsPage() {
   }
 
   return (
-    <div className="container-fluid py-4">
+    <div className="hap-records-page">
       {/* Toast alert */}
       {successToast && (
         <div className="alert alert-success py-2 px-3 mb-3 d-flex align-items-center gap-2">
@@ -283,45 +286,44 @@ function TableRecordsPage() {
       )}
 
       {/* Main Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <div>
-          <h2>{t('records.title')}</h2>
-          <p className="text-muted mb-0">
-            {databaseQuery.data?.name} → {tableQuery.data?.name}
-          </p>
-        </div>
-        <div className="d-flex gap-2">
-          <button
-            type="button"
-            className="btn btn-outline-secondary btn-sm"
-            onClick={() => setIsTrashOpen(true)}
-            data-testid="trash-btn"
-          >
-            <i className="ti ti-trash me-1" aria-hidden="true" />
-            {t('records.trash.title')}
-          </button>
-          <Link
-            to="/builder/$databaseId/$tableId"
-            params={{ databaseId, tableId }}
-            className="btn btn-outline-secondary btn-sm"
-          >
-            <i className="ti ti-stack-2 me-1" aria-hidden="true" />
-            {t('builder.tabs.structure')}
-          </Link>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            onClick={() => navigate({ search: { action: 'create' } as any })}
-            data-testid="add-record-btn"
-          >
-            <i className="ti ti-plus me-1" aria-hidden="true" />
-            {t('records.add')}
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        pretitle={databaseQuery.data?.name}
+        title={tableQuery.data?.name}
+        description={t('records.title')}
+        actions={
+          <PageActions>
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => setIsTrashOpen(true)}
+                data-testid="trash-btn"
+              >
+                <i className="ti ti-trash me-1" aria-hidden="true" />
+                {t('records.trash.title')}
+              </button>
+              <Link
+                to="/builder/$databaseId/$tableId"
+                params={{ databaseId, tableId }}
+                className="btn btn-outline-secondary"
+              >
+                <i className="ti ti-stack-2 me-1" aria-hidden="true" />
+                {t('builder.tabs.structure')}
+              </Link>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => navigate({ search: { action: 'create' } as any })}
+                data-testid="add-record-btn"
+              >
+                <i className="ti ti-plus me-1" aria-hidden="true" />
+                {t('records.add')}
+              </button>
+          </PageActions>
+        }
+      />
 
       {/* Query Filter and Search Controls */}
-      <div className="card mb-3">
+      <SurfaceCard variant="toolbar" className="mb-3">
         <div className="card-body">
           <div className="row g-3 align-items-center">
             {/* Search Input */}
@@ -333,6 +335,7 @@ function TableRecordsPage() {
                 <input
                   type="text"
                   className="form-control"
+                  aria-label={t('common.search')}
                   placeholder={t('records.search')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -344,8 +347,11 @@ function TableRecordsPage() {
             {/* Group By Selector */}
             <div className="col-md-4">
               <div className="d-flex align-items-center gap-2">
-                <label className="text-nowrap small mb-0">{t('records.groupBy')}:</label>
+                <label htmlFor="group-by-field" className="text-nowrap small mb-0">
+                  {t('records.groupBy')}:
+                </label>
                 <select
+                  id="group-by-field"
                   className="form-select form-select-sm"
                   value={groupByField}
                   onChange={(e) => setGroupByField(e.target.value)}
@@ -383,6 +389,7 @@ function TableRecordsPage() {
                   <div className="col-md-3">
                     <select
                       className="form-select form-select-sm"
+                      aria-label={t('records.filter.field')}
                       value={filter.field}
                       onChange={(e) => handleUpdateFilter(index, 'field', e.target.value)}
                     >
@@ -396,6 +403,7 @@ function TableRecordsPage() {
                   <div className="col-md-3">
                     <select
                       className="form-select form-select-sm"
+                      aria-label={t('records.filter.operator')}
                       value={filter.operator}
                       onChange={(e) => handleUpdateFilter(index, 'operator', e.target.value)}
                     >
@@ -417,6 +425,7 @@ function TableRecordsPage() {
                       <input
                         type="text"
                         className="form-control form-control-sm"
+                        aria-label={t('records.filter.value')}
                         placeholder="Value..."
                         value={filter.value}
                         onChange={(e) => handleUpdateFilter(index, 'value', e.target.value)}
@@ -428,6 +437,7 @@ function TableRecordsPage() {
                     <button
                       type="button"
                       className="btn btn-outline-danger btn-sm py-1"
+                      aria-label={t('common.remove')}
                       onClick={() => handleRemoveFilter(index)}
                     >
                       <i className="ti ti-trash" />
@@ -438,46 +448,71 @@ function TableRecordsPage() {
             </div>
           )}
         </div>
-      </div>
+      </SurfaceCard>
 
       <div className="row g-4">
         {/* Spreadsheet Records browser */}
         <div className={activeAction || activeRecordId ? 'col-lg-7' : 'col-12'}>
-          <div className="card">
+          <SurfaceCard className="overflow-hidden">
             <div
               ref={parentRef}
-              className="table-responsive"
+              className="table-responsive hap-records-table"
               style={{ maxHeight: '600px', overflowY: 'auto' }}
             >
-              <table className="table table-vcenter card-table table-hover">
-                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: '#fff' }}>
+              <table className="table table-vcenter card-table table-hover mb-0">
+                <thead>
                   <tr>
                     {fields.slice(0, 5).map((f) => (
                       <th
                         key={f.id}
-                        className="cursor-pointer select-none"
-                        onClick={() => handleSort(f.name)}
-                        style={{ cursor: 'pointer' }}
+                        aria-sort={
+                          sortBy === f.name
+                            ? sortDir === 'asc'
+                              ? 'ascending'
+                              : 'descending'
+                            : 'none'
+                        }
                         data-testid={`sort-header-${f.name}`}
                       >
-                        <div className="d-flex align-items-center gap-1">
+                        <button
+                          type="button"
+                          className="hap-sort-button"
+                          onClick={() => handleSort(f.name)}
+                        >
                           <span>{f.name}</span>
                           {sortBy === f.name ? (
                             <i className={`ti ti-chevron-${sortDir === 'asc' ? 'up' : 'down'}`} />
                           ) : (
                             <i className="ti ti-selector text-muted small" />
                           )}
-                        </div>
+                        </button>
                       </th>
                     ))}
-                    <th className="w-1" />
+                    <th className="w-1">
+                      <span className="visually-hidden">{t('common.actions')}</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {flatListItems.length === 0 && (
                     <tr>
-                      <td colSpan={fields.slice(0, 5).length + 1} className="text-center py-4 text-muted">
-                        {t('records.empty')}
+                      <td colSpan={fields.slice(0, 5).length + 1}>
+                        <EmptyState
+                          icon="notes-off"
+                          title={t('records.empty.title')}
+                          description={t('records.empty.description')}
+                          testId="records-empty-state"
+                          action={
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={() => navigate({ search: { action: 'create' } as any })}
+                            >
+                              <i className="ti ti-plus me-1" aria-hidden="true" />
+                              {t('records.add')}
+                            </button>
+                          }
+                        />
                       </td>
                     </tr>
                   )}
@@ -518,8 +553,8 @@ function TableRecordsPage() {
                             search: { action: search.action, recordId: rec.id } as any,
                           })
                         }
-                        className={isSelected ? 'table-primary cursor-pointer' : 'cursor-pointer'}
-                        style={{ cursor: 'pointer', height: `${virtualRow.size}px` }}
+                        className={`hap-record-row ${isSelected ? 'is-selected' : ''}`}
+                        style={{ height: `${virtualRow.size}px` }}
                         data-testid={`record-row-${rec.id}`}
                       >
                         {fields.slice(0, 5).map((f) => {
@@ -543,6 +578,19 @@ function TableRecordsPage() {
                             <button
                               type="button"
                               className="btn btn-outline-secondary btn-sm py-1 px-2"
+                              aria-label={t('common.details')}
+                              onClick={() =>
+                                navigate({
+                                  search: { action: search.action, recordId: rec.id } as any,
+                                })
+                              }
+                            >
+                              <i className="ti ti-eye" aria-hidden="true" />
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-outline-secondary btn-sm py-1 px-2"
+                              aria-label={t('common.edit')}
                               onClick={() =>
                                 navigate({
                                   search: { action: 'edit', recordId: rec.id } as any,
@@ -561,6 +609,7 @@ function TableRecordsPage() {
                                 })
                               }
                               data-testid={`duplicate-record-${rec.id}`}
+                              aria-label={t('records.duplicate')}
                               title={t('records.duplicate')}
                             >
                               <i className="ti ti-copy" />
@@ -568,6 +617,7 @@ function TableRecordsPage() {
                             <button
                               type="button"
                               className="btn btn-outline-danger btn-sm py-1 px-2"
+                              aria-label={t('common.delete')}
                               onClick={() => handleDeleteRecord(rec.id)}
                               data-testid={`delete-record-${rec.id}`}
                             >
@@ -587,15 +637,15 @@ function TableRecordsPage() {
                 </tbody>
               </table>
             </div>
-          </div>
+          </SurfaceCard>
         </div>
 
         {/* Side Panel: Create/Edit Form or Detail Card Layout switcher */}
         {(activeAction || activeRecordId) && (
           <div className="col-lg-5">
-            <div className="card shadow-sm border-primary">
+            <SurfaceCard variant="detail">
               <div className="card-header d-flex justify-content-between align-items-center py-2">
-                <h3 className="card-title mb-0">
+                <h2 className="card-title mb-0">
                   {activeAction === 'create'
                     ? t('records.add')
                     : activeAction === 'edit'
@@ -603,7 +653,7 @@ function TableRecordsPage() {
                     : activeAction === 'duplicate'
                     ? t('records.duplicate')
                     : t('common.details')}
-                </h3>
+                </h2>
                 <button
                   type="button"
                   className="btn-close"
@@ -667,7 +717,7 @@ function TableRecordsPage() {
                   )
                 ) : null}
               </div>
-            </div>
+            </SurfaceCard>
           </div>
         )}
       </div>

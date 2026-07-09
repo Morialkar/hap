@@ -105,7 +105,7 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
         );
 
       case 'select':
-        return <span className="badge bg-light text-dark px-2 py-1">{String(value)}</span>;
+        return <span className="badge text-bg-secondary px-2 py-1">{String(value)}</span>;
 
       case 'reference':
         return <ReferenceLabel targetRecordId={String(value)} />;
@@ -155,7 +155,7 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
       }
 
       default:
-        return <div className="text-dark text-wrap">{String(value)}</div>;
+        return <div className="text-body text-wrap">{String(value)}</div>;
     }
   };
 
@@ -179,7 +179,7 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
                 if (!fieldDef) return null;
 
                 return (
-                  <div key={fId} className="card shadow-sm border-0 p-3">
+                  <div key={fId} className="hap-detail-field">
                     <div className="small text-muted fw-bold mb-1 text-uppercase">{fieldDef.name}</div>
                     <div className="lh-sm">{renderFieldValue(fieldDef.name)}</div>
                   </div>

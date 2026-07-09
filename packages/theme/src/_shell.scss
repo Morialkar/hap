@@ -1,0 +1,84 @@
+.page {
+  min-height: 100vh;
+}
+
+.hap-topbar {
+  background: var(--hap-surface-elevated);
+  border-bottom: 1px solid var(--tblr-border-color);
+}
+
+.hap-navbar {
+  background: var(--hap-surface);
+  border-bottom: 1px solid var(--tblr-border-color);
+  box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 4%);
+}
+
+.hap-navbar .nav-link.active {
+  color: var(--hap-accent-text);
+}
+
+.hap-navbar .nav-link.active::after {
+  background: var(--tblr-primary);
+}
+
+.hap-appearance-menu {
+  inset-inline-end: 0;
+  min-width: min(22rem, calc(100vw - 2rem));
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  z-index: 1050;
+}
+
+.hap-accent-grid {
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.hap-accent-option {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--tblr-border-radius);
+  color: var(--tblr-body-color);
+  display: flex;
+  font: inherit;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  text-align: start;
+}
+
+.hap-accent-option:hover {
+  background: var(--tblr-bg-surface-secondary);
+}
+
+.hap-accent-option.is-active {
+  background: var(--tblr-primary-bg-subtle);
+  border-color: var(--tblr-primary-border-subtle);
+}
+
+.hap-accent-swatch {
+  background: var(--hap-accent);
+  border: 1px solid rgb(0 0 0 / 18%);
+  border-radius: 50%;
+  flex: 0 0 auto;
+  height: 1rem;
+  width: 1rem;
+}
+
+@media (width < 768px) {
+  .hap-navbar .navbar-nav {
+    padding-block: 0.5rem;
+  }
+
+  .hap-navbar .nav-link {
+    border-radius: var(--tblr-border-radius);
+    padding-inline: 0.75rem;
+  }
+
+  .hap-appearance-menu {
+    position: fixed;
+    right: 1rem;
+    top: 4rem;
+  }
+}

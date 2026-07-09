@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 const mockUser = {
   id: '00000000-0000-0000-0000-000000000000',
@@ -104,21 +105,55 @@ test.describe('Authentication Flow', () => {
     await expect(page.locator('h1')).toContainText('Espaces de travail');
 
     // Toggle to English (button shows the target locale)
-    await page.locator('nav button', { hasText: 'EN' }).click();
+    await page.getByTestId('language-toggle').click();
     await expect(page.locator('h1')).toContainText('Workspaces');
 
     await page.reload();
     await expect(page.locator('h1')).toContainText('Workspaces');
   });
 
-  test('theme toggle switches themes', async ({ page }) => {
+  test('appearance and accent preferences persist across reloads', async ({ page }) => {
     mockAuthRoutes(page, { authed: true });
     await page.goto('/workspaces');
 
-    const themeButton = page.locator('nav button').filter({ hasText: /🌙|🌞|🌿/ });
-    const initialEmoji = await themeButton.textContent();
-    await themeButton.click();
-    const newEmoji = await themeButton.textContent();
-    expect(newEmoji).not.toBe(initialEmoji);
+    await page.getByTestId('appearance-menu-toggle').click();
+    await page.getByTestId('appearance-dark').click();
+    await page.getByTestId('accent-magenta').click();
+
+    await expect(page.locator('html')).toHaveAttribute('data-bs-theme', 'dark');
+    await expect(page.locator('html')).toHaveAttribute('data-hap-accent', 'magenta');
+
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-bs-theme', 'dark');
+    await expect(page.locator('html')).toHaveAttribute('data-hap-accent', 'magenta');
+  });
+
+  test('mobile navigation opens and closes without Bootstrap JavaScript', async ({ page }) => {
+    mockAuthRoutes(page, { authed: true });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/workspaces');
+
+    const toggle = page.getByTestId('navigation-toggle');
+    const navigation = page.locator('#primary-navigation');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(navigation).not.toBeVisible();
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(navigation).toBeVisible();
+
+    await navigation.getByRole('link', { name: 'Accueil' }).click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('shared shell and workspace empty state have no detectable accessibility violations', async ({
+    page,
+  }) => {
+    mockAuthRoutes(page, { authed: true });
+    await page.goto('/workspaces');
+    await expect(page.getByRole('heading', { level: 1, name: 'Espaces de travail' })).toBeVisible();
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
   });
 });

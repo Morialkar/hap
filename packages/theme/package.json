@@ -2,5 +2,8 @@
   "name": "@hap/theme",
   "version": "0.0.0",
   "private": true,
-  "description": "HAP design system: Tabler SCSS base (green dark theme lands R1-D6)"
+  "description": "HAP design system: Tabler SCSS base and accessible accent themes",
+  "dependencies": {
+    "@tabler/core": "^1.4.0"
+  }
 }

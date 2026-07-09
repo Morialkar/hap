@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { httpClient } from '../lib/httpClient';
+import { PageHeader } from '../components/ui/PageHeader';
+import { SurfaceCard } from '../components/ui/SurfaceCard';
 
 export const Route = createFileRoute('/ping')({
   component: PingPage,
@@ -21,9 +23,9 @@ function PingPage() {
 
   return (
     <div>
-      <h1 className="page-title mb-4">API Status</h1>
+      <PageHeader title="API Status" />
       <div className="col-md-5">
-        <div className={`card ${isError ? 'border-danger' : isPending ? '' : 'border-success'}`}>
+        <SurfaceCard className={isError ? 'border-danger' : isPending ? '' : 'border-success'}>
           <div className="card-body">
             {isPending && (
               <div className="d-flex align-items-center gap-2 text-secondary">
@@ -50,7 +52,7 @@ function PingPage() {
               </dl>
             )}
           </div>
-        </div>
+        </SurfaceCard>
       </div>
     </div>
   );

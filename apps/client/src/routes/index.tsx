@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { PageHeader } from '../components/ui/PageHeader';
+import { SurfaceCard } from '../components/ui/SurfaceCard';
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -6,27 +8,22 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
   return (
-    <div className="page-header">
-      <div className="row align-items-center">
-        <div className="col-auto">
-          <h1 className="page-title">Heritage Archives Patrimoine</h1>
-          <p className="text-secondary mt-1">
-            Open-source platform for cataloguing and preserving literary and cultural heritage
-            collections.
-          </p>
-        </div>
-      </div>
+    <div>
+      <PageHeader
+        title="Heritage Archives Patrimoine"
+        description="Open-source platform for cataloguing and preserving literary and cultural heritage collections."
+      />
       <div className="row mt-4">
         <div className="col-md-4">
-          <div className="card">
+          <SurfaceCard>
             <div className="card-body">
-              <h3 className="card-title">API Status</h3>
+              <h2 className="card-title">API Status</h2>
               <p className="text-secondary">Check connectivity to the HAP API.</p>
               <Link to="/ping" className="btn btn-primary">
                 View status
               </Link>
             </div>
-          </div>
+          </SurfaceCard>
         </div>
       </div>
     </div>

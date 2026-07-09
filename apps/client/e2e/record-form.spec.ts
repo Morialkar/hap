@@ -79,12 +79,13 @@ test.describe('Record Forms and Ergonomics', () => {
   });
 
   test('creates a record with inline reference and checks counter', async ({ page }) => {
-    await expect(page.locator('h2')).toContainText('Fiches');
-    await expect(page.locator('text=Aucune fiche dans cette table.')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Ouvrages' })).toBeVisible();
+    await expect(page.getByText('Aucune fiche pour le moment')).toBeVisible();
 
     // Open creation panel
     await page.click('[data-testid="add-record-btn"]');
-    await expect(page.locator('h3')).toContainText('Ajouter une fiche');
+    const createPanelTitle = page.getByRole('heading', { level: 2, name: 'Ajouter une fiche' });
+    await expect(createPanelTitle).toBeVisible();
 
     // Fill Title and verify counter updates
     const titleInput = page.locator('[data-testid="field-input-Titre"]');
@@ -114,14 +115,15 @@ test.describe('Record Forms and Ergonomics', () => {
     await page.click('[data-testid="save-record"]');
 
     // Form closes and record is in table list
-    await expect(page.locator('h3')).not.toBeVisible();
+    await expect(createPanelTitle).not.toBeVisible();
     await expect(page.locator('text=Le Petit Prince')).toBeVisible();
   });
 
   test('unsaved changes guard blocks cancel action when form is dirty', async ({ page }) => {
     // Open creation panel
     await page.click('[data-testid="add-record-btn"]');
-    await expect(page.locator('h3')).toContainText('Ajouter une fiche');
+    const createPanelTitle = page.getByRole('heading', { level: 2, name: 'Ajouter une fiche' });
+    await expect(createPanelTitle).toBeVisible();
 
     // Type in form (dirty)
     const titleInput = page.locator('[data-testid="field-input-Titre"]');
@@ -137,7 +139,7 @@ test.describe('Record Forms and Ergonomics', () => {
     await page.click('.btn-close');
 
     // Form should remain open
-    await expect(page.locator('h3')).toContainText('Ajouter une fiche');
+    await expect(createPanelTitle).toBeVisible();
 
     // Now set dialog handler to accept the pop-up
     page.once('dialog', async (dialog) => {
@@ -148,6 +150,6 @@ test.describe('Record Forms and Ergonomics', () => {
     await page.click('.btn-close');
 
     // Form should be closed
-    await expect(page.locator('h3')).not.toBeVisible();
+    await expect(createPanelTitle).not.toBeVisible();
   });
 });

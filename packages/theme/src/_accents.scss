@@ -1,0 +1,67 @@
+@use 'sass:list';
+
+$accents: (
+  'heritage-green': (#459e00, 69 158 0, #67b021, #081300),
+  'lime': (#74b816, 116 184 22, #8ac926, #0c1702),
+  'amber': (#f59f00, 245 159 0, #ffb224, #211400),
+  'orange': (#f76707, 247 103 7, #ff812e, #210b00),
+  'red': (#d63939, 214 57 57, #bd2f2f, #ffffff),
+  'rose': (#e64980, 230 73 128, #f06595, #200710),
+  'magenta': (#ae3ec9, 174 62 201, #9434ad, #ffffff),
+  'violet': (#7048e8, 112 72 232, #5f3dc4, #ffffff),
+  'indigo': (#4263eb, 66 99 235, #364fc7, #ffffff),
+  'blue': (#1971c2, 25 113 194, #1864ab, #ffffff),
+  'cyan': (#1098ad, 16 152 173, #22b8cf, #061619),
+  'teal': (#0ca678, 12 166 120, #20c997, #031a13),
+);
+
+@each $name, $values in $accents {
+  $primary: list.nth($values, 1);
+  $rgb: list.nth($values, 2);
+  $hover: list.nth($values, 3);
+  $foreground: list.nth($values, 4);
+
+  [data-hap-accent='#{$name}'] {
+    --hap-accent: #{$primary};
+    --hap-accent-rgb: #{$rgb};
+    --hap-accent-hover: #{$hover};
+    --hap-accent-foreground: #{$foreground};
+    --hap-focus: color-mix(in srgb, var(--hap-accent), #000 42%);
+    --hap-accent-text: color-mix(in srgb, var(--hap-accent), #000 42%);
+
+    --tblr-primary: var(--hap-accent);
+    --tblr-primary-rgb: var(--hap-accent-rgb);
+    --tblr-primary-fg: var(--hap-accent-foreground);
+    --tblr-primary-darken: var(--hap-accent-hover);
+    --tblr-primary-text-emphasis: var(--hap-accent-text);
+    --tblr-link-color: var(--hap-accent-text);
+    --tblr-link-hover-color: color-mix(in srgb, var(--hap-accent-text), #000 18%);
+    --tblr-focus-ring-color: color-mix(in srgb, var(--hap-focus), transparent 35%);
+    --tblr-primary-bg-subtle: rgb(var(--hap-accent-rgb) / 14%);
+    --tblr-primary-border-subtle: rgb(var(--hap-accent-rgb) / 42%);
+  }
+}
+
+[data-bs-theme='dark'][data-hap-accent] {
+  --hap-focus: color-mix(in srgb, var(--hap-accent), #fff 32%);
+  --hap-accent-text: color-mix(in srgb, var(--hap-accent), #fff 38%);
+  --tblr-link-hover-color: color-mix(in srgb, var(--hap-accent-text), #fff 18%);
+  --tblr-primary-bg-subtle: rgb(var(--hap-accent-rgb) / 20%);
+  --tblr-primary-border-subtle: rgb(var(--hap-accent-rgb) / 55%);
+}
+
+.text-primary {
+  color: var(--hap-accent-text) !important;
+}
+
+:where(
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [tabindex]:not([tabindex='-1'])
+):focus-visible {
+  outline: 3px solid var(--hap-focus);
+  outline-offset: 2px;
+}

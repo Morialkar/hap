@@ -5,6 +5,9 @@ import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { generateId } from '../lib/id';
+import { EmptyState } from '../components/ui/EmptyState';
+import { PageHeader } from '../components/ui/PageHeader';
+import { SurfaceCard } from '../components/ui/SurfaceCard';
 
 export const Route = createFileRoute('/workspaces')({
   component: Workspaces,
@@ -69,14 +72,12 @@ function Workspaces() {
   }
 
   return (
-    <div className="container-xl py-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>{t('nav.workspaces')}</h1>
-      </div>
+    <div>
+      <PageHeader title={t('nav.workspaces')} />
 
-      <div className="card mb-4">
+      <SurfaceCard className="mb-4">
         <div className="card-header">
-          <h5 className="card-title mb-0">{t('common.create')}</h5>
+          <h2 className="card-title mb-0">{t('common.create')}</h2>
         </div>
         <div className="card-body">
           <div className="input-group">
@@ -108,10 +109,16 @@ function Workspaces() {
             </button>
           </div>
         </div>
-      </div>
+      </SurfaceCard>
 
       {(databasesQuery.data ?? []).length === 0 ? (
-        <div className="alert alert-info">{t('workspaces.empty.message')}</div>
+        <SurfaceCard>
+          <EmptyState
+            icon="database-off"
+            title={t('workspaces.empty.title')}
+            description={t('workspaces.empty.message')}
+          />
+        </SurfaceCard>
       ) : (
         <div className="vstack gap-3">
           {(databasesQuery.data ?? []).map((database) => {
@@ -119,9 +126,9 @@ function Workspaces() {
             const tableName = newTableNameByDatabase[database.id] ?? '';
 
             return (
-              <div key={database.id} className="card">
+              <SurfaceCard key={database.id}>
                 <div className="card-header d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0">{database.name}</h5>
+                  <h2 className="h4 mb-0">{database.name}</h2>
                   <span className="text-muted small">
                     {tables.length} {t('workspaces.tables.count')}
                   </span>
@@ -189,7 +196,7 @@ function Workspaces() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </SurfaceCard>
             );
           })}
         </div>
@@ -197,4 +204,3 @@ function Workspaces() {
     </div>
   );
 }
-

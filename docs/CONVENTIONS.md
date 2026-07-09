@@ -122,6 +122,12 @@ Heritage-Archives-Patrimoine/
 - TypeScript files use `.ts` / `.tsx` extensions
 - SCSS files use `.scss` extension
 
+### Design System
+- `docs/DESIGN-SYSTEM.md` defines the R1-D6 UI foundation.
+- `packages/theme` owns Tabler imports, HAP design tokens, accent variables, and shared SCSS.
+- `apps/client/src/components/ui` contains reusable route/page primitives.
+- Feature routes should reuse shared primitives before adding route-local layout markup.
+
 ## 5. Testing Conventions
 
 ### Contract-First Testing
