@@ -28,6 +28,8 @@ let views = [
 let records = [
   { id: 'rec-1', table_id: 'tbl-1', data: { Titre: 'Le Petit Prince', Année: 1943 }, version: 1 },
   { id: 'rec-2', table_id: 'tbl-1', data: { Titre: 'Vol de Nuit', Année: 1931 }, version: 1 },
+  { id: 'rec-empty', table_id: 'tbl-1', data: {}, version: 1 },
+  { id: 'rec-error', table_id: 'tbl-1', data: { Titre: 'Erreur' }, version: 1 },
 ];
 
 let trashRecords = [
@@ -105,8 +107,17 @@ function mockRoutes(page: import('@playwright/test').Page) {
       return;
     }
 
+    if (id === 'rec-error') {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Record lookup failed' }),
+      });
+      return;
+    }
+
     const r = records.find((item) => item.id === id) || records[0];
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: r }) });
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(r) });
   });
 
   // Handle record sub-resource routes (must be registered after single-record route)
@@ -158,6 +169,8 @@ test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
     records = [
       { id: 'rec-1', table_id: 'tbl-1', data: { Titre: 'Le Petit Prince', Année: 1943 }, version: 1 },
       { id: 'rec-2', table_id: 'tbl-1', data: { Titre: 'Vol de Nuit', Année: 1931 }, version: 1 },
+      { id: 'rec-empty', table_id: 'tbl-1', data: {}, version: 1 },
+      { id: 'rec-error', table_id: 'tbl-1', data: { Titre: 'Erreur' }, version: 1 },
     ];
     trashRecords = [
       { id: 'rec-trashed-1', table_id: 'tbl-1', data: { Titre: 'L\'Étranger', Année: 1942 }, deleted_at: '2026-07-08T23:30:00Z' }
@@ -201,6 +214,23 @@ test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
     // Revert/restore version
     await page.click('[data-testid="restore-version-btn-101"]');
     await expect(page.locator('text=Version restored successfully')).toBeVisible();
+  });
+
+  test('shows placeholders for a record whose fields are empty', async ({ page }) => {
+    await page.click('[data-testid="record-row-rec-empty"]');
+
+    const detailPanel = page.locator('[data-testid="detail-view"]');
+    await expect(detailPanel).toBeVisible();
+    await expect(detailPanel.locator('.text-muted', { hasText: '--' })).toHaveCount(2);
+  });
+
+  test('shows an explicit error when record details cannot be loaded', async ({ page }) => {
+    await page.click('[data-testid="record-row-rec-error"]');
+
+    await expect(page.locator('[data-testid="detail-error"]')).toContainText(
+      'Record lookup failed',
+      { timeout: 15_000 },
+    );
   });
 
   test('deletes a referenced record with reassignment, restores/purges from trash', async ({ page }) => {

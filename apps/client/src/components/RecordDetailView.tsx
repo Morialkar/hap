@@ -39,7 +39,7 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
     version: number;
   }
 
-  const recordQuery = useQuery<{ data: RecordData }, Error>({
+  const recordQuery = useQuery<RecordData, Error>({
     queryKey: ['records', recordId],
     queryFn: () => apiClient.get(`/records/${recordId}`),
     enabled: !!recordId,
@@ -47,7 +47,7 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
 
   const activeView = viewsQuery.data?.data?.[0] || null;
   const fields = useMemo(() => fieldsQuery.data || [], [fieldsQuery.data]);
-  const recordData = recordQuery.data?.data?.data || {};
+  const recordData = recordQuery.data?.data || {};
 
   // Maps for ID and Name lookups
   const fieldsByIdMap = useMemo(() => {
@@ -73,6 +73,14 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
     return (
       <div className="d-flex justify-content-center p-5">
         <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (recordQuery.isError) {
+    return (
+      <div className="alert alert-danger mb-0" role="alert" data-testid="detail-error">
+        {recordQuery.error.message}
       </div>
     );
   }
@@ -216,7 +224,7 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
 
 
 function ReferenceLabel({ targetRecordId }: { targetRecordId: string }) {
-  const recordQuery = useQuery<{ data: any }, Error>({
+  const recordQuery = useQuery<{ data: Record<string, unknown> }, Error>({
     queryKey: ['records', targetRecordId],
     queryFn: () => apiClient.get(`/records/${targetRecordId}`),
     enabled: !!targetRecordId,
@@ -224,7 +232,7 @@ function ReferenceLabel({ targetRecordId }: { targetRecordId: string }) {
 
   if (recordQuery.isLoading) return <LoadingSpinner size="sm" />;
 
-  const rData = recordQuery.data?.data?.data || {};
+  const rData = recordQuery.data?.data || {};
   const label =
     rData.name || rData.title || rData.nom || rData.titre || Object.values(rData)[0] || targetRecordId;
 

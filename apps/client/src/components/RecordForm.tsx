@@ -54,7 +54,7 @@ export function RecordForm({
   const isEditing = !!recordId && !isDuplicate;
   const isDuplicating = !!recordId && isDuplicate;
 
-  const recordQuery = useQuery<{ data: RecordData }, Error>({
+  const recordQuery = useQuery<RecordData, Error>({
     queryKey: ['records', recordId],
     queryFn: () => apiClient.get(`/records/${recordId}`),
     enabled: !!recordId,
@@ -77,7 +77,7 @@ export function RecordForm({
     });
 
     if (recordQuery.data && (isEditing || isDuplicating)) {
-      Object.assign(data, recordQuery.data.data.data);
+      Object.assign(data, recordQuery.data.data);
     }
     return { data };
   }, [recordFields, recordQuery.data, isEditing, isDuplicating]);
@@ -89,7 +89,7 @@ export function RecordForm({
       const payload = {
         table_id: tableId,
         data: value.data,
-        version: isEditing ? recordQuery.data?.data?.version : undefined,
+        version: isEditing ? recordQuery.data?.version : undefined,
       };
 
       if (isEditing) {
@@ -113,24 +113,24 @@ export function RecordForm({
 
   // Mutations
   const createMutation = useMutation({
-    mutationFn: (payload: any) => apiClient.post<{ data: RecordData }>('/records', payload),
+    mutationFn: (payload: any) => apiClient.post<RecordData>('/records', payload),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       queryClient.invalidateQueries({ queryKey: ['records-select'] });
-      onSaveSuccess?.(response.data);
+      onSaveSuccess?.(response);
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: (payload: any) =>
-      apiClient.put<{ data: RecordData }>(`/records/${recordId}`, {
+      apiClient.put<RecordData>(`/records/${recordId}`, {
         data: payload.data,
         version: payload.version,
       }),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       queryClient.invalidateQueries({ queryKey: ['records-select'] });
-      onSaveSuccess?.(response.data);
+      onSaveSuccess?.(response);
     },
   });
 

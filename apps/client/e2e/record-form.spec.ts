@@ -61,7 +61,7 @@ function mockRoutes(page: import('@playwright/test').Page) {
       } else {
         recordsForOuvrages.push(newRecord);
       }
-      await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify({ data: newRecord }) });
+      await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(newRecord) });
       return;
     }
 
