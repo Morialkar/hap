@@ -9,11 +9,22 @@ use App\Models\Table;
 use App\Models\Template;
 use App\Models\View;
 use App\Models\Workspace;
+use App\Models\Record;
+use App\Services\RecordValidationService;
+use App\Services\RecordLinkService;
+use App\Services\RecordActivityService;
+use Symfony\Component\Uid\Ulid;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class TemplateInstallService
 {
+    public function __construct(
+        private RecordValidationService $recordValidationService,
+        private RecordLinkService $recordLinkService,
+        private RecordActivityService $recordActivityService,
+    ) {}
+
     public function install(Workspace $workspace, array $template): array
     {
         $this->validatePayload($template);
@@ -75,6 +86,83 @@ class TemplateInstallService
                         'query' => $this->replaceKeys($reportDefinition['query'] ?? [], $keyMap),
                         'layout' => $this->replaceKeys($reportDefinition['layout'] ?? [], $keyMap),
                     ]);
+                }
+            }
+
+            // Install demo records if present
+            if (! empty($payload['demo_records'])) {
+                $recordIdMap = [];
+
+                // Pass 1: Generate all record ULIDs beforehand to resolve cross-references
+                foreach ($payload['demo_records'] as $demoTableGroup) {
+                    $tableKey = $demoTableGroup['table'];
+                    $tableId = $tableIds[$tableKey] ?? null;
+                    if (! $tableId) {
+                        continue;
+                    }
+
+                    foreach ($demoTableGroup['records'] as $index => $recordData) {
+                        $tempKey = $recordData['id'] ?? ($tableKey . '_' . $index);
+                        $recordIdMap[$tempKey] = (string) new Ulid();
+                    }
+                }
+
+                // Pass 2: Map, validate, create records and sync links
+                foreach ($payload['demo_records'] as $demoTableGroup) {
+                    $tableKey = $demoTableGroup['table'];
+                    $tableId = $tableIds[$tableKey] ?? null;
+                    if (! $tableId) {
+                        continue;
+                    }
+
+                    $tableModel = Table::with('fields')->find($tableId);
+                    $tableDef = collect($payload['tables'])->firstWhere('key', $tableKey);
+                    $fieldsByKey = $tableDef['fields'] ?? [];
+                    
+                    $fieldKeyToName = collect($fieldsByKey)->pluck('name', 'key')->all();
+                    $fieldKeyToType = collect($fieldsByKey)->pluck('type', 'key')->all();
+
+                    foreach ($demoTableGroup['records'] as $index => $recordData) {
+                        $tempKey = $recordData['id'] ?? ($tableKey . '_' . $index);
+                        $realId = $recordIdMap[$tempKey];
+
+                        $normalizedData = [];
+                        foreach ($recordData as $fieldKey => $value) {
+                            if ($fieldKey === 'id') {
+                                continue;
+                            }
+
+                            $fieldName = $fieldKeyToName[$fieldKey] ?? null;
+                            if (! $fieldName) {
+                                continue;
+                            }
+
+                            $fieldType = $fieldKeyToType[$fieldKey] ?? 'text';
+
+                            if ($fieldType === 'reference') {
+                                if (is_array($value)) {
+                                    $normalizedData[$fieldName] = array_map(fn ($val) => $recordIdMap[$val] ?? $val, $value);
+                                } else {
+                                    $normalizedData[$fieldName] = $recordIdMap[$value] ?? $value;
+                                }
+                            } else {
+                                $normalizedData[$fieldName] = $value;
+                            }
+                        }
+
+                        $record = new Record();
+                        $record->id = $realId;
+                        $record->table_id = $tableId;
+                        $record->data = $this->recordValidationService->normalize($tableModel, $normalizedData);
+                        $record->version = 1;
+                        $record->save();
+
+                        $this->recordLinkService->syncLinks($record);
+                        
+                        if (auth()->check()) {
+                            $this->recordActivityService->logCreate($record, auth()->user());
+                        }
+                    }
                 }
             }
 

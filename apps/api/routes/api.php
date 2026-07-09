@@ -19,7 +19,9 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware([StartSession::class, 'auth:sanctum'])->group(function () {
         Route::get('user', function (Request $request) {
-            return $request->user();
+            $user = $request->user();
+            $user->load('workspaceMembers.workspace');
+            return $user;
         });
 
         Route::apiResource('views', ViewController::class);
@@ -28,6 +30,7 @@ Route::prefix('v1')->group(function () {
         Route::post('uploads', [UploadController::class, 'store']);
 
         Route::apiResource('databases', DatabaseController::class);
+        Route::get('templates', [TemplateController::class, 'index']);
         Route::post('databases/{database}/export-template', [TemplateController::class, 'export']);
         Route::post('workspaces/{workspace}/install-template', [TemplateController::class, 'install']);
         Route::apiResource('tables', TableController::class);

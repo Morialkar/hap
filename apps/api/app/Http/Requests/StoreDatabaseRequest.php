@@ -27,6 +27,14 @@ class StoreDatabaseRequest extends FormRequest
                 $workspace->id = $this->workspace_id;
                 $workspace->name = 'Auto Workspace';
                 $workspace->save();
+
+                if (auth()->check()) {
+                    \App\Models\WorkspaceMember::create([
+                        'workspace_id' => $workspace->id,
+                        'user_id' => auth()->id(),
+                        'role' => 'owner',
+                    ]);
+                }
             }
         }
     }

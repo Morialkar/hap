@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useI18n } from '../contexts/I18nContext';
+import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../lib/apiClient';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { generateId } from '../lib/id';
@@ -25,11 +26,26 @@ interface Table {
   database_id: string;
 }
 
+interface Template {
+  id: string;
+  name: string;
+  description: string;
+  format_version: number;
+  template_version: string;
+  payload: any;
+  includes_demo_records: boolean;
+}
+
 function Workspaces() {
   const { t } = useI18n();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [newDatabaseName, setNewDatabaseName] = useState('');
+  const [templateDbNames, setTemplateDbNames] = useState<Record<string, string>>({});
   const [newTableNameByDatabase, setNewTableNameByDatabase] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState<'empty' | 'template'>('empty');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const databasesQuery = useQuery<Database[], Error>({
     queryKey: ['databases'],
@@ -41,9 +57,48 @@ function Workspaces() {
     queryFn: () => apiClient.get('/tables'),
   });
 
+  const templatesQuery = useQuery<Template[], Error>({
+    queryKey: ['templates'],
+    queryFn: () => apiClient.get('/templates'),
+  });
+
+  // Find user owner workspace, fallback to first workspace or generate a new workspace UUID
+  const workspaceMember = (user as any)?.workspace_members?.find((m: any) => m.role === 'owner') || (user as any)?.workspace_members?.[0];
+  const workspaceId = workspaceMember?.workspace_id || databasesQuery.data?.[0]?.workspace_id || generateId();
+
   const createDatabase = useMutation({
-    mutationFn: (name: string) => apiClient.post<Database>('/databases', { name, workspace_id: generateId() }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['databases'] }),
+    mutationFn: (name: string) => apiClient.post<Database>('/databases', { name, workspace_id: workspaceId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['databases'] });
+      setSuccessMsg(null);
+      setErrorMsg(null);
+    },
+    onError: (err) => {
+      setErrorMsg(err.message || 'Error creating database');
+    }
+  });
+
+  const installTemplate = useMutation({
+    mutationFn: ({ template, dbName }: { template: Template; dbName: string }) => {
+      const payload = { ...template.payload };
+      payload.database = { ...payload.database, name: dbName };
+      return apiClient.post<any>(`/workspaces/${workspaceId}/install-template`, {
+        format_version: template.format_version,
+        template_version: template.template_version,
+        name: dbName,
+        payload,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['databases'] });
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
+      setSuccessMsg(t('workspaces.installSuccess'));
+      setErrorMsg(null);
+    },
+    onError: (err) => {
+      setErrorMsg(err.message || 'Error installing template');
+      setSuccessMsg(null);
+    }
   });
 
   const createTable = useMutation({
@@ -75,39 +130,143 @@ function Workspaces() {
     <div>
       <PageHeader title={t('nav.workspaces')} />
 
+      {errorMsg && (
+        <div className="alert alert-danger alert-dismissible" role="alert">
+          <div className="d-flex">
+            <div><i className="ti ti-alert-triangle me-2" /></div>
+            <div>{errorMsg}</div>
+          </div>
+          <button type="button" className="btn-close" onClick={() => setErrorMsg(null)} aria-label="Close" />
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="alert alert-success alert-dismissible" role="alert">
+          <div className="d-flex">
+            <div><i className="ti ti-check me-2" /></div>
+            <div>{successMsg}</div>
+          </div>
+          <button type="button" className="btn-close" onClick={() => setSuccessMsg(null)} aria-label="Close" />
+        </div>
+      )}
+
       <SurfaceCard className="mb-4">
         <div className="card-header">
-          <h2 className="card-title mb-0">{t('common.create')}</h2>
+          <ul className="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
+            <li className="nav-item">
+              <button
+                type="button"
+                className={`nav-link ${activeTab === 'empty' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('empty'); setErrorMsg(null); setSuccessMsg(null); }}
+              >
+                <i className="ti ti-database me-2" />
+                {t('workspaces.newDatabase.placeholder')}
+              </button>
+            </li>
+            <li className="nav-item">
+              <button
+                type="button"
+                className={`nav-link ${activeTab === 'template' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('template'); setErrorMsg(null); setSuccessMsg(null); }}
+              >
+                <i className="ti ti-template me-2" />
+                {t('workspaces.createFromTemplate')}
+              </button>
+            </li>
+          </ul>
         </div>
         <div className="card-body">
-          <div className="input-group">
-            <input
-              type="text"
-              className="form-control"
-              placeholder={t('workspaces.newDatabase.placeholder')}
-              value={newDatabaseName}
-              onChange={(e) => setNewDatabaseName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && newDatabaseName.trim()) {
-                  createDatabase.mutate(newDatabaseName.trim());
-                  setNewDatabaseName('');
-                }
-              }}
-            />
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => {
-                if (newDatabaseName.trim()) {
-                  createDatabase.mutate(newDatabaseName.trim());
-                  setNewDatabaseName('');
-                }
-              }}
-              disabled={!newDatabaseName.trim() || createDatabase.isPending}
-            >
-              {t('common.create')}
-            </button>
-          </div>
+          {activeTab === 'empty' ? (
+            <div className="input-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder={t('workspaces.newDatabase.placeholder')}
+                value={newDatabaseName}
+                onChange={(e) => setNewDatabaseName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newDatabaseName.trim()) {
+                    createDatabase.mutate(newDatabaseName.trim());
+                    setNewDatabaseName('');
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => {
+                  if (newDatabaseName.trim()) {
+                    createDatabase.mutate(newDatabaseName.trim());
+                    setNewDatabaseName('');
+                  }
+                }}
+                disabled={!newDatabaseName.trim() || createDatabase.isPending}
+              >
+                {createDatabase.isPending ? t('common.loading') : t('common.create')}
+              </button>
+            </div>
+          ) : (
+            <div>
+              {templatesQuery.isLoading ? (
+                <div className="d-flex justify-content-center p-3">
+                  <LoadingSpinner size="md" />
+                </div>
+              ) : (templatesQuery.data ?? []).length === 0 ? (
+                <div className="text-muted text-center p-3">Aucun modèle disponible.</div>
+              ) : (
+                <div className="row row-cards">
+                  {(templatesQuery.data ?? []).map((template) => {
+                    const dbName = templateDbNames[template.id] !== undefined
+                      ? templateDbNames[template.id]
+                      : template.name;
+                    const isLiterary = template.name.toLowerCase().includes('litt');
+                    const iconClass = isLiterary ? 'ti-books text-azure' : 'ti-soup text-orange';
+                    const translationKey = isLiterary ? 'workspaces.template.literary' : 'workspaces.template.recipe';
+
+                    return (
+                      <div className="col-md-6" key={template.id}>
+                        <div className="card h-100 border-0 shadow-sm" style={{ background: 'var(--tblr-bg-surface-secondary)' }}>
+                          <div className="card-body d-flex flex-column">
+                            <div className="d-flex align-items-center mb-3">
+                              <span className="avatar avatar-md bg-transparent me-3">
+                                <i className={`ti ${iconClass} fs-1`} />
+                              </span>
+                              <div>
+                                <h3 className="card-title mb-0">{t(translationKey)}</h3>
+                                <div className="text-muted small">v{template.template_version}</div>
+                              </div>
+                            </div>
+                            <p className="text-muted flex-grow-1">{template.description}</p>
+                            
+                            <div className="mt-3">
+                              <label className="form-label small text-muted">Nom de la base de données</label>
+                              <div className="input-group">
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  value={dbName}
+                                  onChange={(e) => setTemplateDbNames(prev => ({ ...prev, [template.id]: e.target.value }))}
+                                  placeholder={template.name}
+                                />
+                                <button
+                                  type="button"
+                                  className="btn btn-primary"
+                                  onClick={() => installTemplate.mutate({ template, dbName: dbName.trim() })}
+                                  disabled={!dbName.trim() || installTemplate.isPending}
+                                >
+                                  {installTemplate.isPending ? t('workspaces.installing') : t('workspaces.install')}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </SurfaceCard>
 

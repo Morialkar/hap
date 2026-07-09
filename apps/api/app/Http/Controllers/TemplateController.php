@@ -20,6 +20,12 @@ class TemplateController extends Controller
         private TemplateInstallService $installService,
     ) {}
 
+    public function index(): JsonResponse
+    {
+        $templates = Template::orderBy('name')->get();
+        return response()->json(TemplateResource::collection($templates));
+    }
+
     public function export(ExportTemplateRequest $request, Database $database): JsonResponse
     {
         $payload = $this->exportService->export($database);

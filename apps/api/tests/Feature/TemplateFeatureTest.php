@@ -374,3 +374,70 @@ test('non-owner workspace members cannot export or install templates', function 
         ->postJson('/api/v1/databases/'.$database->id.'/export-template')
         ->assertStatus(201);
 });
+
+test('user can list seeded templates', function () {
+    [$user, $workspace] = createWorkspaceOwner();
+    $this->seed(\Database\Seeders\TemplateSeeder::class);
+
+    $response = $this->actingAs($user)
+        ->getJson('/api/v1/templates');
+
+    $response->assertStatus(200)
+        ->assertJsonCount(2)
+        ->assertJsonPath('0.name', 'Boîte à Recettes')
+        ->assertJsonPath('1.name', 'Catalogue Littéraire');
+});
+
+test('installing template creates database tables fields and maps demo records successfully', function () {
+    [$user, $workspace] = createWorkspaceOwner();
+    $this->seed(\Database\Seeders\TemplateSeeder::class);
+
+    $templateModel = App\Models\Template::where('name', 'Boîte à Recettes')->firstOrFail();
+
+    $installResponse = $this->actingAs($user)
+        ->postJson('/api/v1/workspaces/'.$workspace->id.'/install-template', [
+            'format_version' => $templateModel->format_version,
+            'template_version' => $templateModel->template_version,
+            'name' => 'Ma Boîte à Recettes',
+            'payload' => $templateModel->payload,
+        ]);
+
+    $installResponse->assertStatus(201)
+        ->assertJsonPath('database.name', 'Boîte à Recettes');
+
+    $databaseId = $installResponse->json('database.id');
+
+    // Assert tables created
+    $this->assertDatabaseHas('tables', [
+        'database_id' => $databaseId,
+        'name' => 'Recettes',
+    ]);
+    $this->assertDatabaseHas('tables', [
+        'database_id' => $databaseId,
+        'name' => 'Ingrédients',
+    ]);
+
+    // Assert demo records created
+    $recipesTable = App\Models\Table::where('database_id', $databaseId)->where('name', 'Recettes')->firstOrFail();
+    $ingredientsTable = App\Models\Table::where('database_id', $databaseId)->where('name', 'Ingrédients')->firstOrFail();
+
+    $this->assertDatabaseHas('records', [
+        'table_id' => $recipesTable->id,
+    ]);
+    $this->assertDatabaseHas('records', [
+        'table_id' => $ingredientsTable->id,
+    ]);
+
+    // Check relationship is correctly mapped in the records
+    $recipeRecord = App\Models\Record::where('table_id', $recipesTable->id)->firstOrFail();
+    $ingredientRecord = App\Models\Record::where('table_id', $ingredientsTable->id)->firstOrFail();
+
+    expect($recipeRecord->data['Titre de la recette'])->toBe('Gâteau au Chocolat Moelleux');
+    expect($ingredientRecord->data['Recette associée'])->toBe($recipeRecord->id);
+    
+    // Check record links populated
+    $this->assertDatabaseHas('record_links', [
+        'from_record' => $ingredientRecord->id,
+        'to_record' => $recipeRecord->id,
+    ]);
+});
