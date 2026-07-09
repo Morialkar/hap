@@ -54,7 +54,7 @@ export function RecordForm({
   const isEditing = !!recordId && !isDuplicate;
   const isDuplicating = !!recordId && isDuplicate;
 
-  const recordQuery = useQuery<RecordData, Error>({
+  const recordQuery = useQuery<{ data: RecordData }, Error>({
     queryKey: ['records', recordId],
     queryFn: () => apiClient.get(`/records/${recordId}`),
     enabled: !!recordId,
@@ -77,7 +77,7 @@ export function RecordForm({
     });
 
     if (recordQuery.data && (isEditing || isDuplicating)) {
-      Object.assign(data, recordQuery.data.data);
+      Object.assign(data, recordQuery.data.data.data);
     }
     return { data };
   }, [recordFields, recordQuery.data, isEditing, isDuplicating]);
@@ -89,7 +89,7 @@ export function RecordForm({
       const payload = {
         table_id: tableId,
         data: value.data,
-        version: isEditing ? recordQuery.data?.version : undefined,
+        version: isEditing ? recordQuery.data?.data?.version : undefined,
       };
 
       if (isEditing) {
@@ -109,28 +109,28 @@ export function RecordForm({
   // React to defaultValues change when editing data is loaded
   useEffect(() => {
     form.reset(defaultValues);
-  }, [defaultValues]);
+  }, [defaultValues, form]);
 
   // Mutations
   const createMutation = useMutation({
-    mutationFn: (payload: any) => apiClient.post<any>('/records', payload),
-    onSuccess: (data) => {
+    mutationFn: (payload: any) => apiClient.post<{ data: RecordData }>('/records', payload),
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       queryClient.invalidateQueries({ queryKey: ['records-select'] });
-      onSaveSuccess?.(data);
+      onSaveSuccess?.(response.data);
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: (payload: any) =>
-      apiClient.put<any>(`/records/${recordId}`, {
+      apiClient.put<{ data: RecordData }>(`/records/${recordId}`, {
         data: payload.data,
         version: payload.version,
       }),
-    onSuccess: (data) => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       queryClient.invalidateQueries({ queryKey: ['records-select'] });
-      onSaveSuccess?.(data);
+      onSaveSuccess?.(response.data);
     },
   });
 
@@ -260,7 +260,8 @@ export function RecordForm({
           <form.Field
             key={field.id}
             name={`data.${field.name}`}
-            children={((fieldApi: any) => {
+          >
+            {((fieldApi: any) => {
               const value = fieldApi.state.value || '';
               const isRequired = field.validation?.required === true;
 
@@ -474,7 +475,7 @@ export function RecordForm({
                 </div>
               );
             }) as any}
-          />
+          </form.Field>
         );
       })}
 

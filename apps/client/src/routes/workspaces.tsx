@@ -139,6 +139,7 @@ function Workspaces() {
                           <Link
                             to="/tables/$databaseId/$tableId"
                             params={{ databaseId: database.id, tableId: table.id }}
+                            search={{ action: undefined, recordId: undefined }}
                             className="fw-medium text-decoration-none text-dark"
                           >
                             <i className="ti ti-table me-2 text-muted" aria-hidden="true" />

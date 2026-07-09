@@ -1,10 +1,15 @@
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
 import { type BuilderField } from '../lib/fieldTypes';
 import { RecordForm } from '../components/RecordForm';
+import { RecordDetailView } from '../components/RecordDetailView';
+import { RecordHistoryPanel } from '../components/RecordHistoryPanel';
+import { DeleteReassignModal } from '../components/DeleteReassignModal';
+import { TrashManagerModal } from '../components/TrashManagerModal';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 
 export const Route = createFileRoute('/tables/$databaseId/$tableId')({
@@ -35,6 +40,12 @@ interface RecordData {
   version: number;
 }
 
+interface FilterItem {
+  field: string;
+  operator: string;
+  value: string;
+}
+
 function TableRecordsPage() {
   const { databaseId, tableId } = Route.useParams();
   const search = useSearch({ from: '/tables/$databaseId/$tableId' });
@@ -42,14 +53,30 @@ function TableRecordsPage() {
   const { t } = useI18n();
   const queryClient = useQueryClient();
 
-  const [isFormDirty, setIsFormDirty] = useState(false);
-  const [successToast, setSuccessToast] = useState<string | null>(null);
-
-  // Read action and recordId from search parameters
+  // Route Form State
   const activeAction = search.action;
   const activeRecordId = search.recordId;
 
-  // Unsaved changes guard (beforeunload)
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<FilterItem[]>([]);
+  const [sortBy, setSortBy] = useState('');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [groupByField, setGroupByField] = useState('');
+
+  // Modals & Panels State
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
+  const [deleteConflictConfig, setDeleteConflictConfig] = useState<{
+    recordId: string;
+    conflictData: any;
+  } | null>(null);
+  const [activeTab, setActiveTab] = useState<'details' | 'history'>('details');
+
+  const [successToast, setSuccessToast] = useState<string | null>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  // Unsaved changes guard
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isFormDirty) {
@@ -60,7 +87,7 @@ function TableRecordsPage() {
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isFormDirty]);
+  }, [isFormDirty, t]);
 
   // Queries
   const databaseQuery = useQuery<Database, Error>({
@@ -78,17 +105,46 @@ function TableRecordsPage() {
     queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
   });
 
+  // Query records dynamically based on search, filter, and sort states
   const recordsQuery = useQuery<{ data: RecordData[] }, Error>({
-    queryKey: ['records', tableId],
-    queryFn: () => apiClient.get(`/records?table_id=${tableId}&per_page=100`),
+    queryKey: ['records', tableId, searchQuery, filters, sortBy, sortDir],
+    queryFn: () => {
+      const qParams = new URLSearchParams();
+      qParams.append('table_id', tableId);
+      qParams.append('per_page', '100');
+
+      if (searchQuery.trim()) {
+        qParams.append('search', searchQuery.trim());
+      }
+      if (filters.length > 0) {
+        qParams.append('filters', JSON.stringify(filters));
+      }
+      if (sortBy) {
+        qParams.append('sort', sortBy);
+        qParams.append('sort_dir', sortDir);
+      }
+
+      return apiClient.get(`/records?${qParams.toString()}`);
+    },
   });
 
   // Mutations
   const deleteRecordMutation = useMutation({
     mutationFn: (id: string) => apiClient.delete(`/records/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['records', tableId] });
+      queryClient.invalidateQueries({ queryKey: ['records'] });
+      queryClient.invalidateQueries({ queryKey: ['records-select'] });
       showToast('Record deleted successfully');
+    },
+    onError: (err: any, id: string) => {
+      if (err.status === 409 && err.data?.reference_counts) {
+        setDeleteConflictConfig({
+          recordId: id,
+          conflictData: err.data.reference_counts,
+        });
+      } else {
+        alert(err.message || 'Failed to delete record.');
+      }
     },
   });
 
@@ -101,17 +157,13 @@ function TableRecordsPage() {
     if (isFormDirty && !window.confirm(t('records.unsavedChanges'))) {
       return;
     }
-    navigate({
-      search: {} as any,
-    });
+    navigate({ search: {} as any });
     setIsFormDirty(false);
   };
 
   const handleSaveSuccess = () => {
     showToast(t('common.save'));
-    navigate({
-      search: {} as any,
-    });
+    navigate({ search: {} as any });
     setIsFormDirty(false);
   };
 
@@ -119,6 +171,91 @@ function TableRecordsPage() {
     if (window.confirm(t('common.confirm'))) {
       deleteRecordMutation.mutate(id);
     }
+  };
+
+  // Build the list of records
+  const rawRecords = useMemo(() => recordsQuery.data?.data || [], [recordsQuery.data]);
+  const fields = fieldsQuery.data || [];
+
+  // Group records locally if groupBy is set
+  const groupedRecords = useMemo(() => {
+    if (!groupByField) {
+      return [{ key: '', items: rawRecords }];
+    }
+
+    const groups: Record<string, RecordData[]> = {};
+    rawRecords.forEach((rec) => {
+      const val = rec.data?.[groupByField];
+      const key = val === undefined || val === null || val === '' ? 'Empty' : String(val);
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(rec);
+    });
+
+    return Object.entries(groups).map(([key, items]) => ({
+      key,
+      items,
+    }));
+  }, [rawRecords, groupByField]);
+
+  // Flattened list of grouped items to virtualize (either Group Headers or Records)
+  const flatListItems = useMemo(() => {
+    const list: ({ type: 'header'; key: string; count: number } | { type: 'record'; record: RecordData })[] = [];
+
+    groupedRecords.forEach((group) => {
+      if (groupByField) {
+        list.push({ type: 'header', key: group.key, count: group.items.length });
+      }
+      group.items.forEach((item) => {
+        list.push({ type: 'record', record: item });
+      });
+    });
+
+    return list;
+  }, [groupedRecords, groupByField]);
+
+  // Virtualizer Setup
+  const rowVirtualizer = useVirtualizer({
+    count: flatListItems.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 48,
+    overscan: 15,
+  });
+
+  const virtualItems = rowVirtualizer.getVirtualItems();
+  const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
+  const paddingBottom =
+    virtualItems.length > 0
+      ? rowVirtualizer.getTotalSize() - virtualItems[virtualItems.length - 1].end
+      : 0;
+
+  // Header click sorting
+  const handleSort = (fieldName: string) => {
+    if (sortBy === fieldName) {
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(fieldName);
+      setSortDir('asc');
+    }
+  };
+
+  // Filter creation handlers
+  const handleAddFilter = () => {
+    if (fields.length === 0) return;
+    setFilters((prev) => [...prev, { field: fields[0].name, operator: 'eq', value: '' }]);
+  };
+
+  const handleUpdateFilter = (index: number, key: keyof FilterItem, val: string) => {
+    setFilters((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [key]: val };
+      return updated;
+    });
+  };
+
+  const handleRemoveFilter = (index: number) => {
+    setFilters((prev) => prev.filter((_, idx) => idx !== index));
   };
 
   const isLoading =
@@ -135,9 +272,6 @@ function TableRecordsPage() {
     );
   }
 
-  const fields = fieldsQuery.data || [];
-  const records = recordsQuery.data?.data || [];
-
   return (
     <div className="container-fluid py-4">
       {/* Toast alert */}
@@ -148,7 +282,7 @@ function TableRecordsPage() {
         </div>
       )}
 
-      {/* Header */}
+      {/* Main Header */}
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
           <h2>{t('records.title')}</h2>
@@ -157,6 +291,15 @@ function TableRecordsPage() {
           </p>
         </div>
         <div className="d-flex gap-2">
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => setIsTrashOpen(true)}
+            data-testid="trash-btn"
+          >
+            <i className="ti ti-trash me-1" aria-hidden="true" />
+            {t('records.trash.title')}
+          </button>
           <Link
             to="/builder/$databaseId/$tableId"
             params={{ databaseId, tableId }}
@@ -168,11 +311,7 @@ function TableRecordsPage() {
           <button
             type="button"
             className="btn btn-primary btn-sm"
-            onClick={() =>
-              navigate({
-                search: { action: 'create' } as any,
-              })
-            }
+            onClick={() => navigate({ search: { action: 'create' } as any })}
             data-testid="add-record-btn"
           >
             <i className="ti ti-plus me-1" aria-hidden="true" />
@@ -181,108 +320,289 @@ function TableRecordsPage() {
         </div>
       </div>
 
+      {/* Query Filter and Search Controls */}
+      <div className="card mb-3">
+        <div className="card-body">
+          <div className="row g-3 align-items-center">
+            {/* Search Input */}
+            <div className="col-md-4">
+              <div className="input-icon">
+                <span className="input-icon-addon">
+                  <i className="ti ti-search" />
+                </span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder={t('records.search')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  data-testid="search-input"
+                />
+              </div>
+            </div>
+
+            {/* Group By Selector */}
+            <div className="col-md-4">
+              <div className="d-flex align-items-center gap-2">
+                <label className="text-nowrap small mb-0">{t('records.groupBy')}:</label>
+                <select
+                  className="form-select form-select-sm"
+                  value={groupByField}
+                  onChange={(e) => setGroupByField(e.target.value)}
+                  data-testid="group-by-select"
+                >
+                  <option value="">{t('records.noGrouping')}</option>
+                  {fields.map((f) => (
+                    <option key={f.id} value={f.name}>
+                      {f.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Add Filter trigger */}
+            <div className="col-md-4 text-end">
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={handleAddFilter}
+                data-testid="add-filter-btn"
+              >
+                <i className="ti ti-plus me-1" />
+                {t('records.filter.add')}
+              </button>
+            </div>
+          </div>
+
+          {/* Active AST filter builders */}
+          {filters.length > 0 && (
+            <div className="mt-3 border-top pt-3 vstack gap-2">
+              {filters.map((filter, index) => (
+                <div key={index} className="row g-2 align-items-center">
+                  <div className="col-md-3">
+                    <select
+                      className="form-select form-select-sm"
+                      value={filter.field}
+                      onChange={(e) => handleUpdateFilter(index, 'field', e.target.value)}
+                    >
+                      {fields.map((f) => (
+                        <option key={f.id} value={f.name}>
+                          {f.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-md-3">
+                    <select
+                      className="form-select form-select-sm"
+                      value={filter.operator}
+                      onChange={(e) => handleUpdateFilter(index, 'operator', e.target.value)}
+                    >
+                      <option value="eq">Equals (==)</option>
+                      <option value="neq">Not equals (!=)</option>
+                      <option value="contains">Contains (LIKE)</option>
+                      <option value="starts_with">Starts with</option>
+                      <option value="ends_with">Ends with</option>
+                      <option value="gt">Greater than (&gt;)</option>
+                      <option value="gte">Greater or equal (&gt;=)</option>
+                      <option value="lt">Less than (&lt;)</option>
+                      <option value="lte">Less or equal (&lt;=)</option>
+                      <option value="is_null">Is empty</option>
+                      <option value="is_not_null">Is not empty</option>
+                    </select>
+                  </div>
+                  <div className="col-md-4">
+                    {filter.operator !== 'is_null' && filter.operator !== 'is_not_null' && (
+                      <input
+                        type="text"
+                        className="form-control form-control-sm"
+                        placeholder="Value..."
+                        value={filter.value}
+                        onChange={(e) => handleUpdateFilter(index, 'value', e.target.value)}
+                        data-testid={`filter-value-${index}`}
+                      />
+                    )}
+                  </div>
+                  <div className="col-md-2">
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger btn-sm py-1"
+                      onClick={() => handleRemoveFilter(index)}
+                    >
+                      <i className="ti ti-trash" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="row g-4">
-        {/* Main Records Table list */}
-        <div className={activeAction ? 'col-lg-7' : 'col-12'}>
+        {/* Spreadsheet Records browser */}
+        <div className={activeAction || activeRecordId ? 'col-lg-7' : 'col-12'}>
           <div className="card">
-            <div className="card-body p-0">
-              {records.length === 0 ? (
-                <div className="text-center py-5 text-muted">
-                  <i className="ti ti-database fs-1 mb-2 d-block" />
-                  <p>{t('records.empty')}</p>
-                </div>
-              ) : (
-                <div className="table-responsive">
-                  <table className="table table-vcenter table-mobile-md card-table">
-                    <thead>
-                      <tr>
-                        {fields.slice(0, 4).map((f) => (
-                          <th key={f.id}>{f.name}</th>
-                        ))}
-                        <th className="w-1" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {records.map((record) => {
-                        const recordData = record.data || {};
-                        return (
-                          <tr key={record.id}>
-                            {fields.slice(0, 4).map((f) => {
-                              const val = recordData[f.name];
-                              return (
-                                <td key={f.id} data-label={f.name}>
-                                  {Array.isArray(val) ? (
-                                    <span className="badge bg-light text-muted">
-                                      {val.length} items
-                                    </span>
-                                  ) : typeof val === 'boolean' ? (
-                                    <i
-                                      className={`ti ti-${val ? 'check text-success' : 'x text-danger'}`}
-                                    />
-                                  ) : (
-                                    String(val ?? '')
-                                  )}
-                                </td>
-                              );
-                            })}
-                            <td>
-                              <div className="btn-list flex-nowrap">
-                                <button
-                                  type="button"
-                                  className="btn btn-outline-secondary btn-sm"
-                                  onClick={() =>
-                                    navigate({
-                                      search: { action: 'edit', recordId: record.id } as any,
-                                    })
-                                  }
-                                  data-testid={`edit-record-${record.id}`}
-                                >
-                                  <i className="ti ti-edit" />
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn btn-outline-secondary btn-sm"
-                                  onClick={() =>
-                                    navigate({
-                                      search: { action: 'duplicate', recordId: record.id } as any,
-                                    })
-                                  }
-                                  data-testid={`duplicate-record-${record.id}`}
-                                  title={t('records.duplicate')}
-                                >
-                                  <i className="ti ti-copy" />
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn btn-outline-danger btn-sm"
-                                  onClick={() => handleDeleteRecord(record.id)}
-                                >
-                                  <i className="ti ti-trash" />
-                                </button>
-                              </div>
+            <div
+              ref={parentRef}
+              className="table-responsive"
+              style={{ maxHeight: '600px', overflowY: 'auto' }}
+            >
+              <table className="table table-vcenter card-table table-hover">
+                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: '#fff' }}>
+                  <tr>
+                    {fields.slice(0, 5).map((f) => (
+                      <th
+                        key={f.id}
+                        className="cursor-pointer select-none"
+                        onClick={() => handleSort(f.name)}
+                        style={{ cursor: 'pointer' }}
+                        data-testid={`sort-header-${f.name}`}
+                      >
+                        <div className="d-flex align-items-center gap-1">
+                          <span>{f.name}</span>
+                          {sortBy === f.name ? (
+                            <i className={`ti ti-chevron-${sortDir === 'asc' ? 'up' : 'down'}`} />
+                          ) : (
+                            <i className="ti ti-selector text-muted small" />
+                          )}
+                        </div>
+                      </th>
+                    ))}
+                    <th className="w-1" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {flatListItems.length === 0 && (
+                    <tr>
+                      <td colSpan={fields.slice(0, 5).length + 1} className="text-center py-4 text-muted">
+                        {t('records.empty')}
+                      </td>
+                    </tr>
+                  )}
+
+                  {paddingTop > 0 && (
+                    <tr style={{ height: `${paddingTop}px` }}>
+                      <td colSpan={fields.slice(0, 5).length + 1} />
+                    </tr>
+                  )}
+
+                  {virtualItems.map((virtualRow) => {
+                    const item = flatListItems[virtualRow.index];
+
+                    if (item.type === 'header') {
+                      return (
+                        <tr
+                          key={`group-header-${item.key}`}
+                          className="bg-light-subtle"
+                          style={{ height: `${virtualRow.size}px` }}
+                        >
+                          <td colSpan={fields.slice(0, 5).length + 1} className="fw-bold py-2 px-3 text-secondary border-bottom">
+                            <i className="ti ti-folder me-2" />
+                            {item.key} &mdash; {item.count} {tableQuery.data?.name.toLowerCase()}
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    const rec = item.record;
+                    const recordData = rec.data || {};
+                    const isSelected = activeRecordId === rec.id;
+
+                    return (
+                      <tr
+                        key={rec.id}
+                        onClick={() =>
+                          navigate({
+                            search: { action: search.action, recordId: rec.id } as any,
+                          })
+                        }
+                        className={isSelected ? 'table-primary cursor-pointer' : 'cursor-pointer'}
+                        style={{ cursor: 'pointer', height: `${virtualRow.size}px` }}
+                        data-testid={`record-row-${rec.id}`}
+                      >
+                        {fields.slice(0, 5).map((f) => {
+                          const val = recordData[f.name];
+                          return (
+                            <td key={f.id}>
+                              {Array.isArray(val) ? (
+                                <span className="badge bg-light text-muted">{val.length} files</span>
+                              ) : typeof val === 'boolean' ? (
+                                <i
+                                  className={`ti ti-${val ? 'check text-success' : 'x text-danger'}`}
+                                />
+                              ) : (
+                                String(val ?? '')
+                              )}
                             </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                          );
+                        })}
+                        <td onClick={(e) => e.stopPropagation()}>
+                          <div className="btn-list flex-nowrap">
+                            <button
+                              type="button"
+                              className="btn btn-outline-secondary btn-sm py-1 px-2"
+                              onClick={() =>
+                                navigate({
+                                  search: { action: 'edit', recordId: rec.id } as any,
+                                })
+                              }
+                              data-testid={`edit-record-${rec.id}`}
+                            >
+                              <i className="ti ti-edit" />
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-outline-secondary btn-sm py-1 px-2"
+                              onClick={() =>
+                                navigate({
+                                  search: { action: 'duplicate', recordId: rec.id } as any,
+                                })
+                              }
+                              data-testid={`duplicate-record-${rec.id}`}
+                              title={t('records.duplicate')}
+                            >
+                              <i className="ti ti-copy" />
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger btn-sm py-1 px-2"
+                              onClick={() => handleDeleteRecord(rec.id)}
+                              data-testid={`delete-record-${rec.id}`}
+                            >
+                              <i className="ti ti-trash" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {paddingBottom > 0 && (
+                    <tr style={{ height: `${paddingBottom}px` }}>
+                      <td colSpan={fields.slice(0, 5).length + 1} />
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
 
-        {/* Side Panel: Create/Edit/Duplicate Form */}
-        {activeAction && (
+        {/* Side Panel: Create/Edit Form or Detail Card Layout switcher */}
+        {(activeAction || activeRecordId) && (
           <div className="col-lg-5">
             <div className="card shadow-sm border-primary">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <h3 className="card-title">
+              <div className="card-header d-flex justify-content-between align-items-center py-2">
+                <h3 className="card-title mb-0">
                   {activeAction === 'create'
                     ? t('records.add')
                     : activeAction === 'edit'
                     ? t('records.edit')
-                    : t('records.duplicate')}
+                    : activeAction === 'duplicate'
+                    ? t('records.duplicate')
+                    : t('common.details')}
                 </h3>
                 <button
                   type="button"
@@ -291,21 +611,92 @@ function TableRecordsPage() {
                   onClick={handleCloseForm}
                 />
               </div>
+
+              {/* Tab Header if viewing record details */}
+              {!activeAction && activeRecordId && (
+                <div className="card-header p-0 border-bottom-0">
+                  <ul className="nav nav-tabs card-header-tabs m-0 px-3 border-bottom">
+                    <li className="nav-item">
+                      <button
+                        type="button"
+                        className={`nav-link border-0 py-2 ${activeTab === 'details' ? 'active font-weight-bold text-primary border-bottom border-primary' : ''}`}
+                        onClick={() => setActiveTab('details')}
+                        data-testid="details-tab-btn"
+                      >
+                        {t('common.details')}
+                      </button>
+                    </li>
+                    <li className="nav-item">
+                      <button
+                        type="button"
+                        className={`nav-link border-0 py-2 ${activeTab === 'history' ? 'active font-weight-bold text-primary border-bottom border-primary' : ''}`}
+                        onClick={() => setActiveTab('history')}
+                        data-testid="history-tab-btn"
+                      >
+                        {t('records.history.title')}
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+
               <div className="card-body">
-                <RecordForm
-                  tableId={tableId}
-                  fields={fields}
-                  recordId={activeRecordId}
-                  isDuplicate={activeAction === 'duplicate'}
-                  onCancel={handleCloseForm}
-                  onSaveSuccess={handleSaveSuccess}
-                  onDirtyChange={setIsFormDirty}
-                />
+                {activeAction ? (
+                  /* Form create / edit / duplicate */
+                  <RecordForm
+                    tableId={tableId}
+                    fields={fields}
+                    recordId={activeRecordId}
+                    isDuplicate={activeAction === 'duplicate'}
+                    onCancel={handleCloseForm}
+                    onSaveSuccess={handleSaveSuccess}
+                    onDirtyChange={setIsFormDirty}
+                  />
+                ) : activeRecordId ? (
+                  /* Detail card layout or history panel */
+                  activeTab === 'details' ? (
+                    <RecordDetailView tableId={tableId} recordId={activeRecordId} />
+                  ) : (
+                    <RecordHistoryPanel
+                      recordId={activeRecordId}
+                      onRestoreSuccess={() => {
+                        showToast('Version restored successfully');
+                        setActiveTab('details');
+                      }}
+                    />
+                  )
+                ) : null}
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Delete / Reassign links conflict Modal */}
+      {deleteConflictConfig && (
+        <DeleteReassignModal
+          recordId={deleteConflictConfig.recordId}
+          tableId={tableId}
+          conflictData={deleteConflictConfig.conflictData}
+          onClose={() => setDeleteConflictConfig(null)}
+          onSuccess={() => {
+            setDeleteConflictConfig(null);
+            showToast('Links reassigned and record deleted.');
+          }}
+        />
+      )}
+
+      {/* Trash manager Modal */}
+      {isTrashOpen && (
+        <TrashManagerModal
+          tableId={tableId}
+          isOpen
+          onClose={() => setIsTrashOpen(false)}
+          onDeleteConflict={(id, counts) =>
+            setDeleteConflictConfig({ recordId: id, conflictData: counts })
+          }
+        />
+      )}
     </div>
   );
 }

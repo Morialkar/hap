@@ -1,3 +1,15 @@
+export class ApiError extends Error {
+  status: number;
+  data: any;
+
+  constructor(message: string, status: number, data: any) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
+  }
+}
+
 class ApiClient {
   private baseUrl: string;
 
@@ -29,10 +41,10 @@ class ApiClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Request failed' }));
-      throw new Error(error.message || 'Request failed');
+      throw new ApiError(error.message || 'Request failed', response.status, error);
     }
 
-    return response.json();
+    return await response.json().catch(() => undefined) as T;
   }
 
   async get<T>(endpoint: string): Promise<T> {
