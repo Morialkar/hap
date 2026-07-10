@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
 export type BrowseDimension = "titre" | "auteurs" | "dates" | "genre" | "categorie";
 
@@ -7,6 +7,10 @@ export class BrowseOuvragePage {
 
   async goto(dimension: BrowseDimension): Promise<void> {
     await this.page.goto(`/view/ouvrage/${dimension}`);
+  }
+
+  async expectReady(): Promise<void> {
+    await expect(this.page).toHaveTitle(/Eusebe/i);
   }
 
   async dimensionLinks(): Promise<Array<{ label: string; href: string }>> {
@@ -40,6 +44,18 @@ export class BrowseOuvragePage {
 
   async openFirst(): Promise<OuvrageDetailPage> {
     const first = this.page.locator("a[href*='/view/ouvrage/id/']").first();
+    await first.click();
+    return new OuvrageDetailPage(this.page);
+  }
+
+  async openFirstDimensionResult(dimension: Exclude<BrowseDimension, "titre">): Promise<void> {
+    const legacyDimension = dimension === "auteurs" ? "auteur" : dimension;
+    await this.page.locator(`a[href*='/view/ouvrage/${legacyDimension}/']`).first().click();
+  }
+
+  async openFirstOuvrageFromCurrentList(): Promise<OuvrageDetailPage> {
+    const first = this.page.locator("a[href*='/view/ouvrage/id/']").first();
+    await expect(first).toBeVisible();
     await first.click();
     return new OuvrageDetailPage(this.page);
   }
@@ -91,5 +107,22 @@ export class OuvrageDetailPage {
 
   async clickDelete(): Promise<void> {
     await this.page.locator("a[href*='/delete/ouvrage/']").first().click();
+  }
+
+  async deleteViaLegacyEndpoint(id: number): Promise<{ status: number; bodyLength: number }> {
+    const [response] = await Promise.all([
+      this.page.waitForResponse((r) => r.url().includes(`/delete/ouvrage/${id}`)),
+      this.page.goto(`/delete/ouvrage/${id}`),
+    ]);
+
+    return {
+      status: response.status(),
+      bodyLength: (await response.body()).length,
+    };
+  }
+
+  async expectOuvrageGone(id: number, title: string): Promise<void> {
+    await this.page.request.get(`/view/ouvrage/id/${id}`);
+    await expect(this.page.locator("body")).not.toContainText(title);
   }
 }

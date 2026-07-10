@@ -7,6 +7,10 @@ export class DashboardPage {
     await this.page.goto("/");
   }
 
+  async expectReady(): Promise<void> {
+    await expect(this.page).toHaveTitle(/Eusebe/i);
+  }
+
   async counts(): Promise<{ ouvrages: number; auteurs: number; periodiques: number }> {
     const h2s = this.page.locator("h2");
     const texts = await h2s.allTextContents();

@@ -7,8 +7,8 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { AddOuvragePage, EditOuvragePage } from "../pages/v2/AddEditOuvragePage";
-import { BrowseOuvragePage, OuvrageDetailPage } from "../pages/v2/BrowseOuvragePage";
+import { AddOuvragePage, EditOuvragePage } from "../pages";
+import { BrowseOuvragePage, OuvrageDetailPage } from "../pages";
 import { reseedCapsule } from "../helpers/reseed";
 
 let createdOuvrageId: number | null = null;
@@ -19,11 +19,7 @@ test.afterAll(() => {
 
 test("create ouvrage (no image) → appears in browse-by-titre", async ({ page }) => {
   const addPage = new AddOuvragePage(page);
-  const [, , ] = await Promise.all([
-    page.waitForResponse((r) => r.url().includes("/ajax/loadchoices/auteur")),
-    page.waitForResponse((r) => r.url().includes("/ajax/loadchoices/editeur")),
-    addPage.goto(),
-  ]);
+  await addPage.goto();
 
   await addPage.fill({
     titre: "E2E-TEST-OUVRAGE",
@@ -58,25 +54,11 @@ test("create ouvrage (no image) → appears in browse-by-titre", async ({ page }
 
 test("create ouvrage with inline new auteur via modal", async ({ page }) => {
   const addPage = new AddOuvragePage(page);
-  const [,] = await Promise.all([
-    page.waitForResponse((r) => r.url().includes("/ajax/loadchoices/auteur")),
-    addPage.goto(),
-  ]);
+  await addPage.goto();
 
-  await page.locator("#add_auteur").click();
-  await expect(page.locator("#aut_add")).toBeVisible();
+  await addPage.createInlineAuthor("E2E", "TestAuteur");
 
-  await page.locator("#aut_prenom").fill("E2E");
-  await page.locator("#aut_nom").fill("TestAuteur");
-
-  await Promise.all([
-    page.waitForResponse((r) => r.url().includes("/ajax/save/auteur")),
-    page.locator("#aut_add .save").click(),
-  ]);
-
-  await page.waitForResponse((r) => r.url().includes("/ajax/loadchoices/auteur"));
-
-  const options = await page.locator("#auteur option").allTextContents();
+  const options = await addPage.authorOptions();
   expect(options.some((o) => o.includes("TestAuteur"))).toBe(true);
 });
 
@@ -85,10 +67,7 @@ test("edit ouvrage → verify persistence via fresh GET (B7 quirk)", async ({ pa
   const id = createdOuvrageId!;
 
   const editPage = new EditOuvragePage(page);
-  await Promise.all([
-    page.waitForResponse((r) => r.url().includes("/ajax/loadchoices/auteur")),
-    editPage.goto(id),
-  ]);
+  await editPage.goto(id);
 
   await editPage.fill({ titre: "E2E-TEST-OUVRAGE-EDITED", anneePublication: "1889" });
   await editPage.submit();
@@ -107,16 +86,11 @@ test("delete ouvrage via GET link → 200 empty → record gone (B1)", async ({ 
   expect(createdOuvrageId).not.toBeNull();
   const id = createdOuvrageId!;
 
-  const [response] = await Promise.all([
-    page.waitForResponse((r) => r.url().includes(`/delete/ouvrage/${id}`)),
-    page.goto(`/delete/ouvrage/${id}`),
-  ]);
+  const detail = new OuvrageDetailPage(page);
+  const deletion = await detail.deleteViaLegacyEndpoint(id);
 
-  expect(response.status()).toBe(200);
-  const body = await response.body();
-  expect(body.length).toBe(0);
+  expect(deletion.status).toBe(200);
+  expect(deletion.bodyLength).toBe(0);
 
-  const res = await page.request.get(`/view/ouvrage/id/${id}`);
-  await expect(page.locator("body")).not.toContainText("E2E-TEST-OUVRAGE");
-  void res;
+  await detail.expectOuvrageGone(id, "E2E-TEST-OUVRAGE");
 });

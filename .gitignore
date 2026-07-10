@@ -18,10 +18,15 @@ build/
 !docker/empty-seed.sql
 
 # Laravel runtime
+apps/api/eusebe_import_report.md
 storage/framework/cache/
 storage/framework/sessions/
 storage/framework/views/
 storage/logs/
+
+# Playwright runtime
+test-results/
+tests/parity/artifacts/
 
 # IDE
 .idea/

@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "pnpm --filter client dev",
     "build": "pnpm --filter client build",
+    "parity:matrix": "node tests/parity/generate-matrix.mjs",
     "test": "pnpm -r test",
     "prepare": "husky"
   },

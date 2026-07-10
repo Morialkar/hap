@@ -1,10 +1,14 @@
-import { Page } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
 export class BrowsePeriodiquePage {
   constructor(private page: Page) {}
 
   async goto(): Promise<void> {
     await this.page.goto("/view/periodique/titre");
+  }
+
+  async expectReady(): Promise<void> {
+    await expect(this.page).toHaveTitle(/Eusebe/i);
   }
 
   async periodiqueLinks(): Promise<Array<{ id: number; titre: string }>> {

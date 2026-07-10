@@ -4,6 +4,9 @@
   "description": "R0-S4 — Playwright E2E journeys against the Eusèbe v2 capsule",
   "scripts": {
     "test": "playwright test",
+    "test:v2": "E2E_TARGET=v2 playwright test",
+    "test:v3": "E2E_TARGET=v3 playwright test",
+    "test:v3:local": "E2E_TARGET=v3 E2E_V3_BOOTSTRAP=1 E2E_V3_WEB_SERVER=1 playwright test",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui"
   },

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { AnnexPage } from "../pages/v2/AnnexPage";
+import { AnnexPage } from "../pages";
 
 test("/annex renders year groups, first group is Inconnu", async ({ page }) => {
   const annex = new AnnexPage(page);

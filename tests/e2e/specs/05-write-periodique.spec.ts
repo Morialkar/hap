@@ -4,8 +4,8 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { AddPeriodiquePage, EditPeriodiquePage } from "../pages/v2/AddEditPeriodiquePage";
-import { BrowsePeriodiquePage, PeriodiqueDetailPage } from "../pages/v2/BrowsePeriodiquePage";
+import { AddPeriodiquePage, EditPeriodiquePage } from "../pages";
+import { BrowsePeriodiquePage, PeriodiqueDetailPage } from "../pages";
 import { reseedCapsule } from "../helpers/reseed";
 
 let createdPeriodiqueId: number | null = null;
@@ -16,10 +16,7 @@ test.afterAll(() => {
 
 test("create périodique → appears in browse-by-titre", async ({ page }) => {
   const addPage = new AddPeriodiquePage(page);
-  await Promise.all([
-    page.waitForResponse((r) => r.url().includes("/ajax/loadchoices/frequence")),
-    addPage.goto(),
-  ]);
+  await addPage.goto();
 
   await addPage.fill({
     titre: "E2E-TEST-PERIODIQUE",
@@ -49,10 +46,7 @@ test("edit périodique → verify persistence via fresh GET", async ({ page }) =
   const id = createdPeriodiqueId!;
 
   const editPage = new EditPeriodiquePage(page);
-  await Promise.all([
-    page.waitForResponse((r) => r.url().includes("/ajax/loadchoices/frequence")),
-    editPage.goto(id),
-  ]);
+  await editPage.goto(id);
 
   await editPage.fill({ titre: "E2E-TEST-PERIODIQUE-EDITED" });
   await editPage.submit();

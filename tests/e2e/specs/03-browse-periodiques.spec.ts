@@ -1,10 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { BrowsePeriodiquePage, PeriodiqueDetailPage } from "../pages/v2/BrowsePeriodiquePage";
+import { BrowsePeriodiquePage, PeriodiqueDetailPage } from "../pages";
 
 test("browse périodiques by titre shows 17 entries", async ({ page }) => {
   const browse = new BrowsePeriodiquePage(page);
   await browse.goto();
-  await expect(page).toHaveTitle(/Eusebe/i);
+  await browse.expectReady();
 
   const links = await browse.periodiqueLinks();
   expect(links.length).toBe(17);

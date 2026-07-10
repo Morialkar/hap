@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
 export interface OuvrageFormData {
   titre: string;
@@ -79,6 +79,25 @@ export class AddOuvragePage {
 
   async submit(): Promise<void> {
     await this.page.locator("input[type='submit'], button[type='submit']").click();
+  }
+
+  async createInlineAuthor(firstName: string, lastName: string): Promise<void> {
+    await this.page.locator("#add_auteur").click();
+    await expect(this.page.locator("#aut_add")).toBeVisible();
+
+    await this.page.locator("#aut_prenom").fill(firstName);
+    await this.page.locator("#aut_nom").fill(lastName);
+
+    await Promise.all([
+      this.page.waitForResponse((r) => r.url().includes("/ajax/save/auteur")),
+      this.page.locator("#aut_add .save").click(),
+    ]);
+
+    await this.page.waitForResponse((r) => r.url().includes("/ajax/loadchoices/auteur"));
+  }
+
+  async authorOptions(): Promise<string[]> {
+    return this.page.locator("#auteur option").allTextContents();
   }
 
   async successIndicator(): Promise<string> {

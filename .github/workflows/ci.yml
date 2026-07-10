@@ -150,10 +150,30 @@ jobs:
       - name: Vitest
         run: cd apps/client && pnpm exec vitest run
 
+  parity-matrix:
+    name: Parity Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate parity matrix
+        run: node tests/parity/generate-matrix.mjs
+
+      - name: Upload parity matrix
+        uses: actions/upload-artifact@v4
+        with:
+          name: r1-f2-parity-matrix
+          path: tests/parity/artifacts/
+
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lint, api-tests, client-tests]
+    needs: [lint, api-tests, client-tests, parity-matrix]
     steps:
       - uses: actions/checkout@v4
 
