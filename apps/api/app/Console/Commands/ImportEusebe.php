@@ -48,7 +48,7 @@ class ImportEusebe extends Command
         'localisations' => ['id', 'nom'],
         'longueurs' => ['id', 'nom'],
         'types' => ['id', 'nom'],
-        'periodiques' => ['id', 'titre', 'fk_imprimeur', 'fk_editeur', 'fk_frequence', 'proprietaire', 'debut', 'fin', 'description_courte', 'description', 'images', 'notes'],
+        'periodiques' => ['id', 'titre', 'proprietaire', 'fk_imprimeur', 'fk_editeur', 'debut', 'fin', 'description_courte', 'description', 'fk_frequence', 'images', 'created_at', 'updated_at', 'notes'],
         'ouvrages' => ['id', 'titre', 'description', 'description_courte', 'images', 'annee_publication', 'fk_auteur', 'fk_type', 'fk_cat', 'mois_publication', 'nombre_pages', 'fk_editeur', 'fk_imprimeur', 'nombre_editions', 'fk_local', 'notes'],
         'numeros' => ['id', 'code', 'date', 'publicite', 'localisation', 'fk_periodique'],
         'articles' => ['id', 'titre', 'fk_auteur', 'description', 'description_courte', 'fk_numero', 'illustrations', 'fk_longueur', 'quantite_longueur', 'de', 'a', 'consultation', 'images'],

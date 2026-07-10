@@ -60,12 +60,18 @@ test('artisan command imports eusebe database, normalizes types, maps refs, and 
     // 4. Verify lookup and main records are populated
     $authorsTable = $tables->firstWhere('name', 'Auteurs');
     $worksTable = $tables->firstWhere('name', 'Ouvrages');
+    $periodicalsTable = $tables->firstWhere('name', 'Périodiques');
+    $printersTable = $tables->firstWhere('name', 'Imprimeurs');
+    $publishersTable = $tables->firstWhere('name', 'Éditeurs');
+    $frequenciesTable = $tables->firstWhere('name', 'Fréquences');
 
     $authorRecords = Record::where('table_id', $authorsTable->id)->get();
     $workRecords = Record::where('table_id', $worksTable->id)->get();
+    $periodicalRecords = Record::where('table_id', $periodicalsTable->id)->orderBy('rowid', 'asc')->get();
 
     expect($authorRecords->count())->toBeGreaterThan(0, "Should import author records");
     expect($workRecords->count())->toBeGreaterThan(0, "Should import work records");
+    expect($periodicalRecords->count())->toBe(17, "Should import all periodical records");
 
     // Verify Date normalization
     // In legacy auteurs dump, row 4 'Badeaux' has birth birth '0000-00-00'.
@@ -78,6 +84,27 @@ test('artisan command imports eusebe database, normalizes types, maps refs, and 
     $journal = $workRecords->first(fn($r) => str_contains($r->data['Titre'] ?? '', 'Journal des opérations'));
     expect($journal)->not->toBeNull("Journal des opérations should be imported");
     expect($journal->data['Auteur'] ?? '')->toBe($badeaux->id, "Work author reference should be remapped to Badeaux's ULID");
+
+    $firstPeriodical = $periodicalRecords->first();
+    $senecalPrinter = Record::where('table_id', $printersTable->id)
+        ->get()
+        ->first(fn ($r) => ($r->data['Nom'] ?? '') === 'Eusèbe Senécal, imprimeur-éditeur');
+    $senecalPublisher = Record::where('table_id', $publishersTable->id)
+        ->get()
+        ->first(fn ($r) => ($r->data['Nom'] ?? '') === 'Eusèbe Senécal, imprimeur-éditeur');
+    $weekly = Record::where('table_id', $frequenciesTable->id)
+        ->get()
+        ->first(fn ($r) => ($r->data['Nom'] ?? '') === 'Hebdomadaire');
+
+    expect($firstPeriodical->data['Titre'] ?? null)->toBeNull("Blank legacy periodical titles should remain blank/null");
+    expect($firstPeriodical->data['Propriétaire'] ?? '')->toBe('', "Periodical owner must not be shifted from the date column");
+    expect($firstPeriodical->data['Début de parution'] ?? '')->toBe('unknown');
+    expect($firstPeriodical->data['Fin de parution'] ?? '')->toBe('unknown');
+    expect($firstPeriodical->data['Description'] ?? '')->toBe('');
+    expect($firstPeriodical->data['Notes'] ?? '')->toBe('');
+    expect($firstPeriodical->data['Imprimeur'] ?? '')->toBe($senecalPrinter?->id);
+    expect($firstPeriodical->data['Éditeur'] ?? '')->toBe($senecalPublisher?->id);
+    expect($firstPeriodical->data['Fréquence'] ?? '')->toBe($weekly?->id);
 
     // Verify Image split normalizer
     // Row 15 'Les Soirées du Château de Ramezay' has images 'img/Les belles soirées.jpg~'

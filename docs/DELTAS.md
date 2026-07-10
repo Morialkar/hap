@@ -38,3 +38,10 @@ The v3 adapter validates these as ID sets grouped by display label, instead of m
 The annex contract validates the exact normalized content of each year group. It does not require byte-for-byte row order inside a year group, because v2 ordering depends on legacy MySQL string behavior and v3 ordering depends on the active database collation.
 
 The adapter also normalizes legacy HTML whitespace before punctuation, for example `l'exposition , 8 pages` versus `l'exposition, 8 pages`. These are rendering whitespace differences, not data differences.
+
+## 5. Unknown Legacy Dates
+
+The v2 dump stores unknown dates as `0000-00-00`. The v3 platform normalizes that
+sentinel to `unknown` for dynamic date fields. This is an intentional data-quality
+delta: the information content is unchanged, but the modern platform no longer
+persists invalid calendar dates.

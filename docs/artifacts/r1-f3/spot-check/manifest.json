@@ -1,0 +1,102 @@
+[
+  {
+    "number": 1,
+    "type": "work",
+    "legacyId": 3,
+    "v3RecordId": "01KX6GZQ7T8X7AR4EGCBSXTPN0",
+    "title": "Journal des opérations de l'armée américaine lors de l'invasion du Canada en 1775-1776",
+    "reason": "baseline work with accent and publisher/printer references",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/01-work-3-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/01-work-3-v3.png"
+  },
+  {
+    "number": 2,
+    "type": "work",
+    "legacyId": 18,
+    "v3RecordId": "01KX6GZQ8KVR4084SWDWH937VS",
+    "title": "De l'incapacité légale de la femme mariée : thèse pour le doctorat présentée et soutenue le 28 juin 1899 / par Louis J. Loranger...",
+    "reason": "long title and bibliography-style payload",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/02-work-18-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/02-work-18-v3.png"
+  },
+  {
+    "number": 3,
+    "type": "work",
+    "legacyId": 37,
+    "v3RecordId": "01KX6GZQA1SADW48SFB4AD9VJC",
+    "title": "Informations précises et officielles touchant l'enregistrement et l'impôt / par J.C. Auger...",
+    "reason": "periodical-like publication title in works table",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/03-work-37-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/03-work-37-v3.png"
+  },
+  {
+    "number": 4,
+    "type": "work",
+    "legacyId": 58,
+    "v3RecordId": "01KX6GZQBSKVHY9MZFA9VEC2DN",
+    "title": "Règlements de la cité de Montréal compilés à date : Montréal, septembre 1893",
+    "reason": "religious work with date/category references",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/04-work-58-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/04-work-58-v3.png"
+  },
+  {
+    "number": 5,
+    "type": "work",
+    "legacyId": 116,
+    "v3RecordId": "01KX6GZQGCVSH30CV5KEHFP625",
+    "title": "L'Honorable J.A. Chapleau : sa biographie, suivie de ses principaux discours, manifestes, etc., publiés depuis son entrée au Parlement en 1867 / [compilation par A. de Bonneterre].",
+    "reason": "accented French title and person references",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/05-work-116-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/05-work-116-v3.png"
+  },
+  {
+    "number": 6,
+    "type": "work",
+    "legacyId": 207,
+    "v3RecordId": "01KX6GZQPC2JCVPZ2N2VJP94ZS",
+    "title": "Respect aux vieillards / par F.P.B.",
+    "reason": "late catalogue record with sparse fields",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/06-work-207-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/06-work-207-v3.png"
+  },
+  {
+    "number": 7,
+    "type": "work",
+    "legacyId": 470,
+    "v3RecordId": "01KX6GZR38D9QY2J374HYMGZW0",
+    "title": "Notice sur la famille Guy, et sur quelques autres familles.",
+    "reason": "last imported work boundary record",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/07-work-470-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/07-work-470-v3.png"
+  },
+  {
+    "number": 8,
+    "type": "periodical",
+    "legacyId": 1,
+    "v3RecordId": "01KX6GZQ70CZ705Q2WJDJGC53G",
+    "title": "(titre vide)",
+    "reason": "periodical with blank title edge case",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/08-periodical-1-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/08-periodical-1-v3.png"
+  },
+  {
+    "number": 9,
+    "type": "periodical",
+    "legacyId": 10,
+    "v3RecordId": "01KX6GZQ7EE9SZK082DK4RSKWN",
+    "title": "La revue franciscaine puis Petite revue du tiers Ordre et de Saint-François.",
+    "reason": "mid-list periodical with frequency references",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/09-periodical-10-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/09-periodical-10-v3.png"
+  },
+  {
+    "number": 10,
+    "type": "periodical",
+    "legacyId": 17,
+    "v3RecordId": "01KX6GZQ7S5EXKX9HDKQMR1D03",
+    "title": "The Journal of agriculture illustrated / Department of Agriculture for the Province of Quebec",
+    "reason": "last imported periodical boundary record",
+    "v2Screenshot": "docs/artifacts/r1-f3/spot-check/10-periodical-17-v2.png",
+    "v3Screenshot": "docs/artifacts/r1-f3/spot-check/10-periodical-17-v3.png"
+  }
+]

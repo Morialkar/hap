@@ -69,6 +69,50 @@ export class EditPeriodiquePage {
 
   async goto(id: number): Promise<void> {
     await this.page.goto(`/editer/periodique/${id}`);
+    await this.restoreLegacySelectedReferences();
+  }
+
+  private async waitForSelect(name: string): Promise<void> {
+    await this.page.waitForFunction(
+      (sel: string) => {
+        const el = document.querySelector(`select[name="${sel}"]`) as HTMLSelectElement | null;
+        return el !== null && el.options.length > 1;
+      },
+      name,
+      { timeout: 10000 }
+    );
+  }
+
+  private async restoreLegacySelectedReferences(): Promise<void> {
+    await Promise.all([
+      this.waitForSelect("frequence"),
+      this.waitForSelect("editeur"),
+      this.waitForSelect("imprimeur"),
+    ]);
+
+    const selected = await this.page.evaluate(() => {
+      const legacyWindow = window as typeof window & {
+        selFreq?: number;
+        selEditeur?: number;
+        selImprimeur?: number;
+      };
+
+      return {
+        frequence: String(legacyWindow.selFreq ?? ""),
+        editeur: String(legacyWindow.selEditeur ?? ""),
+        imprimeur: String(legacyWindow.selImprimeur ?? ""),
+      };
+    });
+
+    if (selected.frequence) {
+      await this.page.locator("select[name='frequence']").selectOption(selected.frequence);
+    }
+    if (selected.editeur) {
+      await this.page.locator("select[name='editeur']").selectOption(selected.editeur);
+    }
+    if (selected.imprimeur) {
+      await this.page.locator("select[name='imprimeur']").selectOption(selected.imprimeur);
+    }
   }
 
   async fill(data: Partial<PeriodiqueFormData>): Promise<void> {
@@ -81,25 +125,25 @@ export class EditPeriodiquePage {
     if (data.fin !== undefined)
       await this.page.locator("input[name='fin']").fill(data.fin);
     if (data.frequenceId !== undefined) {
-      await this.page.waitForFunction(
-        (sel: string) => {
-          const el = document.querySelector(`select[name="${sel}"]`) as HTMLSelectElement | null;
-          return el !== null && el.options.length > 1;
-        },
-        "frequence",
-        { timeout: 10000 }
-      );
+      await this.waitForSelect("frequence");
       await this.page.locator("select[name='frequence']").selectOption(data.frequenceId);
     }
     if (data.editeurId !== undefined) {
+      await this.waitForSelect("editeur");
       await this.page.locator("select[name='editeur']").selectOption(data.editeurId);
     }
     if (data.imprimeurId !== undefined) {
+      await this.waitForSelect("imprimeur");
       await this.page.locator("select[name='imprimeur']").selectOption(data.imprimeurId);
     }
   }
 
   async submit(): Promise<void> {
-    await this.page.locator("input[type='submit'], button[type='submit']").click();
+    await Promise.all([
+      this.page.waitForResponse((response) => {
+        return response.url().includes("/editer/periodique/") && response.request().method() === "POST";
+      }),
+      this.page.locator("form").first().locator("input[type='submit'], button[type='submit']").click(),
+    ]);
   }
 }

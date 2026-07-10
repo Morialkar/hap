@@ -227,6 +227,28 @@ function normalizeParityText(?string $value): string
     return preg_replace('/\s+,/', ',', $normalized);
 }
 
+function normalizeLegacyDateForV3(?string $value): string
+{
+    $value = (string) $value;
+
+    if ($value === '' || $value === '0000-00-00') {
+        return 'unknown';
+    }
+
+    return $value;
+}
+
+function lookupNameById(Table $table, ?string $recordId): string
+{
+    if (! $recordId) {
+        return '';
+    }
+
+    $record = Record::where('table_id', $table->id)->where('id', $recordId)->first();
+
+    return normalizeParityText($record?->data['Nom'] ?? '');
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -456,17 +478,18 @@ test('read contract: details of periodiques', function () use (&$tablesByTemplat
         expect(preg_replace('/\s+/', ' ', trim($rec['Titre'] ?? '')))
             ->toBe(preg_replace('/\s+/', ' ', trim($goldRec['fields']['titre'] ?? '')));
 
-        // Check description mapping
-        if (isset($goldRec['fields']['Description'])) {
-            expect(preg_replace('/\s+/', ' ', trim($rec['Description'] ?? '')))
-                ->toBe(preg_replace('/\s+/', ' ', trim($goldRec['fields']['Description'] ?? '')));
-        }
-
-        // Check notes mapping
-        if (isset($goldRec['fields']['Notes'])) {
-            expect(preg_replace('/\s+/', ' ', trim($rec['Notes'] ?? '')))
-                ->toBe(preg_replace('/\s+/', ' ', trim($goldRec['fields']['Notes'] ?? '')));
-        }
+        expect(normalizeParityText($rec['Propriétaire'] ?? ''))
+            ->toBe(normalizeParityText($goldRec['fields']['Propriétaire'] ?? ''));
+        expect(normalizeParityText($rec['Début de parution'] ?? ''))
+            ->toBe(normalizeLegacyDateForV3($goldRec['fields']['Début de Publication'] ?? ''));
+        expect(normalizeParityText($rec['Fin de parution'] ?? ''))
+            ->toBe(normalizeLegacyDateForV3($goldRec['fields']['Fin de Publication'] ?? ''));
+        expect(lookupNameById($tablesByTemplateKey['editeurs'], $rec['Éditeur'] ?? null))
+            ->toBe(normalizeParityText($goldRec['fields']['Éditeur'] ?? ''));
+        expect(lookupNameById($tablesByTemplateKey['imprimeurs'], $rec['Imprimeur'] ?? null))
+            ->toBe(normalizeParityText($goldRec['fields']['Imprimeur'] ?? ''));
+        expect(lookupNameById($tablesByTemplateKey['frequences'], $rec['Fréquence'] ?? null))
+            ->toBe(normalizeParityText($goldRec['fields']['Fréquence'] ?? ''));
     }
 });
 
