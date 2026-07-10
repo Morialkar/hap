@@ -5,6 +5,7 @@ import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
 import type { ApiRecord, ApiRecordData, ApiValue } from '../lib/apiTypes';
 import { type BuilderField } from '../lib/fieldTypes';
+import { GpsMapPicker } from './GpsMapPicker';
 import { LoadingSpinner } from './LoadingSpinner';
 import { InlineRecordModal } from './InlineRecordModal';
 
@@ -593,6 +594,13 @@ function GpsFieldEditor({ value, onChange, testId }: GpsFieldEditorProps) {
     typeof coordinate === 'string' || typeof coordinate === 'number' ? String(coordinate) : '';
   const lat = coordinateValue(coordinates.lat);
   const lng = coordinateValue(coordinates.lng);
+  const numericCoordinates =
+    lat !== '' && lng !== ''
+      ? {
+          lat: Number(lat),
+          lng: Number(lng),
+        }
+      : null;
 
   const updateCoordinate = (key: 'lat' | 'lng', rawValue: string) => {
     const nextRaw = {
@@ -612,34 +620,45 @@ function GpsFieldEditor({ value, onChange, testId }: GpsFieldEditorProps) {
   };
 
   return (
-    <div className="row g-2" data-testid={testId}>
-      <div className="col-12 col-sm-6">
-        <input
-          type="number"
-          className="form-control"
-          min={-90}
-          max={90}
-          step="any"
-          placeholder="45.5017"
-          aria-label="Latitude"
-          value={lat ?? ''}
-          onChange={(e) => updateCoordinate('lat', e.target.value)}
-          data-testid={`${testId}-lat`}
-        />
-      </div>
-      <div className="col-12 col-sm-6">
-        <input
-          type="number"
-          className="form-control"
-          min={-180}
-          max={180}
-          step="any"
-          placeholder="-73.5673"
-          aria-label="Longitude"
-          value={lng ?? ''}
-          onChange={(e) => updateCoordinate('lng', e.target.value)}
-          data-testid={`${testId}-lng`}
-        />
+    <div className="vstack gap-2" data-testid={testId}>
+      <GpsMapPicker
+        coordinates={numericCoordinates}
+        onChange={(nextCoordinates) => {
+          onChange({
+            lat: String(nextCoordinates.lat),
+            lng: String(nextCoordinates.lng),
+          });
+        }}
+      />
+      <div className="row g-2">
+        <div className="col-12 col-sm-6">
+          <input
+            type="number"
+            className="form-control"
+            min={-90}
+            max={90}
+            step="any"
+            placeholder="45.5017"
+            aria-label="Latitude"
+            value={lat ?? ''}
+            onChange={(e) => updateCoordinate('lat', e.target.value)}
+            data-testid={`${testId}-lat`}
+          />
+        </div>
+        <div className="col-12 col-sm-6">
+          <input
+            type="number"
+            className="form-control"
+            min={-180}
+            max={180}
+            step="any"
+            placeholder="-73.5673"
+            aria-label="Longitude"
+            value={lng ?? ''}
+            onChange={(e) => updateCoordinate('lng', e.target.value)}
+            data-testid={`${testId}-lng`}
+          />
+        </div>
       </div>
     </div>
   );
