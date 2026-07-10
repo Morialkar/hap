@@ -44,6 +44,36 @@ php apps/api/artisan key:generate
 
 ### 3. Start the dev stack
 
+One command starts the Docker API stack, runs migrations, and starts the Vite client:
+
+```bash
+pnpm dev:stack
+```
+
+Default URLs:
+
+- Client: http://127.0.0.1:5173
+- API: http://localhost:8080/api/v1/ping
+- Mailpit: http://localhost:8025
+
+Useful options:
+
+```bash
+pnpm dev:stack:fresh
+pnpm dev:stack -- --fresh --import-eusebe
+```
+
+`--import-eusebe` reads `EUSEBE_DUMP_PATH` when set, otherwise it uses
+`/Users/nao/Eusebe/sql/eusebe.sql`.
+
+Stop the Docker services when you are done:
+
+```bash
+docker compose -f docker/compose.yml down
+```
+
+Manual Docker-only startup is still available:
+
 ```bash
 cd docker
 cp .env.example .env          # adjust ports if needed
