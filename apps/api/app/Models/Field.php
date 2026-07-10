@@ -14,11 +14,12 @@ class Field extends Model
     protected $keyType = 'uuid';
     public $incrementing = false;
 
-    protected $fillable = ['type', 'name', 'position', 'options', 'validation', 'table_id'];
+    protected $fillable = ['type', 'name', 'position', 'options', 'validation', 'table_id', 'is_filterable'];
 
     protected $casts = [
         'options' => 'array',
         'validation' => 'array',
+        'is_filterable' => 'boolean',
     ];
 
     protected static function boot()

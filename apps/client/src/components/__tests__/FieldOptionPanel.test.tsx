@@ -158,4 +158,18 @@ describe('FieldOptionPanel', () => {
       })
     );
   });
+
+  it('renders and toggles is_filterable parameter', () => {
+    const onChange = vi.fn();
+    render(<FieldOptionPanel field={{ ...baseField, is_filterable: true }} onChange={onChange} />);
+
+    const filterToggle = screen.getByLabelText(/enable filtering/i);
+    expect(filterToggle).toBeInTheDocument();
+    expect(filterToggle).toBeChecked();
+
+    fireEvent.click(filterToggle);
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ is_filterable: false })
+    );
+  });
 });

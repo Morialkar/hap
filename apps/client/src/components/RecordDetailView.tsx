@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/apiClient';
-import type { ApiRecordData } from '../lib/apiTypes';
+import type { ApiRecord, ApiRecordData } from '../lib/apiTypes';
 import { type BuilderField } from '../lib/fieldTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 
@@ -114,7 +114,7 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
       case 'image':
       case 'file': {
         const isImg = field.type === 'image';
-        const hashes = Array.isArray(value) ? value : [value];
+        const hashes = (Array.isArray(value) ? value : [value]).map(String);
 
         return (
           <div className="d-flex flex-wrap gap-2 mt-1">
@@ -176,11 +176,12 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
           <div key={colIdx} className={colWidthClass}>
             <div className="vstack gap-3 h-100 p-2 border border-dashed rounded bg-light-subtle">
               {colFields.map((fId) => {
-                const fieldDef = fieldsByIdMap.get(fId);
+                const cleanId = fId.startsWith('draft-') ? fId.substring(6) : fId;
+                const fieldDef = fieldsByIdMap.get(cleanId);
                 if (!fieldDef) return null;
 
                 return (
-                  <div key={fId} className="hap-detail-field">
+                  <div key={cleanId} className="hap-detail-field">
                     <div className="small text-muted fw-bold mb-1 text-uppercase">{fieldDef.name}</div>
                     <div className="lh-sm">{renderFieldValue(fieldDef.name)}</div>
                   </div>
@@ -224,18 +225,60 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
 
 
 
-function ReferenceLabel({ targetRecordId }: { targetRecordId: string }) {
-  const recordQuery = useQuery<{ data: Record<string, unknown> }, Error>({
+function ReferenceLabel({
+  targetRecordId,
+  fallback,
+  className = 'fw-medium text-primary',
+}: {
+  targetRecordId: string;
+  fallback?: string;
+  className?: string;
+}) {
+  const recordQuery = useQuery<ApiRecord, Error>({
     queryKey: ['records', targetRecordId],
     queryFn: () => apiClient.get(`/records/${targetRecordId}`),
-    enabled: !!targetRecordId,
+    enabled: !!targetRecordId && targetRecordId !== '--',
   });
 
-  if (recordQuery.isLoading) return <LoadingSpinner size="sm" />;
+  const targetTableId = recordQuery.data?.table_id;
 
-  const rData = recordQuery.data?.data || {};
-  const label =
-    rData.name || rData.title || rData.nom || rData.titre || Object.values(rData)[0] || targetRecordId;
+  const fieldsQuery = useQuery<BuilderField[], Error>({
+    queryKey: ['fields', targetTableId],
+    queryFn: () => apiClient.get(`/fields?table_id=${targetTableId}`),
+    enabled: !!targetTableId,
+  });
 
-  return <span className="fw-medium text-primary">{String(label)}</span>;
+  if (targetRecordId === '--') {
+    return <span>Sans valeur</span>;
+  }
+
+  if (recordQuery.isLoading || fieldsQuery.isLoading) {
+    return <LoadingSpinner size="sm" />;
+  }
+
+  if (recordQuery.isError || !recordQuery.data) {
+    return <span className={className}>{fallback || targetRecordId}</span>;
+  }
+
+  const rData = recordQuery.data.data || {};
+  const fields = fieldsQuery.data || [];
+
+  // Find the field of type 'title'
+  const titleField = fields.find((f) => f.type === 'title');
+  if (titleField && rData[titleField.name] !== undefined && rData[titleField.name] !== null && rData[titleField.name] !== '') {
+    return <span className={className}>{String(rData[titleField.name])}</span>;
+  }
+
+  // Find the first field (by position or just first in list)
+  const sortedFields = [...fields].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  const firstField = sortedFields[0];
+  if (firstField && rData[firstField.name] !== undefined && rData[firstField.name] !== null && rData[firstField.name] !== '') {
+    return <span className={className}>{String(rData[firstField.name])}</span>;
+  }
+
+  // Fallback if no fields exist or values are empty
+  const defaultLabel =
+    rData.name || rData.title || rData.nom || rData.titre || Object.values(rData)[0] || fallback || targetRecordId;
+
+  return <span className={className}>{String(defaultLabel)}</span>;
 }

@@ -40,6 +40,7 @@ class FieldTypeRegistry
     private function registerDefaultTypes(): void
     {
         $this->register('text', new ShortTextType());
+        $this->register('title', new ShortTextType());
         $this->register('long_text', new LongTextType());
         $this->register('number', new NumberType());
         $this->register('date', new DateType());

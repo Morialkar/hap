@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, type ComponentType, type ReactNode } from 'react';
 import { useForm, useStore } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
@@ -34,6 +34,15 @@ interface DynamicFieldApi {
     value: ApiValue | undefined;
   };
   handleChange: (value: ApiValue) => void;
+}
+
+interface DynamicFormApi {
+  getFieldValue: (name: string) => ApiValue | undefined;
+  setFieldValue: (name: string, value: ApiValue) => void;
+  Field: ComponentType<{
+    name: string;
+    children: (fieldApi: DynamicFieldApi) => ReactNode;
+  }>;
 }
 
 export function RecordForm({
@@ -110,6 +119,7 @@ export function RecordForm({
       }
     },
   });
+  const dynamicForm = form as unknown as DynamicFormApi;
 
   // Track dirty state
   const isFormDirty = useStore(form.store, (state: FormStateSnapshot) => state.isDirty);
@@ -197,12 +207,12 @@ export function RecordForm({
         });
 
         // Set the form value
-        const currentValue = form.getFieldValue(`data.${fieldKey}`);
+        const currentValue = dynamicForm.getFieldValue(`data.${fieldKey}`);
         if (multi) {
           const arr = Array.isArray(currentValue) ? currentValue : [];
-          form.setFieldValue(`data.${fieldKey}`, [...arr, data.hash]);
+          dynamicForm.setFieldValue(`data.${fieldKey}`, [...arr, data.hash]);
         } else {
-          form.setFieldValue(`data.${fieldKey}`, data.hash);
+          dynamicForm.setFieldValue(`data.${fieldKey}`, data.hash);
         }
       } catch (err) {
         console.error(err);
@@ -227,14 +237,14 @@ export function RecordForm({
       };
     });
 
-    const currentValue = form.getFieldValue(`data.${fieldKey}`);
+    const currentValue = dynamicForm.getFieldValue(`data.${fieldKey}`);
     if (multi && Array.isArray(currentValue)) {
-      form.setFieldValue(
+      dynamicForm.setFieldValue(
         `data.${fieldKey}`,
         currentValue.filter((h) => h !== hash)
       );
     } else {
-      form.setFieldValue(`data.${fieldKey}`, '');
+      dynamicForm.setFieldValue(`data.${fieldKey}`, '');
     }
   };
 
@@ -267,8 +277,9 @@ export function RecordForm({
       >
       {recordFields.map((field) => {
         const options = field.options || {};
+        const FormField = dynamicForm.Field;
         return (
-          <form.Field
+          <FormField
             key={field.id}
             name={`data.${field.name}`}
           >
@@ -303,6 +314,7 @@ export function RecordForm({
                   {/* Render Editor based on Field Type */}
                   {(() => {
                     switch (field.type) {
+                      case 'title':
                       case 'text':
                         return (
                           <input
@@ -404,11 +416,11 @@ export function RecordForm({
                       case 'file': {
                         const isImage = field.type === 'image';
                         const multi = !!options.multi;
-                        const uploadedHashes = Array.isArray(value)
+                        const uploadedHashes = (Array.isArray(value)
                           ? value
                           : value
                           ? [value]
-                          : [];
+                          : []).map(String);
 
                         return (
                           <div className="border rounded p-3 bg-light-subtle">
@@ -486,7 +498,7 @@ export function RecordForm({
                 </div>
               );
             })}
-          </form.Field>
+          </FormField>
         );
       })}
 
@@ -533,7 +545,7 @@ export function RecordForm({
           onClose={() => setInlineModalConfig(null)}
           onSuccess={(newRecord) => {
             // Automatically set the value of the reference select
-            form.setFieldValue(`data.${inlineModalConfig.fieldKey}`, newRecord.id);
+            dynamicForm.setFieldValue(`data.${inlineModalConfig.fieldKey}`, newRecord.id);
             setInlineModalConfig(null);
           }}
         />

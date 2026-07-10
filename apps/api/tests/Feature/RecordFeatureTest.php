@@ -51,6 +51,41 @@ test('user can create record with valid data', function () {
     ]);
 });
 
+test('user can create record with title field type', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create();
+    WorkspaceMember::factory()->create([
+        'user_id' => $user->id,
+        'workspace_id' => $workspace->id,
+        'role' => 'owner',
+    ]);
+
+    $database = Database::factory()->create(['workspace_id' => $workspace->id]);
+    $table = Table::factory()->create(['database_id' => $database->id]);
+    Field::factory()->create([
+        'table_id' => $table->id,
+        'name' => 'Titre',
+        'type' => 'title',
+        'options' => ['max_length' => 255],
+    ]);
+
+    $response = $this->actingAs($user)
+        ->postJson('/api/v1/records', [
+            'table_id' => $table->id,
+            'data' => [
+                'Titre' => 'Catalogue principal',
+            ],
+        ]);
+
+    $response->assertStatus(201)
+        ->assertJson([
+            'table_id' => $table->id,
+            'data' => [
+                'Titre' => 'Catalogue principal',
+            ],
+        ]);
+});
+
 test('record validation rejects unknown fields', function () {
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create();

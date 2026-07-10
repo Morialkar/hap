@@ -164,3 +164,43 @@ test('validation rejects invalid view types', function () {
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['type']);
 });
+
+test('setting a view as default resets other default views on the same table', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create();
+    WorkspaceMember::factory()->create([
+        'user_id' => $user->id,
+        'workspace_id' => $workspace->id,
+        'role' => 'owner',
+    ]);
+
+    $database = Database::factory()->create(['workspace_id' => $workspace->id]);
+    $table = Table::factory()->create(['database_id' => $database->id]);
+
+    $view1 = View::create([
+        'table_id' => $table->id,
+        'name' => 'View 1',
+        'type' => 'card',
+        'is_default' => true,
+    ]);
+
+    $view2 = View::create([
+        'table_id' => $table->id,
+        'name' => 'View 2',
+        'type' => 'card',
+        'is_default' => false,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->putJson('/api/v1/views/' . $view2->id, [
+            'is_default' => true,
+        ]);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'is_default' => true,
+        ]);
+
+    $view1->refresh();
+    expect($view1->is_default)->toBeFalse();
+});

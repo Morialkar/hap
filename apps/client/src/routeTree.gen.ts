@@ -14,6 +14,7 @@ import { Route as PingRouteImport } from './routes/ping'
 import { Route as NotFoundRouteImport } from './routes/not-found'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NavigationDatabaseIdRouteImport } from './routes/navigation.$databaseId'
 import { Route as TablesDatabaseIdTableIdRouteImport } from './routes/tables.$databaseId.$tableId'
 import { Route as BuilderDatabaseIdTableIdRouteImport } from './routes/builder.$databaseId.$tableId'
 
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NavigationDatabaseIdRoute = NavigationDatabaseIdRouteImport.update({
+  id: '/navigation/$databaseId',
+  path: '/navigation/$databaseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TablesDatabaseIdTableIdRoute = TablesDatabaseIdTableIdRouteImport.update({
   id: '/tables/$databaseId/$tableId',
   path: '/tables/$databaseId/$tableId',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/not-found': typeof NotFoundRoute
   '/ping': typeof PingRoute
   '/workspaces': typeof WorkspacesRoute
+  '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
   '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
 }
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/not-found': typeof NotFoundRoute
   '/ping': typeof PingRoute
   '/workspaces': typeof WorkspacesRoute
+  '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
   '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
 }
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/not-found': typeof NotFoundRoute
   '/ping': typeof PingRoute
   '/workspaces': typeof WorkspacesRoute
+  '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
   '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
 }
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/not-found'
     | '/ping'
     | '/workspaces'
+    | '/navigation/$databaseId'
     | '/builder/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
   fileRoutesByTo: FileRoutesByTo
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/not-found'
     | '/ping'
     | '/workspaces'
+    | '/navigation/$databaseId'
     | '/builder/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
   id:
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/not-found'
     | '/ping'
     | '/workspaces'
+    | '/navigation/$databaseId'
     | '/builder/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
   fileRoutesById: FileRoutesById
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   NotFoundRoute: typeof NotFoundRoute
   PingRoute: typeof PingRoute
   WorkspacesRoute: typeof WorkspacesRoute
+  NavigationDatabaseIdRoute: typeof NavigationDatabaseIdRoute
   BuilderDatabaseIdTableIdRoute: typeof BuilderDatabaseIdTableIdRoute
   TablesDatabaseIdTableIdRoute: typeof TablesDatabaseIdTableIdRoute
 }
@@ -159,6 +172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/navigation/$databaseId': {
+      id: '/navigation/$databaseId'
+      path: '/navigation/$databaseId'
+      fullPath: '/navigation/$databaseId'
+      preLoaderRoute: typeof NavigationDatabaseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tables/$databaseId/$tableId': {
       id: '/tables/$databaseId/$tableId'
       path: '/tables/$databaseId/$tableId'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotFoundRoute: NotFoundRoute,
   PingRoute: PingRoute,
   WorkspacesRoute: WorkspacesRoute,
+  NavigationDatabaseIdRoute: NavigationDatabaseIdRoute,
   BuilderDatabaseIdTableIdRoute: BuilderDatabaseIdTableIdRoute,
   TablesDatabaseIdTableIdRoute: TablesDatabaseIdTableIdRoute,
 }

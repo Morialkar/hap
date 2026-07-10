@@ -25,6 +25,7 @@ interface Table {
   id: string;
   name: string;
   database_id: string;
+  is_front_facing?: boolean;
 }
 
 interface Template {
@@ -128,6 +129,14 @@ function Workspaces() {
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       setNewTableNameByDatabase((prev) => ({ ...prev, [vars.databaseId]: '' }));
+    },
+  });
+
+  const updateTable = useMutation({
+    mutationFn: ({ id, isFrontFacing }: { id: string; isFrontFacing: boolean }) =>
+      apiClient.put<Table>(`/tables/${id}`, { is_front_facing: isFrontFacing }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
     },
   });
 
@@ -332,13 +341,35 @@ function Workspaces() {
                             <i className="ti ti-table me-2 text-muted" aria-hidden="true" />
                             {table.name}
                           </Link>
-                          <Link
-                            to="/builder/$databaseId/$tableId"
-                            params={{ databaseId: database.id, tableId: table.id }}
-                            className="btn btn-sm btn-outline-secondary"
-                          >
-                            {t('workspaces.builder.action')}
-                          </Link>
+                          <div className="d-flex align-items-center gap-3">
+                            <div className="form-check form-switch mb-0" title={t('workspaces.table.isFrontFacing')}>
+                              <input
+                                className="form-check-input cursor-pointer"
+                                type="checkbox"
+                                role="switch"
+                                id={`front-facing-${table.id}`}
+                                checked={table.is_front_facing ?? false}
+                                onChange={(e) =>
+                                  updateTable.mutate({
+                                    id: table.id,
+                                    isFrontFacing: e.target.checked,
+                                  })
+                                }
+                                disabled={updateTable.isPending}
+                                aria-label={t('workspaces.table.isFrontFacing')}
+                              />
+                              <label className="form-check-label small text-muted ms-1 d-none d-sm-inline" htmlFor={`front-facing-${table.id}`}>
+                                {t('workspaces.table.isFrontFacing')}
+                              </label>
+                            </div>
+                            <Link
+                              to="/builder/$databaseId/$tableId"
+                              params={{ databaseId: database.id, tableId: table.id }}
+                              className="btn btn-sm btn-outline-secondary"
+                            >
+                              {t('workspaces.builder.action')}
+                            </Link>
+                          </div>
                         </div>
                       ))
                     )}

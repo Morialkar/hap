@@ -18,6 +18,7 @@ class TableResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'database_id' => $this->database_id,
+            'is_front_facing' => (bool) $this->is_front_facing,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

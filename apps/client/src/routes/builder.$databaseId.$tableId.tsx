@@ -23,6 +23,7 @@ interface Table {
   id: string;
   name: string;
   database_id: string;
+  is_front_facing?: boolean;
 }
 
 interface Database {
@@ -125,6 +126,7 @@ function StructureBuilder() {
         options: field.options,
         validation: field.validation,
         table_id: tableId,
+        is_filterable: field.is_filterable !== false,
       };
 
       if (field.isNew) {
@@ -147,6 +149,15 @@ function StructureBuilder() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fields', tableId] });
+    },
+  });
+
+  const updateTableMutation = useMutation({
+    mutationFn: (isFrontFacing: boolean) =>
+      apiClient.put<Table>(`/tables/${tableId}`, { is_front_facing: isFrontFacing }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['table', tableId] });
+      queryClient.invalidateQueries({ queryKey: ['tables', databaseId] });
     },
   });
 
@@ -344,8 +355,22 @@ function StructureBuilder() {
         title={tableQuery.data?.name}
         description={t('builder.title')}
         actions={
-          activeTab === 'structure' ? (
-            <PageActions>
+          <PageActions>
+            <div className="form-check form-switch me-3 d-inline-flex align-items-center mb-0" title={t('builder.isFrontFacing')}>
+              <input
+                className="form-check-input me-2 cursor-pointer"
+                type="checkbox"
+                role="switch"
+                id="isFrontFacingSwitch"
+                checked={tableQuery.data?.is_front_facing ?? false}
+                onChange={(e) => updateTableMutation.mutate(e.target.checked)}
+                disabled={updateTableMutation.isPending}
+              />
+              <label className="form-check-label text-muted small cursor-pointer" htmlFor="isFrontFacingSwitch">
+                {t('builder.isFrontFacing')}
+              </label>
+            </div>
+            {activeTab === 'structure' && (
               <button
                 type="button"
                 className="btn btn-primary"
@@ -355,8 +380,8 @@ function StructureBuilder() {
                 <i className="ti ti-device-floppy me-1" aria-hidden="true" />
                 {t('common.save')}
               </button>
-            </PageActions>
-          ) : undefined
+            )}
+          </PageActions>
         }
       />
 

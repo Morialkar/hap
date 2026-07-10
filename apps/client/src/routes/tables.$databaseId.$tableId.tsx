@@ -18,13 +18,11 @@ import { PageActions, PageHeader } from '../components/ui/PageHeader';
 import { SurfaceCard } from '../components/ui/SurfaceCard';
 
 export const Route = createFileRoute('/tables/$databaseId/$tableId')({
+  validateSearch: (search: Record<string, unknown>): TableSearch => ({
+    action: search.action as string | undefined,
+    recordId: search.recordId as string | undefined,
+  }),
   component: TableRecordsPage,
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      action: (search.action as string) || undefined,
-      recordId: (search.recordId as string) || undefined,
-    };
-  },
 });
 
 interface Table {
@@ -54,7 +52,7 @@ interface FilterItem {
 function TableRecordsPage() {
   const { databaseId, tableId } = Route.useParams();
   const search = useSearch({ from: '/tables/$databaseId/$tableId' });
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/tables/$databaseId/$tableId' });
   const { t } = useI18n();
   const queryClient = useQueryClient();
 

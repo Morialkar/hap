@@ -45,6 +45,7 @@ class TemplateInstallService
                 $table = Table::create([
                     'database_id' => $database->id,
                     'name' => $tableDefinition['name'],
+                    'is_front_facing' => $tableDefinition['is_front_facing'] ?? false,
                 ]);
 
                 $tableIds[$tableDefinition['key']] = $table->id;
@@ -59,6 +60,7 @@ class TemplateInstallService
                         'position' => $fieldDefinition['position'] ?? 0,
                         'options' => $this->replaceKeys($fieldDefinition['options'] ?? [], $tableIds),
                         'validation' => $fieldDefinition['validation'] ?? [],
+                        'is_filterable' => $fieldDefinition['is_filterable'] ?? true,
                     ]);
 
                     $fieldIds[$fieldDefinition['key']] = $field->id;
@@ -76,6 +78,7 @@ class TemplateInstallService
                         'name' => $viewDefinition['name'],
                         'type' => $viewDefinition['type'],
                         'config' => $this->replaceKeys($viewDefinition['config'] ?? [], $keyMap),
+                        'is_default' => $viewDefinition['is_default'] ?? false,
                     ]);
                 }
 

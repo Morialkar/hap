@@ -15,7 +15,11 @@ class Table extends Model
     protected $keyType = 'uuid';
     public $incrementing = false;
 
-    protected $fillable = ['name', 'database_id'];
+    protected $fillable = ['name', 'database_id', 'is_front_facing'];
+
+    protected $casts = [
+        'is_front_facing' => 'boolean',
+    ];
 
     protected static function boot()
     {

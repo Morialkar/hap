@@ -25,6 +25,7 @@ class StoreTableRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'database_id' => ['required', 'uuid', 'exists:databases,id'],
+            'is_front_facing' => ['sometimes', 'boolean'],
         ];
     }
 }

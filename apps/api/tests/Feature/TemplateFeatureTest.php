@@ -35,8 +35,8 @@ test('user can export a database as a canonical versioned template', function ()
         'name' => 'Catalogue littéraire',
         'locale' => 'fr-CA',
     ]);
-    $authors = Table::factory()->create(['database_id' => $database->id, 'name' => 'Authors']);
-    $works = Table::factory()->create(['database_id' => $database->id, 'name' => 'Works']);
+    $authors = Table::factory()->create(['database_id' => $database->id, 'name' => 'Authors', 'is_front_facing' => false]);
+    $works = Table::factory()->create(['database_id' => $database->id, 'name' => 'Works', 'is_front_facing' => true]);
 
     $authorName = Field::factory()->create([
         'table_id' => $authors->id,
@@ -98,8 +98,11 @@ test('user can export a database as a canonical versioned template', function ()
         'locale' => 'fr-CA',
     ]);
     expect($payload['tables'])->toHaveCount(2);
-    expect($payload['tables'][0])->toHaveKeys(['key', 'name', 'fields', 'views', 'reports']);
+    expect($payload['tables'][0])->toHaveKeys(['key', 'name', 'is_front_facing', 'fields', 'views', 'reports']);
     expect($payload['tables'][0]['key'])->toBe('authors');
+    expect($payload['tables'][0]['is_front_facing'])->toBe(false);
+    expect($payload['tables'][1]['key'])->toBe('works');
+    expect($payload['tables'][1]['is_front_facing'])->toBe(true);
     expect($payload['tables'][1]['fields'][1]['options']['target_table'])->toBe('authors');
     expect($payload['tables'][1]['views'][0]['config']['columns'][0][0])->toBe('title');
     expect($payload['tables'][1]['reports'][0]['name'])->toBe('Annexe B');
@@ -122,6 +125,7 @@ test('installing and exporting a template round-trips to an identical canonical 
                 [
                     'key' => 'authors',
                     'name' => 'Authors',
+                    'is_front_facing' => false,
                     'fields' => [
                         [
                             'key' => 'name',
@@ -138,6 +142,7 @@ test('installing and exporting a template round-trips to an identical canonical 
                 [
                     'key' => 'works',
                     'name' => 'Works',
+                    'is_front_facing' => true,
                     'fields' => [
                         [
                             'key' => 'title',

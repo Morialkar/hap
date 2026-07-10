@@ -14,10 +14,11 @@ class View extends Model
     protected $keyType = 'uuid';
     public $incrementing = false;
 
-    protected $fillable = ['name', 'type', 'config', 'table_id'];
+    protected $fillable = ['name', 'type', 'config', 'table_id', 'is_default'];
 
     protected $casts = [
         'config' => 'array',
+        'is_default' => 'boolean',
     ];
 
     protected static function boot()

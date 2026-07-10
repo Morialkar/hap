@@ -2,6 +2,8 @@ import { createRootRoute, Outlet, Link, useNavigate, useLocation } from '@tansta
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '../lib/apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { useI18n } from '../contexts/I18nContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -19,6 +21,35 @@ function RootLayout() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
 
   const isLoginPage = location.pathname === '/login';
+
+
+
+  interface Database {
+    id: string;
+    name: string;
+    workspace_id: string;
+  }
+
+  interface Table {
+    id: string;
+    name: string;
+    database_id: string;
+    is_front_facing?: boolean;
+  }
+
+
+
+  const databasesQuery = useQuery<Database[], Error>({
+    queryKey: ['databases'],
+    queryFn: () => apiClient.get('/databases'),
+    enabled: isAuthenticated,
+  });
+
+  const tablesQuery = useQuery<Table[], Error>({
+    queryKey: ['tables'],
+    queryFn: () => apiClient.get('/tables'),
+    enabled: isAuthenticated,
+  });
 
   useEffect(() => {
     if (isLoading || isAuthenticated || isLoginPage) return;
@@ -55,6 +86,21 @@ function RootLayout() {
 
   return (
     <div className="page">
+      <style>{`
+        .hap-workspace-item {
+          position: relative;
+        }
+        @media (min-width: 768px) {
+          .nav-item.dropdown.hap-workspace-item:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+          }
+        }
+      `}</style>
       <header className="navbar navbar-expand-md d-print-none hap-topbar">
         <div className="container-xl">
           <button
@@ -120,6 +166,47 @@ function RootLayout() {
                 {t('nav.workspaces')}
               </Link>
             </li>
+            {databasesQuery.data?.map((db: Database) => {
+              const dbFrontTables = (tablesQuery.data ?? []).filter((tbl) =>
+                tbl.is_front_facing && tbl.database_id === db.id
+              );
+
+              if (dbFrontTables.length === 0) return null;
+
+              return (
+                <li className="nav-item dropdown hap-workspace-item text-nowrap ms-md-2 ms-0" key={db.id}>
+                  <a
+                    className="nav-link dropdown-toggle cursor-pointer"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    aria-expanded="false"
+                  >
+                    <i className="ti ti-folder me-2 text-muted" aria-hidden="true" />
+                    {db.name}
+                  </a>
+                  <div className="dropdown-menu">
+                    {dbFrontTables.map((tbl) => {
+                      return (
+                        <Link
+                          key={tbl.id}
+                          to="/navigation/$databaseId"
+                          params={{ databaseId: db.id }}
+                          search={{ tableId: tbl.id }}
+                          className="dropdown-item d-flex align-items-center justify-content-between gap-3"
+                          onClick={() => setIsNavigationOpen(false)}
+                        >
+                          <span>
+                            <i className="ti ti-table me-2 text-muted" />
+                            {tbl.name}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </li>
+              );
+            })}
             <li className="nav-item">
               <Link
                 to="/ping"

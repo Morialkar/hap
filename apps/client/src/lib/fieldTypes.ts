@@ -1,4 +1,5 @@
 export type FieldType =
+  | 'title'
   | 'text'
   | 'long_text'
   | 'number'
@@ -44,6 +45,36 @@ export interface FieldTypeDefinition {
 }
 
 export const FIELD_TYPES: Record<FieldType, FieldTypeDefinition> = {
+  title: {
+    type: 'title',
+    icon: 'heading',
+    labelKey: 'fieldType.title.label',
+    descriptionKey: 'fieldType.title.description',
+    options: [
+      {
+        key: 'max_length',
+        type: 'number',
+        label: 'fieldType.text.options.maxLength',
+        required: false,
+        min: 1,
+        max: 10000,
+        step: 1,
+        placeholder: '255',
+      },
+      {
+        key: 'placeholder',
+        type: 'string',
+        label: 'fieldType.text.options.placeholder',
+      },
+    ],
+    validation: [
+      {
+        key: 'required',
+        type: 'boolean',
+        label: 'fieldType.validation.required',
+      },
+    ],
+  },
   text: {
     type: 'text',
     icon: 'forms',
@@ -418,11 +449,13 @@ export interface BuilderField {
   position: number;
   options: Record<string, unknown>;
   validation: Record<string, unknown>;
+  is_filterable?: boolean;
   isNew?: boolean;
   persistedId?: string | null;
 }
 
 export const FIELD_TYPE_ORDER: FieldType[] = [
+  'title',
   'text',
   'long_text',
   'number',

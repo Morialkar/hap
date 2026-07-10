@@ -106,6 +106,7 @@ class TemplateSeeder extends Seeder
                 [
                     'key' => 'periodicals',
                     'name' => 'Périodiques',
+                    'is_front_facing' => true,
                     'fields' => [
                         ['key' => 'titre', 'name' => 'Titre', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
                         ['key' => 'proprietaire', 'name' => 'Propriétaire', 'type' => 'text', 'position' => 1, 'options' => ['max_length' => 255]],
@@ -125,6 +126,7 @@ class TemplateSeeder extends Seeder
                 [
                     'key' => 'works',
                     'name' => 'Ouvrages',
+                    'is_front_facing' => true,
                     'fields' => [
                         ['key' => 'titre', 'name' => 'Titre', 'type' => 'text', 'position' => 0],
                         ['key' => 'description', 'name' => 'Description', 'type' => 'long_text', 'position' => 1],
@@ -293,6 +295,7 @@ class TemplateSeeder extends Seeder
                 [
                     'key' => 'recipes',
                     'name' => 'Recettes',
+                    'is_front_facing' => true,
                     'fields' => [
                         ['key' => 'titre', 'name' => 'Titre de la recette', 'type' => 'text', 'position' => 0],
                         ['key' => 'instructions', 'name' => 'Instructions', 'type' => 'long_text', 'position' => 1],

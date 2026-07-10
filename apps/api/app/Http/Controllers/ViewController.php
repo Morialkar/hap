@@ -28,9 +28,16 @@ class ViewController extends Controller
             'name' => 'required|string|max:255',
             'type' => 'required|string|in:list,card,map',
             'config' => 'nullable|array',
+            'is_default' => 'sometimes|boolean',
         ]);
 
         $view = View::create($validated);
+
+        if ($view->is_default) {
+            View::where('table_id', $view->table_id)
+                ->where('id', '!=', $view->id)
+                ->update(['is_default' => false]);
+        }
 
         return response()->json(new ViewResource($view), 201);
     }
@@ -46,9 +53,16 @@ class ViewController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'type' => 'sometimes|required|string|in:list,card,map',
             'config' => 'nullable|array',
+            'is_default' => 'sometimes|boolean',
         ]);
 
         $view->update($validated);
+
+        if ($view->is_default) {
+            View::where('table_id', $view->table_id)
+                ->where('id', '!=', $view->id)
+                ->update(['is_default' => false]);
+        }
 
         return response()->json(new ViewResource($view));
     }

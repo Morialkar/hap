@@ -73,13 +73,13 @@ See [DELTAS.md](./DELTAS.md).
 
 ## User Verdict
 
-Pending.
+Signed off by user on 2026-07-10.
 
 ## Release Actions
 
 | Action | Status |
 | --- | --- |
-| User signs off R1 | Pending |
+| User signs off R1 | Complete |
 | R1 tag created | Pending |
-| `PLAN.md` updated with D5 status and release notes | Pending user sign-off |
+| `PLAN.md` updated with D5 status and release notes | Pending |
 | R2 elaboration session scheduled | Pending |

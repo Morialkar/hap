@@ -20,6 +20,7 @@ class ViewResource extends JsonResource
             'name' => $this->name,
             'type' => $this->type,
             'config' => $this->config,
+            'is_default' => $this->is_default,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

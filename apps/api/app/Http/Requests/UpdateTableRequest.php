@@ -24,6 +24,7 @@ class UpdateTableRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'string', 'max:255'],
+            'is_front_facing' => ['sometimes', 'boolean'],
         ];
     }
 }

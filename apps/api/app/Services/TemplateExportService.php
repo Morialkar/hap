@@ -32,6 +32,7 @@ class TemplateExportService
                 ->map(fn (Table $table) => [
                     'key' => $tableKeys[$table->id],
                     'name' => $table->name,
+                    'is_front_facing' => (bool) $table->is_front_facing,
                     'fields' => $table->fields
                         ->sortBy([
                             ['position', 'asc'],

@@ -23,12 +23,13 @@ class StoreFieldRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'in:text,long_text,number,date,boolean,select,reference,image,file,url,email'],
+            'type' => ['required', 'string', 'in:text,long_text,number,date,boolean,select,reference,image,file,url,email,title'],
             'name' => ['required', 'string', 'max:255'],
             'position' => ['sometimes', 'integer', 'min:0'],
             'options' => ['sometimes', 'array'],
             'validation' => ['sometimes', 'array'],
             'table_id' => ['required', 'uuid', 'exists:tables,id'],
+            'is_filterable' => ['sometimes', 'boolean'],
         ];
     }
 }

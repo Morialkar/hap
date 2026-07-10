@@ -22,6 +22,7 @@ class FieldResource extends JsonResource
             'options' => $this->options,
             'validation' => $this->validation,
             'table_id' => $this->table_id,
+            'is_filterable' => $this->is_filterable,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -38,6 +38,7 @@ interface View {
     columnCount: number;
     columns: string[][];
   } | null;
+  is_default?: boolean;
 }
 
 interface DroppableColumnProps {
@@ -215,6 +216,15 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
     },
   });
 
+  const toggleDefaultMutation = useMutation({
+    mutationFn: (isDefault: boolean) =>
+      apiClient.put<View>(`/views/${selectedViewId}`, { is_default: isDefault }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['views', tableId] });
+      showToast(t('layout.defaultSetSuccess'));
+    },
+  });
+
   const deleteViewMutation = useMutation({
     mutationFn: (id: string) => apiClient.delete(`/views/${id}`),
     onSuccess: () => {
@@ -299,9 +309,34 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
         const items = prev[activeContainer] || [];
         const oldIndex = items.indexOf(activeIdStr);
         const newIndex = items.indexOf(overIdStr);
+        if (oldIndex === -1 || newIndex === -1) {
+          return prev;
+        }
         return {
           ...prev,
           [activeContainer]: arrayMove(items, oldIndex, newIndex),
+        };
+      });
+    } else {
+      // Cross-container drop fallback
+      setLayoutItems((prev) => {
+        const activeItems = prev[activeContainer] || [];
+        const overItems = prev[overContainer] || [];
+        const overIndex = overItems.indexOf(overIdStr);
+        
+        let newIndex = overItems.length;
+        if (overIndex !== -1) {
+          newIndex = overIndex;
+        }
+        
+        return {
+          ...prev,
+          [activeContainer]: activeItems.filter((item) => item !== activeIdStr),
+          [overContainer]: [
+            ...overItems.slice(0, newIndex),
+            activeIdStr,
+            ...overItems.slice(newIndex)
+          ]
         };
       });
     }
@@ -435,7 +470,21 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                   ))}
                 </div>
               </div>
-              <div className="col text-end">
+              <div className="col d-flex justify-content-end align-items-center gap-3">
+                <div className="form-check form-switch mb-0" title={t('layout.isDefault')}>
+                  <input
+                    className="form-check-input cursor-pointer"
+                    type="checkbox"
+                    role="switch"
+                    id="isDefaultViewSwitch"
+                    checked={selectedView?.is_default ?? false}
+                    onChange={(e) => toggleDefaultMutation.mutate(e.target.checked)}
+                    disabled={toggleDefaultMutation.isPending}
+                  />
+                  <label className="form-check-label text-muted small cursor-pointer" htmlFor="isDefaultViewSwitch">
+                    {t('layout.isDefault')}
+                  </label>
+                </div>
                 <button
                   type="button"
                   className="btn btn-sm btn-success"
@@ -510,7 +559,24 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                                   ) : (
                                     colItems.map((id) => {
                                       const field = fieldMap.get(id);
-                                      return field ? <LayoutFieldItem key={id} field={field} /> : null;
+                                      return field ? (
+                                        <LayoutFieldItem
+                                          key={id}
+                                          field={field}
+                                          onRemove={() => {
+                                            setLayoutItems((prev) => {
+                                              const activeContainer = `column-${colIdx}`;
+                                              const activeItems = prev[activeContainer] || [];
+                                              const unassignedItems = prev.unassigned || [];
+                                              return {
+                                                ...prev,
+                                                [activeContainer]: activeItems.filter((item) => item !== id),
+                                                unassigned: [...unassignedItems, id],
+                                              };
+                                            });
+                                          }}
+                                        />
+                                      ) : null;
                                     })
                                   )}
                                 </DroppableColumn>
@@ -545,7 +611,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   );
 }
 
-function LayoutFieldItem({ field }: { field: BuilderField }) {
+function LayoutFieldItem({ field, onRemove }: { field: BuilderField; onRemove?: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id,
   });
@@ -573,7 +639,26 @@ function LayoutFieldItem({ field }: { field: BuilderField }) {
           <i className={`ti ti-${definition.icon} text-primary`} aria-hidden="true" />
           <span className="text-truncate fw-medium">{field.name}</span>
         </div>
-        <span className="badge text-bg-light border text-muted small">{field.type}</span>
+        <div className="d-flex align-items-center gap-2">
+          <span className="badge text-bg-light border text-muted small">{field.type}</span>
+          {onRemove && (
+            <button
+              type="button"
+              className="btn btn-sm btn-link text-danger p-0 border-0 ms-1"
+              onPointerDown={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onRemove();
+              }}
+              title="Retirer"
+              style={{ cursor: 'pointer' }}
+            >
+              <i className="ti ti-x fs-4" aria-hidden="true" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
