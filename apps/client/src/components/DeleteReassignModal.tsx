@@ -2,15 +2,13 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
+import type { ApiErrorLike, ApiRecord, DeleteConflictData } from '../lib/apiTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 
 interface DeleteReassignModalProps {
   recordId: string;
   tableId: string;
-  conflictData: {
-    total: number;
-    by_table: Record<string, number>;
-  };
+  conflictData: DeleteConflictData;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -28,7 +26,7 @@ export function DeleteReassignModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Fetch candidate replacement records (same table, excluding current record)
-  const candidatesQuery = useQuery<{ data: any[] }, Error>({
+  const candidatesQuery = useQuery<{ data: ApiRecord[] }, Error>({
     queryKey: ['records-reassign-candidates', tableId],
     queryFn: () => apiClient.get(`/records?table_id=${tableId}&per_page=100`),
   });
@@ -59,7 +57,7 @@ export function DeleteReassignModal({
       queryClient.invalidateQueries({ queryKey: ['records-select'] });
       onSuccess();
     },
-    onError: (err: any) => {
+    onError: (err: ApiErrorLike) => {
       setErrorMsg(err.message || 'Failed to reassign and delete record.');
     },
   });

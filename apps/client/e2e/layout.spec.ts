@@ -13,7 +13,15 @@ let fields = [
   { id: 'fld-2', name: 'Auteur', type: 'text', position: 1, options: {}, validation: {}, table_id: 'tbl-1' },
   { id: 'fld-3', name: 'Année', type: 'number', position: 2, options: {}, validation: {}, table_id: 'tbl-1' }
 ];
-let views: any[] = [];
+type MockView = {
+  id: string;
+  name?: string;
+  table_id?: string;
+  type?: string;
+  config?: unknown;
+};
+
+let views: MockView[] = [];
 
 function mockRoutes(page: import('@playwright/test').Page) {
   page.route('**/api/v1/user', async (route) => {

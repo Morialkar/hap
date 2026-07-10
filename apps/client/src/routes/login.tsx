@@ -6,6 +6,11 @@ export const Route = createFileRoute('/login')({
   component: Login,
 });
 
+function getReturnTo(searchStr: string): string {
+  const returnTo = searchStr ? new URLSearchParams(searchStr).get('returnTo') : null;
+  return returnTo?.startsWith('/') ? returnTo : '/';
+}
+
 function Login() {
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -18,8 +23,7 @@ function Login() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && location.pathname === '/login') {
-      const returnTo = location.searchStr ? new URLSearchParams(location.searchStr).get('returnTo') : null;
-      navigate({ to: (returnTo as any) || '/' });
+      navigate({ to: getReturnTo(location.searchStr) as never });
     }
   }, [isAuthenticated, navigate, location]);
 
@@ -30,8 +34,7 @@ function Login() {
 
     try {
       await login(email, password);
-      const returnTo = location.searchStr ? new URLSearchParams(location.searchStr).get('returnTo') : null;
-      navigate({ to: (returnTo as any) || '/' });
+      navigate({ to: getReturnTo(location.searchStr) as never });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {

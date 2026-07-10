@@ -1,19 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
+import type { ApiErrorLike, ApiRecordData, DeleteConflictData } from '../lib/apiTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 
 interface TrashManagerModalProps {
   tableId: string;
   isOpen: boolean;
   onClose: () => void;
-  onDeleteConflict: (recordId: string, conflictData: any) => void;
+  onDeleteConflict: (recordId: string, conflictData: DeleteConflictData) => void;
 }
 
 interface TrashedRecord {
   id: string;
   table_id: string;
-  data: Record<string, any>;
+  data: ApiRecordData;
   deleted_at: string;
 }
 
@@ -46,7 +47,7 @@ export function TrashManagerModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['records-trash', tableId] });
     },
-    onError: (err: any, id: string) => {
+    onError: (err: ApiErrorLike, id: string) => {
       if (err.status === 409 && err.data?.reference_counts) {
         // Trigger parent block/reassign delete conflict modal
         onDeleteConflict(id, err.data.reference_counts);

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useI18n } from '../contexts/I18nContext';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../lib/apiClient';
+import type { ApiValue } from '../lib/apiTypes';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { generateId } from '../lib/id';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -32,8 +33,25 @@ interface Template {
   description: string;
   format_version: number;
   template_version: string;
-  payload: any;
+  payload: TemplatePayload;
   includes_demo_records: boolean;
+}
+
+interface TemplatePayload {
+  database?: {
+    name?: string;
+    [key: string]: ApiValue | undefined;
+  };
+  [key: string]: ApiValue | { name?: string; [key: string]: ApiValue | undefined } | undefined;
+}
+
+interface WorkspaceMember {
+  workspace_id: string;
+  role: string;
+}
+
+interface WorkspaceUser {
+  workspace_members?: WorkspaceMember[];
 }
 
 function Workspaces() {
@@ -63,7 +81,10 @@ function Workspaces() {
   });
 
   // Find user owner workspace, fallback to first workspace or generate a new workspace UUID
-  const workspaceMember = (user as any)?.workspace_members?.find((m: any) => m.role === 'owner') || (user as any)?.workspace_members?.[0];
+  const workspaceUser = user as WorkspaceUser | null;
+  const workspaceMember =
+    workspaceUser?.workspace_members?.find((member) => member.role === 'owner') ||
+    workspaceUser?.workspace_members?.[0];
   const workspaceId = workspaceMember?.workspace_id || databasesQuery.data?.[0]?.workspace_id || generateId();
 
   const createDatabase = useMutation({
@@ -82,7 +103,7 @@ function Workspaces() {
     mutationFn: ({ template, dbName }: { template: Template; dbName: string }) => {
       const payload = { ...template.payload };
       payload.database = { ...payload.database, name: dbName };
-      return apiClient.post<any>(`/workspaces/${workspaceId}/install-template`, {
+      return apiClient.post<Database>(`/workspaces/${workspaceId}/install-template`, {
         format_version: template.format_version,
         template_version: template.template_version,
         name: dbName,

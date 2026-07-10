@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/apiClient';
+import type { ApiRecordData } from '../lib/apiTypes';
 import { type BuilderField } from '../lib/fieldTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 
@@ -35,7 +36,7 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
   interface RecordData {
     id: string;
     table_id: string;
-    data: Record<string, any>;
+    data: ApiRecordData;
     version: number;
   }
 

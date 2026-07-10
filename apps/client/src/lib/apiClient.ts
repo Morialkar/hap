@@ -1,8 +1,10 @@
+import type { ApiErrorPayload } from './apiTypes';
+
 export class ApiError extends Error {
   status: number;
-  data: any;
+  data: ApiErrorPayload;
 
-  constructor(message: string, status: number, data: any) {
+  constructor(message: string, status: number, data: ApiErrorPayload) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
@@ -40,7 +42,9 @@ class ApiClient {
     }
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      const error = (await response
+        .json()
+        .catch(() => ({ message: 'Request failed' }))) as ApiErrorPayload;
       throw new ApiError(error.message || 'Request failed', response.status, error);
     }
 
@@ -74,7 +78,9 @@ class ApiClient {
     }
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      const error = (await response
+        .json()
+        .catch(() => ({ message: 'Request failed' }))) as ApiErrorPayload;
       throw new ApiError(error.message || 'Request failed', response.status, error);
     }
 

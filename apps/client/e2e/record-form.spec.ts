@@ -17,8 +17,15 @@ let fieldsForAuteurs = [
   { id: 'fld-a1', name: 'Nom', type: 'text', position: 0, options: {}, validation: { required: true }, table_id: 'tbl-author' }
 ];
 
-let recordsForOuvrages: any[] = [];
-let recordsForAuteurs: any[] = [];
+type MockRecord = {
+  id: string;
+  table_id: string;
+  data: Record<string, unknown>;
+  version: number;
+};
+
+let recordsForOuvrages: MockRecord[] = [];
+let recordsForAuteurs: MockRecord[] = [];
 
 function mockRoutes(page: import('@playwright/test').Page) {
   page.route('**/api/v1/user', async (route) => {

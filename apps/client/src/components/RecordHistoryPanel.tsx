@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
+import type { ApiRecordData, ApiValue } from '../lib/apiTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -8,12 +9,12 @@ interface HistoryLog {
   id: number;
   action: 'create' | 'update' | 'delete' | 'restore';
   changes: {
-    data?: Record<string, any>;
+    data?: ApiRecordData;
     diff?: Record<
       string,
-      | { type: 'added'; new: any }
-      | { type: 'changed'; old: any; new: any }
-      | { type: 'removed'; old: any }
+      | { type: 'added'; new: ApiValue }
+      | { type: 'changed'; old: ApiValue; new: ApiValue }
+      | { type: 'removed'; old: ApiValue }
     >;
     version?: number;
     new_version?: number;

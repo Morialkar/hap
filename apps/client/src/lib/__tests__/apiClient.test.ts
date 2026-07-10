@@ -1,6 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { apiClient } from '../apiClient';
 
+type ApiClientPrivateShape = {
+  baseUrl: string;
+};
+
+type ApiClientConstructor = new () => ApiClientPrivateShape;
+
 describe('ApiClient', () => {
   beforeEach(() => {
     // Reset window.__APP__ before each test
@@ -9,12 +15,12 @@ describe('ApiClient', () => {
   });
 
   it('should use default API base from window.__APP__', () => {
-    expect((apiClient as any).baseUrl).toBe('/api/v1');
+    expect((apiClient as unknown as ApiClientPrivateShape).baseUrl).toBe('/api/v1');
   });
 
   it('should use fallback API base when window.__APP__ is undefined', () => {
     window.__APP__ = undefined;
-    const newClient = new (apiClient.constructor as any)();
+    const newClient = new (apiClient.constructor as unknown as ApiClientConstructor)();
     expect(newClient.baseUrl).toBe('/api/v1');
   });
 

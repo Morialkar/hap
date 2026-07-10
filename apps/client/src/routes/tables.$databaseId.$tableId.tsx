@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
+import type { ApiErrorLike, ApiRecord, DeleteConflictData } from '../lib/apiTypes';
 import { type BuilderField } from '../lib/fieldTypes';
 import { RecordForm } from '../components/RecordForm';
 import { RecordDetailView } from '../components/RecordDetailView';
@@ -37,12 +38,12 @@ interface Database {
   name: string;
 }
 
-interface RecordData {
-  id: string;
-  table_id: string;
-  data: Record<string, any>;
-  version: number;
-}
+type RecordData = ApiRecord;
+
+type TableSearch = {
+  action?: string;
+  recordId?: string;
+};
 
 interface FilterItem {
   field: string;
@@ -74,7 +75,7 @@ function TableRecordsPage() {
   const [isCsvImportOpen, setIsCsvImportOpen] = useState(false);
   const [deleteConflictConfig, setDeleteConflictConfig] = useState<{
     recordId: string;
-    conflictData: any;
+    conflictData: DeleteConflictData;
   } | null>(null);
   const [activeTab, setActiveTab] = useState<'details' | 'history'>('details');
 
@@ -141,7 +142,7 @@ function TableRecordsPage() {
       queryClient.invalidateQueries({ queryKey: ['records-select'] });
       showToast('Record deleted successfully');
     },
-    onError: (err: any, id: string) => {
+    onError: (err: ApiErrorLike, id: string) => {
       if (err.status === 409 && err.data?.reference_counts) {
         setDeleteConflictConfig({
           recordId: id,
@@ -162,13 +163,13 @@ function TableRecordsPage() {
     if (isFormDirty && !window.confirm(t('records.unsavedChanges'))) {
       return;
     }
-    navigate({ search: {} as any });
+    navigate({ search: {} as TableSearch });
     setIsFormDirty(false);
   };
 
   const handleSaveSuccess = () => {
     showToast(t('common.save'));
-    navigate({ search: {} as any });
+    navigate({ search: {} as TableSearch });
     setIsFormDirty(false);
   };
 
@@ -323,7 +324,7 @@ function TableRecordsPage() {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => navigate({ search: { action: 'create' } as any })}
+                onClick={() => navigate({ search: { action: 'create' } as TableSearch })}
                 data-testid="add-record-btn"
               >
                 <i className="ti ti-plus me-1" aria-hidden="true" />
@@ -517,7 +518,7 @@ function TableRecordsPage() {
                             <button
                               type="button"
                               className="btn btn-primary"
-                              onClick={() => navigate({ search: { action: 'create' } as any })}
+                              onClick={() => navigate({ search: { action: 'create' } as TableSearch })}
                             >
                               <i className="ti ti-plus me-1" aria-hidden="true" />
                               {t('records.add')}
@@ -561,7 +562,7 @@ function TableRecordsPage() {
                         key={rec.id}
                         onClick={() =>
                           navigate({
-                            search: { action: search.action, recordId: rec.id } as any,
+                            search: { action: search.action, recordId: rec.id } as TableSearch,
                           })
                         }
                         className={`hap-record-row ${isSelected ? 'is-selected' : ''}`}
@@ -592,7 +593,7 @@ function TableRecordsPage() {
                               aria-label={t('common.details')}
                               onClick={() =>
                                 navigate({
-                                  search: { action: search.action, recordId: rec.id } as any,
+                                  search: { action: search.action, recordId: rec.id } as TableSearch,
                                 })
                               }
                             >
@@ -604,7 +605,7 @@ function TableRecordsPage() {
                               aria-label={t('common.edit')}
                               onClick={() =>
                                 navigate({
-                                  search: { action: 'edit', recordId: rec.id } as any,
+                                  search: { action: 'edit', recordId: rec.id } as TableSearch,
                                 })
                               }
                               data-testid={`edit-record-${rec.id}`}
@@ -616,7 +617,7 @@ function TableRecordsPage() {
                               className="btn btn-outline-secondary btn-sm py-1 px-2"
                               onClick={() =>
                                 navigate({
-                                  search: { action: 'duplicate', recordId: rec.id } as any,
+                                  search: { action: 'duplicate', recordId: rec.id } as TableSearch,
                                 })
                               }
                               data-testid={`duplicate-record-${rec.id}`}

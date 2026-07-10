@@ -3,6 +3,7 @@ import { useForm, useStore } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
+import type { ApiRecord, ApiRecordData, ApiValue } from '../lib/apiTypes';
 import { type BuilderField } from '../lib/fieldTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 import { InlineRecordModal } from './InlineRecordModal';
@@ -14,15 +15,25 @@ interface RecordFormProps {
   isDuplicate?: boolean;
   isInline?: boolean;
   onCancel: () => void;
-  onSaveSuccess?: (record: any) => void;
+  onSaveSuccess?: (record: ApiRecord) => void;
   onDirtyChange?: (isDirty: boolean) => void;
 }
 
-interface RecordData {
-  id: string;
+interface RecordPayload {
   table_id: string;
-  data: Record<string, any>;
-  version: number;
+  data: ApiRecordData;
+  version?: number;
+}
+
+interface FormStateSnapshot {
+  isDirty: boolean;
+}
+
+interface DynamicFieldApi {
+  state: {
+    value: ApiValue | undefined;
+  };
+  handleChange: (value: ApiValue) => void;
 }
 
 export function RecordForm({
@@ -54,7 +65,7 @@ export function RecordForm({
   const isEditing = !!recordId && !isDuplicate;
   const isDuplicating = !!recordId && isDuplicate;
 
-  const recordQuery = useQuery<RecordData, Error>({
+  const recordQuery = useQuery<ApiRecord, Error>({
     queryKey: ['records', recordId],
     queryFn: () => apiClient.get(`/records/${recordId}`),
     enabled: !!recordId,
@@ -66,7 +77,7 @@ export function RecordForm({
 
   // Compute default values
   const defaultValues = useMemo(() => {
-    const data: Record<string, any> = {};
+    const data: ApiRecordData = {};
     recordFields.forEach((field) => {
       // Default type values
       if (field.type === 'boolean') {
@@ -86,7 +97,7 @@ export function RecordForm({
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      const payload = {
+      const payload: RecordPayload = {
         table_id: tableId,
         data: value.data,
         version: isEditing ? recordQuery.data?.version : undefined,
@@ -101,7 +112,7 @@ export function RecordForm({
   });
 
   // Track dirty state
-  const isFormDirty = useStore(form.store, (state: any) => state.isDirty);
+  const isFormDirty = useStore(form.store, (state: FormStateSnapshot) => state.isDirty);
   useEffect(() => {
     onDirtyChange?.(isFormDirty);
   }, [isFormDirty, onDirtyChange]);
@@ -113,7 +124,7 @@ export function RecordForm({
 
   // Mutations
   const createMutation = useMutation({
-    mutationFn: (payload: any) => apiClient.post<RecordData>('/records', payload),
+    mutationFn: (payload: RecordPayload) => apiClient.post<ApiRecord>('/records', payload),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       queryClient.invalidateQueries({ queryKey: ['records-select'] });
@@ -122,8 +133,8 @@ export function RecordForm({
   });
 
   const updateMutation = useMutation({
-    mutationFn: (payload: any) =>
-      apiClient.put<RecordData>(`/records/${recordId}`, {
+    mutationFn: (payload: RecordPayload) =>
+      apiClient.put<ApiRecord>(`/records/${recordId}`, {
         data: payload.data,
         version: payload.version,
       }),
@@ -172,7 +183,7 @@ export function RecordForm({
           throw new Error('Upload failed');
         }
 
-        const data = await res.json();
+        const data = (await res.json()) as { hash: string };
 
         // Update uploadsState and form value with the returned hash
         setUploadsState((prev) => {
@@ -261,7 +272,7 @@ export function RecordForm({
             key={field.id}
             name={`data.${field.name}`}
           >
-            {((fieldApi: any) => {
+            {((fieldApi: DynamicFieldApi) => {
               const value = fieldApi.state.value || '';
               const isRequired = field.validation?.required === true;
 
@@ -368,7 +379,7 @@ export function RecordForm({
                             data-testid={`field-input-${field.name}`}
                           >
                             <option value="">-- Select --</option>
-                            {vals.map((v: string) => (
+                            {vals.map((v) => (
                               <option key={v} value={v}>
                                 {v}
                               </option>
@@ -474,7 +485,7 @@ export function RecordForm({
                   })()}
                 </div>
               );
-            }) as any}
+            })}
           </form.Field>
         );
       })}
@@ -544,7 +555,7 @@ function ReferenceFieldEditor({ field, value, onChange, onOpenInlineModal }: Ref
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch referencing records of target table
-  const recordsQuery = useQuery<{ data: any[] }, Error>({
+  const recordsQuery = useQuery<{ data: ApiRecord[] }, Error>({
     queryKey: ['records-select', targetTableId],
     queryFn: () => apiClient.get(`/records?table_id=${targetTableId}&per_page=100`),
     enabled: !!targetTableId,
