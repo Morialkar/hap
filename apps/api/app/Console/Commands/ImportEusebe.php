@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Database;
-use App\Models\Field;
 use App\Models\Record;
 use App\Models\Table;
 use App\Models\Template;
@@ -172,8 +171,9 @@ class ImportEusebe extends Command
     public function handle(): int
     {
         $sqlPath = $this->argument('file');
-        if (!file_exists($sqlPath)) {
+        if (! file_exists($sqlPath)) {
             $this->error("SQL file not found at: {$sqlPath}");
+
             return 1;
         }
 
@@ -188,15 +188,16 @@ class ImportEusebe extends Command
         }
 
         $this->info("Target Workspace: {$workspace->name} ({$workspace->id})");
-        $this->info("Parsing SQL file...");
+        $this->info('Parsing SQL file...');
 
         $rawRecords = $this->parseSqlFile($sqlPath);
         if (empty($rawRecords)) {
-            $this->error("No insert statements found in SQL file.");
+            $this->error('No insert statements found in SQL file.');
+
             return 1;
         }
 
-        $this->info("Installing Literary Catalog template...");
+        $this->info('Installing Literary Catalog template...');
         $template = Template::where('name', 'Catalogue Littéraire')->firstOrFail();
 
         $payload = $template->payload;
@@ -229,7 +230,7 @@ class ImportEusebe extends Command
             }
         }
 
-        $this->info("Importing records...");
+        $this->info('Importing records...');
 
         $idMappings = []; // [legacyTable => [legacyIntId => realUlid]]
         $importStats = [];
@@ -256,14 +257,15 @@ class ImportEusebe extends Command
             ];
 
             foreach ($order as $legacyTable) {
-                if (!isset($rawRecords[$legacyTable])) {
+                if (! isset($rawRecords[$legacyTable])) {
                     continue;
                 }
 
                 $templateKey = $this->tableMapping[$legacyTable];
                 $tableModel = $tablesByTemplateKey[$templateKey] ?? null;
-                if (!$tableModel) {
+                if (! $tableModel) {
                     $this->warn("Table model not found for: {$templateKey}");
+
                     continue;
                 }
 
@@ -282,11 +284,11 @@ class ImportEusebe extends Command
                     }
 
                     $legacyId = $legacyData['id'] ?? null;
-                    if (!$legacyId) {
+                    if (! $legacyId) {
                         continue;
                     }
 
-                    $realId = (string) new Ulid();
+                    $realId = (string) new Ulid;
                     $idMappings[$legacyTable][$legacyId] = $realId;
 
                     $recordData = [];
@@ -294,7 +296,7 @@ class ImportEusebe extends Command
                         $value = $legacyData[$colName] ?? null;
                         $actualFieldName = $fieldKeyToName[$templateKey][$fieldKey] ?? null;
                         $fieldModel = $actualFieldName ? $tableModel->fields->firstWhere('name', $actualFieldName) : null;
-                        
+
                         // Handle date conversions
                         if ($fieldModel?->type === 'date') {
                             $value = $this->normalizeDate($value);
@@ -311,7 +313,7 @@ class ImportEusebe extends Command
                             $targetTable = $refs[$colName] ?? null;
                             if ($targetTable && $value !== null && $value !== '') {
                                 $value = $idMappings[$targetTable][$value] ?? null;
-                                if (!$value) {
+                                if (! $value) {
                                     $warnings[] = [
                                         'table' => $legacyTable,
                                         'id' => $legacyId,
@@ -324,7 +326,7 @@ class ImportEusebe extends Command
 
                         // Safe bio link url check
                         if ($fieldKey === 'lien' && $legacyTable === 'auteurs' && $value) {
-                            if (!str_starts_with($value, 'http')) {
+                            if (! str_starts_with($value, 'http')) {
                                 $value = null; // Prevent URL validation failure on short string
                             }
                         }
@@ -341,10 +343,10 @@ class ImportEusebe extends Command
 
                     // Validate against dynamic schema
                     $valResult = $this->recordValidationService->validate($tableModel, $recordData);
-                    if (!$valResult['valid']) {
+                    if (! $valResult['valid']) {
                         $errorMsg = [];
                         foreach ($valResult['errors'] as $field => $errs) {
-                            $errorMsg[] = "{$field}: " . implode(', ', $errs);
+                            $errorMsg[] = "{$field}: ".implode(', ', $errs);
                         }
                         $warnings[] = [
                             'table' => $legacyTable,
@@ -355,7 +357,7 @@ class ImportEusebe extends Command
                     }
 
                     // Direct Eloquent save to bypass mass assignment
-                    $record = new Record();
+                    $record = new Record;
                     $record->id = $realId;
                     $record->table_id = $tableModel->id;
                     $record->data = $this->recordValidationService->normalize($tableModel, $recordData);
@@ -375,12 +377,13 @@ class ImportEusebe extends Command
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->error("Transaction aborted due to error: " . $e->getMessage());
+            $this->error('Transaction aborted due to error: '.$e->getMessage());
             $this->error($e->getTraceAsString());
+
             return 1;
         }
 
-        $this->info("Import completed successfully!");
+        $this->info('Import completed successfully!');
 
         // Print stats
         $this->info("\n--- Import Summary ---");
@@ -401,19 +404,19 @@ class ImportEusebe extends Command
     {
         $rawRecords = [];
         $handle = fopen($path, 'r');
-        if (!$handle) {
+        if (! $handle) {
             return [];
         }
 
         while (($line = fgets($handle)) !== false) {
             $line = trim($line);
-            if (empty($line) || !str_starts_with($line, 'INSERT INTO')) {
+            if (empty($line) || ! str_starts_with($line, 'INSERT INTO')) {
                 continue;
             }
 
             if (preg_match('/^INSERT INTO `([a-zA-Z0-9_]+)` VALUES/i', $line, $matches)) {
                 $tableName = $matches[1];
-                if (!isset($this->tableMapping[$tableName])) {
+                if (! isset($this->tableMapping[$tableName])) {
                     continue;
                 }
 
@@ -423,7 +426,7 @@ class ImportEusebe extends Command
                 $valuesStr = rtrim($valuesStr, ';');
 
                 $parsedRows = $this->parseInsertValues($valuesStr);
-                if (!isset($rawRecords[$tableName])) {
+                if (! isset($rawRecords[$tableName])) {
                     $rawRecords[$tableName] = [];
                 }
                 $rawRecords[$tableName] = array_merge($rawRecords[$tableName], $parsedRows);
@@ -431,6 +434,7 @@ class ImportEusebe extends Command
         }
 
         fclose($handle);
+
         return $rawRecords;
     }
 
@@ -459,7 +463,15 @@ class ImportEusebe extends Command
 
                 if ($inString) {
                     if ($escape) {
-                        $currentVal .= $char;
+                        if ($char === 'r') {
+                            $currentVal .= "\r";
+                        } elseif ($char === 'n') {
+                            $currentVal .= "\n";
+                        } elseif ($char === 't') {
+                            $currentVal .= "\t";
+                        } else {
+                            $currentVal .= $char;
+                        }
                         $escape = false;
                     } elseif ($char === '\\') {
                         $escape = true;
@@ -506,8 +518,9 @@ class ImportEusebe extends Command
                 return $year;
             }
             if ($day === '00') {
-                return $year . '-' . $month;
+                return $year.'-'.$month;
             }
+
             return $value;
         }
 
@@ -551,7 +564,7 @@ class ImportEusebe extends Command
         if ($auteursTable) {
             $auteurs = Record::where('table_id', $auteursTable->id)->get();
             $grouped = $auteurs->groupBy(function ($rec) {
-                return strtolower(trim(($rec->data['Nom'] ?? '') . '|||' . ($rec->data['Prénom'] ?? '')));
+                return strtolower(trim(($rec->data['Nom'] ?? '').'|||'.($rec->data['Prénom'] ?? '')));
             });
 
             foreach ($grouped as $key => $records) {
@@ -559,7 +572,7 @@ class ImportEusebe extends Command
                     $first = $records->first();
                     $duplicates[] = [
                         'type' => 'auteurs',
-                        'identifier' => ($first->data['Prénom'] ?? '') . ' ' . ($first->data['Nom'] ?? ''),
+                        'identifier' => ($first->data['Prénom'] ?? '').' '.($first->data['Nom'] ?? ''),
                         'count' => $records->count(),
                         'ids' => $records->pluck('id')->all(),
                     ];
@@ -594,7 +607,7 @@ class ImportEusebe extends Command
     private function generateReport(string $path, array $stats, array $warnings, array $duplicates): void
     {
         $content = "# Eusèbe Sénécal Database Import & Integrity Report\n\n";
-        $content .= "Generated on: " . now()->toDateTimeString() . "\n\n";
+        $content .= 'Generated on: '.now()->toDateTimeString()."\n\n";
 
         $content .= "## 1. Import Summary\n\n";
         $content .= "| Table (Legacy) | Table (New) | Records Imported |\n";
@@ -624,7 +637,7 @@ class ImportEusebe extends Command
             $content .= "| Component | Duplicate Identifier | Matches Found | Record IDs |\n";
             $content .= "| :--- | :--- | :--- | :--- |\n";
             foreach ($duplicates as $d) {
-                $ids = implode(', ', array_map(fn($id) => "`{$id}`", $d['ids']));
+                $ids = implode(', ', array_map(fn ($id) => "`{$id}`", $d['ids']));
                 $content .= "| `{$d['type']}` | **{$d['identifier']}** | {$d['count']} | {$ids} |\n";
             }
             $content .= "\n";
