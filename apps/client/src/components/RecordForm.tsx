@@ -25,6 +25,10 @@ interface RecordPayload {
   version?: number;
 }
 
+interface RecordFormValues {
+  data: Record<string, unknown>;
+}
+
 interface FormStateSnapshot {
   isDirty: boolean;
 }
@@ -85,8 +89,8 @@ export function RecordForm({
   }, [fields]);
 
   // Compute default values
-  const defaultValues = useMemo(() => {
-    const data: ApiRecordData = {};
+  const defaultValues = useMemo<RecordFormValues>(() => {
+    const data: Record<string, unknown> = {};
     recordFields.forEach((field) => {
       // Default type values
       if (field.type === 'boolean') {
@@ -108,7 +112,7 @@ export function RecordForm({
     onSubmit: async ({ value }) => {
       const payload: RecordPayload = {
         table_id: tableId,
-        data: value.data,
+        data: value.data as ApiRecordData,
         version: isEditing ? recordQuery.data?.version : undefined,
       };
 
@@ -359,6 +363,15 @@ export function RecordForm({
                             />
                           );
 
+                        case 'gps':
+                          return (
+                            <GpsFieldEditor
+                              value={value}
+                              onChange={(val) => fieldApi.handleChange(val)}
+                              testId={`field-input-${field.name}`}
+                            />
+                          );
+
                         case 'date':
                           return (
                             <input
@@ -562,6 +575,73 @@ export function RecordForm({
         />
       )}
     </>
+  );
+}
+
+interface GpsFieldEditorProps {
+  value: ApiValue | undefined;
+  onChange: (val: ApiValue) => void;
+  testId: string;
+}
+
+function GpsFieldEditor({ value, onChange, testId }: GpsFieldEditorProps) {
+  const coordinates =
+    value && typeof value === 'object' && !Array.isArray(value)
+      ? (value as Record<string, ApiValue>)
+      : {};
+  const coordinateValue = (coordinate: ApiValue | undefined) =>
+    typeof coordinate === 'string' || typeof coordinate === 'number' ? String(coordinate) : '';
+  const lat = coordinateValue(coordinates.lat);
+  const lng = coordinateValue(coordinates.lng);
+
+  const updateCoordinate = (key: 'lat' | 'lng', rawValue: string) => {
+    const nextRaw = {
+      lat: key === 'lat' ? rawValue : lat,
+      lng: key === 'lng' ? rawValue : lng,
+    };
+
+    if (nextRaw.lat === '' && nextRaw.lng === '') {
+      onChange('');
+      return;
+    }
+
+    onChange({
+      lat: nextRaw.lat === '' ? null : nextRaw.lat,
+      lng: nextRaw.lng === '' ? null : nextRaw.lng,
+    });
+  };
+
+  return (
+    <div className="row g-2" data-testid={testId}>
+      <div className="col-12 col-sm-6">
+        <input
+          type="number"
+          className="form-control"
+          min={-90}
+          max={90}
+          step="any"
+          placeholder="45.5017"
+          aria-label="Latitude"
+          value={lat ?? ''}
+          onChange={(e) => updateCoordinate('lat', e.target.value)}
+          data-testid={`${testId}-lat`}
+        />
+      </div>
+      <div className="col-12 col-sm-6">
+        <input
+          type="number"
+          className="form-control"
+          min={-180}
+          max={180}
+          step="any"
+          placeholder="-73.5673"
+          aria-label="Longitude"
+          value={lng ?? ''}
+          onChange={(e) => updateCoordinate('lng', e.target.value)}
+          data-testid={`${testId}-lng`}
+        />
+      </div>
+    </div>
   );
 }
 

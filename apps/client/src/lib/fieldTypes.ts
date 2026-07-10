@@ -10,7 +10,8 @@ export type FieldType =
   | 'image'
   | 'file'
   | 'url'
-  | 'email';
+  | 'email'
+  | 'gps';
 
 export interface FieldOptionSchema {
   key: string;
@@ -440,6 +441,20 @@ export const FIELD_TYPES: Record<FieldType, FieldTypeDefinition> = {
       },
     ],
   },
+  gps: {
+    type: 'gps',
+    icon: 'map-pin',
+    labelKey: 'fieldType.gps.label',
+    descriptionKey: 'fieldType.gps.description',
+    options: [],
+    validation: [
+      {
+        key: 'required',
+        type: 'boolean',
+        label: 'fieldType.validation.required',
+      },
+    ],
+  },
 };
 
 export interface BuilderField {
@@ -467,4 +482,5 @@ export const FIELD_TYPE_ORDER: FieldType[] = [
   'file',
   'url',
   'email',
+  'gps',
 ];
