@@ -38,7 +38,7 @@ return new class extends Migration
         if (DB::getDriverName() === 'pgsql') {
             DB::statement('DROP TRIGGER IF EXISTS records_search_vector_update ON records');
             DB::statement('DROP INDEX IF EXISTS records_search_vector_idx');
-            
+
             Schema::table('records', function (Blueprint $table) {
                 $table->dropColumn('search_vector');
             });

@@ -43,12 +43,15 @@ function Login() {
   };
 
   return (
-    <div className="container-xl d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
+    <div
+      className="container-xl d-flex align-items-center justify-content-center"
+      style={{ minHeight: '100vh' }}
+    >
       <div className="card" style={{ maxWidth: '400px', width: '100%' }}>
         <div className="card-body p-4">
           <h2 className="card-title text-center mb-4">Heritage Archives Patrimoine</h2>
           <h3 className="h5 text-center mb-4">Connexion</h3>
-          
+
           {error && (
             <div className="alert alert-danger" role="alert">
               {error}
@@ -86,11 +89,7 @@ function Login() {
               />
             </div>
 
-            <button
-              type="submit"
-              className="btn btn-primary w-100"
-              disabled={isLoading}
-            >
+            <button type="submit" className="btn btn-primary w-100" disabled={isLoading}>
               {isLoading ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>

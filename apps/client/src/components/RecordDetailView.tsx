@@ -164,10 +164,10 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
     columnsLayout.length === 4
       ? 'col-md-3'
       : columnsLayout.length === 3
-      ? 'col-md-4'
-      : columnsLayout.length === 2
-      ? 'col-md-6'
-      : 'col-12';
+        ? 'col-md-4'
+        : columnsLayout.length === 2
+          ? 'col-md-6'
+          : 'col-12';
 
   return (
     <div className="vstack gap-4" data-testid="detail-view">
@@ -182,7 +182,9 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
 
                 return (
                   <div key={cleanId} className="hap-detail-field">
-                    <div className="small text-muted fw-bold mb-1 text-uppercase">{fieldDef.name}</div>
+                    <div className="small text-muted fw-bold mb-1 text-uppercase">
+                      {fieldDef.name}
+                    </div>
                     <div className="lh-sm">{renderFieldValue(fieldDef.name)}</div>
                   </div>
                 );
@@ -202,7 +204,10 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
           onClick={() => setActiveLightboxHash(null)}
           data-testid="lightbox"
         >
-          <div className="modal-dialog modal-dialog-centered modal-xl" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-dialog modal-dialog-centered modal-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-content border-0 bg-transparent text-center position-relative">
               <button
                 type="button"
@@ -222,8 +227,6 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
     </div>
   );
 }
-
-
 
 function ReferenceLabel({
   targetRecordId,
@@ -265,20 +268,36 @@ function ReferenceLabel({
 
   // Find the field of type 'title'
   const titleField = fields.find((f) => f.type === 'title');
-  if (titleField && rData[titleField.name] !== undefined && rData[titleField.name] !== null && rData[titleField.name] !== '') {
+  if (
+    titleField &&
+    rData[titleField.name] !== undefined &&
+    rData[titleField.name] !== null &&
+    rData[titleField.name] !== ''
+  ) {
     return <span className={className}>{String(rData[titleField.name])}</span>;
   }
 
   // Find the first field (by position or just first in list)
   const sortedFields = [...fields].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   const firstField = sortedFields[0];
-  if (firstField && rData[firstField.name] !== undefined && rData[firstField.name] !== null && rData[firstField.name] !== '') {
+  if (
+    firstField &&
+    rData[firstField.name] !== undefined &&
+    rData[firstField.name] !== null &&
+    rData[firstField.name] !== ''
+  ) {
     return <span className={className}>{String(rData[firstField.name])}</span>;
   }
 
   // Fallback if no fields exist or values are empty
   const defaultLabel =
-    rData.name || rData.title || rData.nom || rData.titre || Object.values(rData)[0] || fallback || targetRecordId;
+    rData.name ||
+    rData.title ||
+    rData.nom ||
+    rData.titre ||
+    Object.values(rData)[0] ||
+    fallback ||
+    targetRecordId;
 
   return <span className={className}>{String(defaultLabel)}</span>;
 }

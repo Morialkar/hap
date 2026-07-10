@@ -48,7 +48,7 @@ const resources = {
       'theme.accent.blue': 'Bleu',
       'theme.accent.cyan': 'Cyan',
       'theme.accent.teal': 'Turquoise',
-      
+
       // Auth
       'auth.login': 'Connexion',
       'auth.email': 'Courriel',
@@ -57,7 +57,7 @@ const resources = {
       'auth.logining': 'Connexion...',
       'auth.loginFailed': 'Échec de la connexion',
       'auth.logoutSuccess': 'Déconnexion réussie',
-      
+
       // Common
       'common.loading': 'Chargement...',
       'common.save': 'Enregistrer',
@@ -82,7 +82,7 @@ const resources = {
       'common.close': 'Fermer',
       'common.yes': 'Oui',
       'common.no': 'Non',
-      
+
       // Builder
       'builder.tabs.structure': 'Structure',
       'builder.tabs.layout': 'Disposition',
@@ -108,7 +108,7 @@ const resources = {
       'builder.subtitle.database': 'Base de données',
       'builder.subtitle.table': 'Table',
       'builder.palette.title': 'Types de champs',
-      'builder.palette.dragHint': 'Glissez un type ici pour l\'ajouter',
+      'builder.palette.dragHint': "Glissez un type ici pour l'ajouter",
       'builder.canvas.title': 'Formulaire',
       'builder.canvas.empty': 'Aucun champ. Faites glisser un type depuis la palette.',
       'builder.fieldName.label': 'Nom du champ',
@@ -119,9 +119,11 @@ const resources = {
       'records.duplicate': 'Dupliquer la fiche',
       'records.empty': 'Aucune fiche dans cette table.',
       'records.empty.title': 'Aucune fiche pour le moment',
-      'records.empty.description': 'Créez une première fiche pour commencer à documenter cette collection.',
+      'records.empty.description':
+        'Créez une première fiche pour commencer à documenter cette collection.',
       'records.saveAndAddAnother': 'Enregistrer et ajouter un autre',
-      'records.unsavedChanges': 'Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?',
+      'records.unsavedChanges':
+        'Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?',
       'records.charCounter': '{{count}} / {{max}} caractères',
       'records.upload.hint': 'Glissez-déposez des fichiers ici ou cliquez pour choisir',
       'records.upload.invalidType': 'Type de fichier non supporté.',
@@ -138,7 +140,8 @@ const resources = {
       'records.filter.value': 'Valeur',
       'records.filter.apply': 'Appliquer les filtres',
       'records.deleteConflict.title': 'Conflit de suppression',
-      'records.deleteConflict.text': 'Cette fiche est référencée {{count}} fois par d\'autres fiches (ex: {{tables}}). Veuillez réassigner ces références vers une autre fiche avant de pouvoir la supprimer.',
+      'records.deleteConflict.text':
+        "Cette fiche est référencée {{count}} fois par d'autres fiches (ex: {{tables}}). Veuillez réassigner ces références vers une autre fiche avant de pouvoir la supprimer.",
       'records.deleteConflict.target': 'Fiche de destination (remplacement)',
       'records.deleteConflict.submit': 'Réassigner et supprimer',
       'records.trash.title': 'Corbeille',
@@ -155,7 +158,7 @@ const resources = {
       'records.history.diff.added': 'Champ ajouté',
       'records.history.diff.changed': 'Champ modifié',
       'records.history.diff.removed': 'Champ supprimé',
-      'builder.fieldName.placeholder': 'ex. Titre de l\'œuvre',
+      'builder.fieldName.placeholder': "ex. Titre de l'œuvre",
       'builder.fieldType.label': 'Type de champ',
       'builder.options.title': 'Options du champ',
       'builder.options.noOptions': 'Aucune option configurable pour ce type.',
@@ -180,7 +183,8 @@ const resources = {
       'builder.isFrontFacing': 'Table de façade',
       'nav.navigation': 'Navigation',
       'navigation.emptyState.title': 'Aucune table de façade',
-      'navigation.emptyState.description': 'Activez l’option « De façade » sur une ou plusieurs tables pour les afficher dans ce mode.',
+      'navigation.emptyState.description':
+        'Activez l’option « De façade » sur une ou plusieurs tables pour les afficher dans ce mode.',
       'navigation.searchPlaceholder': 'Rechercher...',
       'navigation.sortBy': 'Trier par',
       'navigation.sortDir.asc': 'Croissant',
@@ -194,7 +198,8 @@ const resources = {
       'workspaces.install': 'Installer le modèle',
       'workspaces.installing': 'Installation du modèle...',
       'workspaces.installSuccess': 'Le modèle a été installé avec succès !',
-      'builder.destructive.typeChangeMessage': 'Changer le type risque d\'altérer des données. Voulez-vous continuer ?',
+      'builder.destructive.typeChangeMessage':
+        "Changer le type risque d'altérer des données. Voulez-vous continuer ?",
       'builder.destructive.deleteMessage': 'Supprimer ce champ détachera ces données. Continuer?',
       'fieldType.title.label': 'Titre',
       'fieldType.title.description': 'Champ de titre principal pour la fiche.',
@@ -216,7 +221,7 @@ const resources = {
       'fieldType.number.options.decimals': 'Décimales',
       'fieldType.date.label': 'Date',
       'fieldType.date.description': 'Date, optionnellement avec heure.',
-      'fieldType.date.options.includeTime': 'Inclure l\'heure',
+      'fieldType.date.options.includeTime': "Inclure l'heure",
       'fieldType.date.options.allowPartial': 'Autoriser les dates incomplètes',
       'fieldType.date.validation.minDate': 'Date minimale',
       'fieldType.date.validation.maxDate': 'Date maximale',
@@ -264,7 +269,7 @@ const resources = {
       'error.serverError': 'Erreur serveur',
       'error.networkError': 'Erreur réseau',
       'error.tryAgain': 'Réessayer',
-      
+
       // Date formats
       'date.full': 'dd MMMM yyyy',
       'date.short': 'dd/MM/yyyy',
@@ -305,7 +310,7 @@ const resources = {
       'theme.accent.blue': 'Blue',
       'theme.accent.cyan': 'Cyan',
       'theme.accent.teal': 'Teal',
-      
+
       // Auth
       'auth.login': 'Login',
       'auth.email': 'Email',
@@ -314,7 +319,7 @@ const resources = {
       'auth.logining': 'Signing in...',
       'auth.loginFailed': 'Login failed',
       'auth.logoutSuccess': 'Logout successful',
-      
+
       // Common
       'common.loading': 'Loading...',
       'common.save': 'Save',
@@ -339,7 +344,7 @@ const resources = {
       'common.close': 'Close',
       'common.yes': 'Yes',
       'common.no': 'No',
-      
+
       // Builder
       'builder.tabs.structure': 'Structure',
       'builder.tabs.layout': 'Layout',
@@ -395,7 +400,8 @@ const resources = {
       'records.filter.value': 'Value',
       'records.filter.apply': 'Apply filters',
       'records.deleteConflict.title': 'Delete Conflict',
-      'records.deleteConflict.text': 'This record is referenced {{count}} times by other records (e.g. {{tables}}). Please reassign these references to another record before deleting.',
+      'records.deleteConflict.text':
+        'This record is referenced {{count}} times by other records (e.g. {{tables}}). Please reassign these references to another record before deleting.',
       'records.deleteConflict.target': 'Target record (replacement)',
       'records.deleteConflict.submit': 'Reassign & Delete',
       'records.trash.title': 'Trash Bin',
@@ -437,7 +443,8 @@ const resources = {
       'builder.isFrontFacing': 'Front facing table',
       'nav.navigation': 'Navigation',
       'navigation.emptyState.title': 'No front-facing tables',
-      'navigation.emptyState.description': 'Enable the "Front facing" option on one or more tables to view them in this mode.',
+      'navigation.emptyState.description':
+        'Enable the "Front facing" option on one or more tables to view them in this mode.',
       'navigation.searchPlaceholder': 'Search...',
       'navigation.sortBy': 'Sort by',
       'navigation.sortDir.asc': 'Ascending',
@@ -451,8 +458,10 @@ const resources = {
       'workspaces.install': 'Install template',
       'workspaces.installing': 'Installing template...',
       'workspaces.installSuccess': 'Template installed successfully!',
-      'builder.destructive.typeChangeMessage': 'Changing the type may alter existing data. Continue?',
-      'builder.destructive.deleteMessage': 'Deleting this field will detach existing data. Continue?',
+      'builder.destructive.typeChangeMessage':
+        'Changing the type may alter existing data. Continue?',
+      'builder.destructive.deleteMessage':
+        'Deleting this field will detach existing data. Continue?',
       'fieldType.title.label': 'Title',
       'fieldType.title.description': 'Main title field for the card.',
       'fieldType.isFilterable': 'Enable filtering with this field',
@@ -521,7 +530,7 @@ const resources = {
       'error.serverError': 'Server error',
       'error.networkError': 'Network error',
       'error.tryAgain': 'Try again',
-      
+
       // Date formats
       'date.full': 'MMMM dd, yyyy',
       'date.short': 'MM/dd/yyyy',

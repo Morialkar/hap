@@ -22,8 +22,6 @@ function RootLayout() {
 
   const isLoginPage = location.pathname === '/login';
 
-
-
   interface Database {
     id: string;
     name: string;
@@ -36,8 +34,6 @@ function RootLayout() {
     database_id: string;
     is_front_facing?: boolean;
   }
-
-
 
   const databasesQuery = useQuery<Database[], Error>({
     queryKey: ['databases'],
@@ -65,7 +61,10 @@ function RootLayout() {
 
   if (isLoading) {
     return (
-      <div className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ minHeight: '100vh' }}
+      >
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -128,7 +127,11 @@ function RootLayout() {
             >
               {locale === 'fr' ? 'EN' : 'FR'}
             </button>
-            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={handleLogout}>
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={handleLogout}
+            >
               <i className="ti ti-logout me-1" aria-hidden="true" />
               <span className="d-none d-sm-inline">{t('nav.logout')}</span>
             </button>
@@ -167,14 +170,17 @@ function RootLayout() {
               </Link>
             </li>
             {databasesQuery.data?.map((db: Database) => {
-              const dbFrontTables = (tablesQuery.data ?? []).filter((tbl) =>
-                tbl.is_front_facing && tbl.database_id === db.id
+              const dbFrontTables = (tablesQuery.data ?? []).filter(
+                (tbl) => tbl.is_front_facing && tbl.database_id === db.id
               );
 
               if (dbFrontTables.length === 0) return null;
 
               return (
-                <li className="nav-item dropdown hap-workspace-item text-nowrap ms-md-2 ms-0" key={db.id}>
+                <li
+                  className="nav-item dropdown hap-workspace-item text-nowrap ms-md-2 ms-0"
+                  key={db.id}
+                >
                   <a
                     className="nav-link dropdown-toggle cursor-pointer"
                     role="button"

@@ -13,22 +13,22 @@ class ReferenceType implements FieldTypeInterface
         $isMulti = ($options['multi'] ?? false) === true;
         $targetTable = $options['target_table'] ?? null;
 
-        if (!$targetTable) {
+        if (! $targetTable) {
             return ['valid' => false, 'error' => 'Reference field must specify a target table'];
         }
 
         if ($isMulti) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 return ['valid' => false, 'error' => 'Value must be an array for multi-reference'];
             }
 
             foreach ($value as $item) {
-                if (!$this->isValidUuid($item)) {
+                if (! $this->isValidUuid($item)) {
                     return ['valid' => false, 'error' => "Invalid reference ID: {$item}"];
                 }
             }
         } else {
-            if (!$this->isValidUuid($value)) {
+            if (! $this->isValidUuid($value)) {
                 return ['valid' => false, 'error' => "Invalid reference ID: {$value}"];
             }
         }
@@ -45,11 +45,11 @@ class ReferenceType implements FieldTypeInterface
         $isMulti = ($options['multi'] ?? false) === true;
 
         if ($isMulti) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 return null;
             }
 
-            return array_values(array_filter($value, fn($v) => $v !== null && $v !== ''));
+            return array_values(array_filter($value, fn ($v) => $v !== null && $v !== ''));
         }
 
         return $value;
@@ -67,7 +67,7 @@ class ReferenceType implements FieldTypeInterface
 
     private function isValidUuid(mixed $value): bool
     {
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
 

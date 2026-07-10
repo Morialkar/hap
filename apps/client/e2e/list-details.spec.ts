@@ -1,16 +1,34 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-const mockUser = { id: '00000000-0000-0000-0000-000000000000', name: 'Test User', email: 'test@example.com' };
+const mockUser = {
+  id: '00000000-0000-0000-0000-000000000000',
+  name: 'Test User',
+  email: 'test@example.com',
+};
 
 let databases = [{ id: 'db-1', name: 'Catalogue', locale: 'fr-CA', workspace_id: 'w1' }];
-let tables = [
-  { id: 'tbl-1', name: 'Ouvrages', database_id: 'db-1' },
-];
+let tables = [{ id: 'tbl-1', name: 'Ouvrages', database_id: 'db-1' }];
 
 let fields = [
-  { id: 'fld-1', name: 'Titre', type: 'text', position: 0, options: {}, validation: {}, table_id: 'tbl-1' },
-  { id: 'fld-2', name: 'Année', type: 'number', position: 1, options: {}, validation: {}, table_id: 'tbl-1' },
+  {
+    id: 'fld-1',
+    name: 'Titre',
+    type: 'text',
+    position: 0,
+    options: {},
+    validation: {},
+    table_id: 'tbl-1',
+  },
+  {
+    id: 'fld-2',
+    name: 'Année',
+    type: 'number',
+    position: 1,
+    options: {},
+    validation: {},
+    table_id: 'tbl-1',
+  },
 ];
 
 let views = [
@@ -34,7 +52,12 @@ let records = [
 ];
 
 let trashRecords = [
-  { id: 'rec-trashed-1', table_id: 'tbl-1', data: { Titre: 'L\'Étranger', Année: 1942 }, deleted_at: '2026-07-08T23:30:00Z' }
+  {
+    id: 'rec-trashed-1',
+    table_id: 'tbl-1',
+    data: { Titre: "L'Étranger", Année: 1942 },
+    deleted_at: '2026-07-08T23:30:00Z',
+  },
 ];
 
 let historyLogs = [
@@ -43,25 +66,37 @@ let historyLogs = [
     action: 'update',
     changes: {
       diff: {
-        Titre: { type: 'changed', old: 'Draft Title', new: 'Vol de Nuit' }
-      }
+        Titre: { type: 'changed', old: 'Draft Title', new: 'Vol de Nuit' },
+      },
     },
     user: { id: 'u1', name: 'Antoine' },
-    created_at: '2026-07-08T23:00:00Z'
-  }
+    created_at: '2026-07-08T23:00:00Z',
+  },
 ];
 
 function mockRoutes(page: import('@playwright/test').Page) {
   page.route('**/api/v1/user', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockUser) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(mockUser),
+    });
   });
 
   page.route('**/api/v1/databases/*', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(databases[0]) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(databases[0]),
+    });
   });
 
   page.route('**/api/v1/tables/*', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(tables[0]) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(tables[0]),
+    });
   });
 
   page.route(/.*\/api\/v1\/tables\/[^/?]+\/csv-import\/dry-run$/, async (route) => {
@@ -87,8 +122,13 @@ function mockRoutes(page: import('@playwright/test').Page) {
 
   page.route(/.*\/api\/v1\/tables\/[^/?]+\/csv-import$/, async (route) => {
     records.push(
-      { id: 'csv-rec-1', table_id: 'tbl-1', data: { Titre: 'L’Étranger', Année: 1942 }, version: 1 },
-      { id: 'csv-rec-2', table_id: 'tbl-1', data: { Titre: 'Chéri', Année: 1920 }, version: 1 },
+      {
+        id: 'csv-rec-1',
+        table_id: 'tbl-1',
+        data: { Titre: 'L’Étranger', Année: 1942 },
+        version: 1,
+      },
+      { id: 'csv-rec-2', table_id: 'tbl-1', data: { Titre: 'Chéri', Année: 1920 }, version: 1 }
     );
 
     await route.fulfill({
@@ -112,11 +152,19 @@ function mockRoutes(page: import('@playwright/test').Page) {
   });
 
   page.route('**/api/v1/fields**', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fields) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(fields),
+    });
   });
 
   page.route('**/api/v1/views**', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: views }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: views }),
+    });
   });
 
   // Track records that are currently blocked by reference links
@@ -124,7 +172,11 @@ function mockRoutes(page: import('@playwright/test').Page) {
 
   // Handle general records listing (least specific; registered first so checked last)
   page.route(/.*\/api\/v1\/records(?:\?.*)?$/, async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: records, pagination: {} }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: records, pagination: {} }),
+    });
   });
 
   // Handle single record details request (GET / DELETE)
@@ -143,9 +195,9 @@ function mockRoutes(page: import('@playwright/test').Page) {
             error: 'Cannot delete record',
             reference_counts: {
               total: 3,
-              by_table: { 'Ouvrages': 3 }
-            }
-          })
+              by_table: { Ouvrages: 3 },
+            },
+          }),
         });
       } else {
         // Success delete
@@ -170,7 +222,11 @@ function mockRoutes(page: import('@playwright/test').Page) {
 
   // Handle record sub-resource routes (must be registered after single-record route)
   page.route(/.*\/api\/v1\/records\/[^/?]+\/history(?:\?.*)?$/, async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: historyLogs }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: historyLogs }),
+    });
   });
 
   // Handle reassign-links (unblocks the record so it can be deleted)
@@ -178,12 +234,20 @@ function mockRoutes(page: import('@playwright/test').Page) {
     const url = new URL(route.request().url());
     const id = url.pathname.split('/')[4] ?? '';
     blockedRecordIds.delete(id);
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'Success' }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Success' }),
+    });
   });
 
   // Handle restore-version
   page.route(/.*\/api\/v1\/records\/[^/?]+\/restore-version(?:\?.*)?$/, async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'Restored' }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Restored' }),
+    });
   });
 
   // Handle restore from trash
@@ -195,7 +259,11 @@ function mockRoutes(page: import('@playwright/test').Page) {
       records.push({ id: trashed.id, table_id: trashed.table_id, data: trashed.data, version: 1 });
       trashRecords = trashRecords.filter((t) => t.id !== id);
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'Restored' }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Restored' }),
+    });
   });
 
   // Handle purge from trash
@@ -208,20 +276,34 @@ function mockRoutes(page: import('@playwright/test').Page) {
 
   // Handle trash listing (most specific; registered last so checked first)
   page.route(/.*\/api\/v1\/records\/trash(?:\?.*)?$/, async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: trashRecords }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: trashRecords }),
+    });
   });
 }
 
 test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
   test.beforeEach(async ({ page }) => {
     records = [
-      { id: 'rec-1', table_id: 'tbl-1', data: { Titre: 'Le Petit Prince', Année: 1943 }, version: 1 },
+      {
+        id: 'rec-1',
+        table_id: 'tbl-1',
+        data: { Titre: 'Le Petit Prince', Année: 1943 },
+        version: 1,
+      },
       { id: 'rec-2', table_id: 'tbl-1', data: { Titre: 'Vol de Nuit', Année: 1931 }, version: 1 },
       { id: 'rec-empty', table_id: 'tbl-1', data: {}, version: 1 },
       { id: 'rec-error', table_id: 'tbl-1', data: { Titre: 'Erreur' }, version: 1 },
     ];
     trashRecords = [
-      { id: 'rec-trashed-1', table_id: 'tbl-1', data: { Titre: 'L\'Étranger', Année: 1942 }, deleted_at: '2026-07-08T23:30:00Z' }
+      {
+        id: 'rec-trashed-1',
+        table_id: 'tbl-1',
+        data: { Titre: "L'Étranger", Année: 1942 },
+        deleted_at: '2026-07-08T23:30:00Z',
+      },
     ];
     mockRoutes(page);
     await page.goto('/tables/db-1/tbl-1');
@@ -301,7 +383,7 @@ test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
 
     await expect(page.locator('[data-testid="detail-error"]')).toContainText(
       'Record lookup failed',
-      { timeout: 15_000 },
+      { timeout: 15_000 }
     );
   });
 
@@ -311,7 +393,10 @@ test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
     await page.getByTestId('csv-file-input').setInputFiles({
       name: 'ouvrages.csv',
       mimeType: 'text/csv',
-      buffer: Buffer.from('Titre,Année\nL’Étranger,1942\nChéri,1920\nBad Row,not-a-number\n', 'utf8'),
+      buffer: Buffer.from(
+        'Titre,Année\nL’Étranger,1942\nChéri,1920\nBad Row,not-a-number\n',
+        'utf8'
+      ),
     });
 
     await expect(page.getByTestId('csv-map-field-Titre')).toBeVisible();
@@ -327,7 +412,9 @@ test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
     await expect(page.getByText('L’Étranger')).toBeVisible();
   });
 
-  test('deletes a referenced record with reassignment, restores/purges from trash', async ({ page }) => {
+  test('deletes a referenced record with reassignment, restores/purges from trash', async ({
+    page,
+  }) => {
     // Register dialog accept listener
     page.on('dialog', async (dialog) => {
       await dialog.accept();
@@ -355,11 +442,11 @@ test.describe('List & Detail Views, Sorting, Filtering, and Audit log', () => {
     const trashModal = page.locator('.modal.show');
     await expect(trashModal).toBeVisible();
     await expect(trashModal.locator('.modal-title')).toContainText('Corbeille');
-    await expect(trashModal.locator('text=L\'Étranger')).toBeVisible();
+    await expect(trashModal.locator("text=L'Étranger")).toBeVisible();
 
     // Restore from trash
     await trashModal.locator('[data-testid="restore-trash-rec-trashed-1"]').click();
-    await expect(trashModal.locator('text=L\'Étranger')).not.toBeVisible();
+    await expect(trashModal.locator("text=L'Étranger")).not.toBeVisible();
 
     // Close trash modal
     await trashModal.locator('[data-testid="trash-close-btn"]').click();

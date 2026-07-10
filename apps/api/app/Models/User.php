@@ -16,6 +16,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     protected $keyType = 'uuid';
+
     public $incrementing = false;
 
     /** @use HasFactory<UserFactory> */

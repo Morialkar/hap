@@ -21,6 +21,7 @@ Route::prefix('v1')->group(function () {
         Route::get('user', function (Request $request) {
             $user = $request->user();
             $user->load('workspaceMembers.workspace');
+
             return $user;
         });
 

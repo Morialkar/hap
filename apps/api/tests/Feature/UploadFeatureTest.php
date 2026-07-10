@@ -27,9 +27,9 @@ test('user can upload a text file', function () {
         ]);
 
     $response->assertStatus(201);
-    
+
     $hash = hash_file('sha256', $file->getRealPath());
-    
+
     $response->assertJson([
         'filename' => 'document.txt',
         'size' => 102400, // 100kb in bytes
@@ -69,7 +69,7 @@ test('user can upload an image file which generates a thumbnail', function () {
 
 test('duplicate upload does not duplicate storage files', function () {
     $user = User::factory()->create();
-    
+
     // Upload 1
     $file1 = UploadedFile::fake()->create('test.txt', 50, 'text/plain');
     $response1 = $this->actingAs($user)->postJson('/api/v1/uploads', ['file' => $file1]);
@@ -81,13 +81,13 @@ test('duplicate upload does not duplicate storage files', function () {
 
     // Upload same content again (simulate identical file)
     $file2 = UploadedFile::fake()->create('test.txt', 50, 'text/plain');
-    
+
     // We force the underlying file content to be identical to mock same hash
     // UploadedFile fake content is generated, so let's mock it
     // Wait, content-addressing check will just run.
     $response2 = $this->actingAs($user)->postJson('/api/v1/uploads', ['file' => $file2]);
     $response2->assertStatus(201);
-    
+
     Storage::assertExists("uploads/{$hash}");
 });
 
@@ -130,7 +130,7 @@ test('creating record with file and image metadata works and passes validation',
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     // Create image field (single)
     $imageField = Field::factory()->create([
         'table_id' => $table->id,
@@ -184,7 +184,7 @@ test('invalid file structure is rejected by record validation', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'cover',

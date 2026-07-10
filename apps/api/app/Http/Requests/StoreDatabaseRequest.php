@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Workspace;
+use App\Models\WorkspaceMember;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -21,15 +23,15 @@ class StoreDatabaseRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($this->workspace_id) {
-            $exists = \App\Models\Workspace::where('id', $this->workspace_id)->exists();
-            if (!$exists) {
-                $workspace = new \App\Models\Workspace();
+            $exists = Workspace::where('id', $this->workspace_id)->exists();
+            if (! $exists) {
+                $workspace = new Workspace;
                 $workspace->id = $this->workspace_id;
                 $workspace->name = 'Auto Workspace';
                 $workspace->save();
 
                 if (auth()->check()) {
-                    \App\Models\WorkspaceMember::create([
+                    WorkspaceMember::create([
                         'workspace_id' => $workspace->id,
                         'user_id' => auth()->id(),
                         'role' => 'owner',

@@ -12,6 +12,7 @@ class Workspace extends Model
     use HasFactory;
 
     protected $keyType = 'uuid';
+
     public $incrementing = false;
 
     protected $fillable = ['name'];

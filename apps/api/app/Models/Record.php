@@ -14,6 +14,7 @@ class Record extends Model
     use HasFactory, SoftDeletes;
 
     protected $keyType = 'ulid';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -33,7 +34,7 @@ class Record extends Model
 
         static::creating(function ($model) {
             if (empty($model->id)) {
-                $model->id = (string) new Ulid();
+                $model->id = (string) new Ulid;
             }
         });
     }

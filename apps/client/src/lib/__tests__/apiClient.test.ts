@@ -31,7 +31,7 @@ describe('ApiClient', () => {
     } as Response);
 
     await apiClient.get('/test');
-    
+
     expect(fetch).toHaveBeenCalledWith(
       '/api/v1/test',
       expect.objectContaining({
@@ -47,7 +47,7 @@ describe('ApiClient', () => {
     } as Response);
 
     await apiClient.post('/test', { foo: 'bar' });
-    
+
     expect(fetch).toHaveBeenCalledWith(
       '/api/v1/test',
       expect.objectContaining({
@@ -75,7 +75,9 @@ describe('ApiClient', () => {
     });
     Object.defineProperty(window.location, 'href', {
       get: () => redirectUrl,
-      set: (url) => { redirectUrl = url; },
+      set: (url) => {
+        redirectUrl = url;
+      },
       configurable: true,
     });
 
@@ -116,7 +118,7 @@ describe('ApiClient', () => {
     } as Response);
 
     await apiClient.get('/test');
-    
+
     expect(fetch).toHaveBeenCalledWith(
       '/api/v1/test',
       expect.objectContaining({
@@ -132,7 +134,7 @@ describe('ApiClient', () => {
     } as Response);
 
     await apiClient.post('/test', { foo: 'bar' });
-    
+
     expect(fetch).toHaveBeenCalledWith(
       '/api/v1/test',
       expect.objectContaining({
@@ -149,7 +151,7 @@ describe('ApiClient', () => {
     } as Response);
 
     await apiClient.put('/test', { foo: 'bar' });
-    
+
     expect(fetch).toHaveBeenCalledWith(
       '/api/v1/test',
       expect.objectContaining({
@@ -166,7 +168,7 @@ describe('ApiClient', () => {
     } as Response);
 
     await apiClient.patch('/test', { foo: 'bar' });
-    
+
     expect(fetch).toHaveBeenCalledWith(
       '/api/v1/test',
       expect.objectContaining({
@@ -183,7 +185,7 @@ describe('ApiClient', () => {
     } as Response);
 
     await apiClient.delete('/test');
-    
+
     expect(fetch).toHaveBeenCalledWith(
       '/api/v1/test',
       expect.objectContaining({

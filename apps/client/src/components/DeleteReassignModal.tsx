@@ -103,9 +103,7 @@ export function DeleteReassignModal({
               </p>
 
               <div className="mb-3">
-                <label className="form-label fw-bold">
-                  {t('records.deleteConflict.target')}
-                </label>
+                <label className="form-label fw-bold">{t('records.deleteConflict.target')}</label>
                 {candidatesQuery.isLoading ? (
                   <div className="d-flex align-items-center gap-2 text-muted small">
                     <LoadingSpinner size="sm" />

@@ -13,6 +13,7 @@ class Table extends Model
     use HasFactory;
 
     protected $keyType = 'uuid';
+
     public $incrementing = false;
 
     protected $fillable = ['name', 'database_id', 'is_front_facing'];

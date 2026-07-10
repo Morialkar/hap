@@ -31,7 +31,7 @@ test('accent ordering with French collation', function () {
         'locale' => 'fr-CA',
     ]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'name',
@@ -56,12 +56,12 @@ test('accent ordering with French collation', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records?table_id=' . $table->id . '&sort=name&sort_dir=asc');
+        ->getJson('/api/v1/records?table_id='.$table->id.'&sort=name&sort_dir=asc');
 
     $response->assertStatus(200);
-    
+
     $names = collect($response->json('data'))->pluck('data.name')->toArray();
-    
+
     // With French collation, É should sort with E
     expect($names)->toBe(['Aubin', 'Ethier', 'Éthier']);
 });
@@ -77,7 +77,7 @@ test('reference field filtering using record_links', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     $referenceField = Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'author',
@@ -117,12 +117,12 @@ test('reference field filtering using record_links', function () {
     ]]);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records?table_id=' . $table->id . '&filters=' . urlencode($filters));
+        ->getJson('/api/v1/records?table_id='.$table->id.'&filters='.urlencode($filters));
 
     $response->assertStatus(200);
-    
+
     $recordIds = collect($response->json('data'))->pluck('id')->toArray();
-    
+
     expect($recordIds)->toContain($book1Id);
     expect($recordIds)->toContain($book3Id);
     expect($recordIds)->not->toContain($book2Id);
@@ -139,7 +139,7 @@ test('full-text search across text fields', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -178,10 +178,10 @@ test('full-text search across text fields', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records?table_id=' . $table->id . '&search=novel');
+        ->getJson('/api/v1/records?table_id='.$table->id.'&search=novel');
 
     $response->assertStatus(200);
-    
+
     expect($response->json('data'))->toHaveCount(3);
 });
 
@@ -196,7 +196,7 @@ test('cursor pagination works correctly', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -207,15 +207,15 @@ test('cursor pagination works correctly', function () {
     for ($i = 1; $i <= 25; $i++) {
         Record::factory()->create([
             'table_id' => $table->id,
-            'data' => ['title' => 'Record ' . $i],
+            'data' => ['title' => 'Record '.$i],
         ]);
     }
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records?table_id=' . $table->id . '&per_page=10');
+        ->getJson('/api/v1/records?table_id='.$table->id.'&per_page=10');
 
     $response->assertStatus(200);
-    
+
     expect($response->json('data'))->toHaveCount(10);
     expect($response->json('pagination.total'))->toBe(25);
     expect($response->json('pagination.next_cursor'))->not->toBeNull();
@@ -232,7 +232,7 @@ test('filter operators work correctly', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'year',
@@ -261,12 +261,12 @@ test('filter operators work correctly', function () {
     ]]);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records?table_id=' . $table->id . '&filters=' . urlencode($filters));
+        ->getJson('/api/v1/records?table_id='.$table->id.'&filters='.urlencode($filters));
 
     $response->assertStatus(200);
-    
+
     $years = collect($response->json('data'))->pluck('data.year')->toArray();
-    
+
     expect($years)->toContain(1950);
     expect($years)->toContain(2000);
     expect($years)->not->toContain(1920);

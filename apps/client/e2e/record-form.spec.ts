@@ -1,20 +1,48 @@
 import { test, expect } from '@playwright/test';
 
-const mockUser = { id: '00000000-0000-0000-0000-000000000000', name: 'Test User', email: 'test@example.com' };
+const mockUser = {
+  id: '00000000-0000-0000-0000-000000000000',
+  name: 'Test User',
+  email: 'test@example.com',
+};
 
 let databases = [{ id: 'db-1', name: 'Catalogue', workspace_id: 'w1' }];
 let tables = [
   { id: 'tbl-1', name: 'Ouvrages', database_id: 'db-1' },
-  { id: 'tbl-author', name: 'Auteurs', database_id: 'db-1' }
+  { id: 'tbl-author', name: 'Auteurs', database_id: 'db-1' },
 ];
 
 let fieldsForOuvrages = [
-  { id: 'fld-1', name: 'Titre', type: 'text', position: 0, options: { max_length: 100 }, validation: { required: true }, table_id: 'tbl-1' },
-  { id: 'fld-2', name: 'Auteur', type: 'reference', position: 1, options: { target_table: 'tbl-author' }, validation: {}, table_id: 'tbl-1' }
+  {
+    id: 'fld-1',
+    name: 'Titre',
+    type: 'text',
+    position: 0,
+    options: { max_length: 100 },
+    validation: { required: true },
+    table_id: 'tbl-1',
+  },
+  {
+    id: 'fld-2',
+    name: 'Auteur',
+    type: 'reference',
+    position: 1,
+    options: { target_table: 'tbl-author' },
+    validation: {},
+    table_id: 'tbl-1',
+  },
 ];
 
 let fieldsForAuteurs = [
-  { id: 'fld-a1', name: 'Nom', type: 'text', position: 0, options: {}, validation: { required: true }, table_id: 'tbl-author' }
+  {
+    id: 'fld-a1',
+    name: 'Nom',
+    type: 'text',
+    position: 0,
+    options: {},
+    validation: { required: true },
+    table_id: 'tbl-author',
+  },
 ];
 
 type MockRecord = {
@@ -29,18 +57,30 @@ let recordsForAuteurs: MockRecord[] = [];
 
 function mockRoutes(page: import('@playwright/test').Page) {
   page.route('**/api/v1/user', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockUser) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(mockUser),
+    });
   });
 
   page.route('**/api/v1/databases/*', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(databases[0]) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(databases[0]),
+    });
   });
 
   page.route('**/api/v1/tables/*', async (route) => {
     const url = new URL(route.request().url());
     const id = url.pathname.split('/').pop();
     const table = tables.find((t) => t.id === id) || tables[0];
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(table) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(table),
+    });
   });
 
   page.route('**/api/v1/fields**', async (route) => {
@@ -61,19 +101,27 @@ function mockRoutes(page: import('@playwright/test').Page) {
         id: `rec-${Date.now()}`,
         table_id: body.table_id,
         data: body.data,
-        version: 1
+        version: 1,
       };
       if (body.table_id === 'tbl-author') {
         recordsForAuteurs.push(newRecord);
       } else {
         recordsForOuvrages.push(newRecord);
       }
-      await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(newRecord) });
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(newRecord),
+      });
       return;
     }
 
     const items = tableId === 'tbl-author' ? recordsForAuteurs : recordsForOuvrages;
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: items, pagination: {} }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: items, pagination: {} }),
+    });
   });
 }
 

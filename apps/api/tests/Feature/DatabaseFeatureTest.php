@@ -5,7 +5,6 @@ use App\Models\User;
 use App\Models\Workspace;
 use App\Models\WorkspaceMember;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
@@ -49,7 +48,7 @@ test('user can list databases in their workspace', function () {
     Database::factory()->create(['workspace_id' => $workspace->id, 'name' => 'Database 2']);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/databases?workspace_id=' . $workspace->id);
+        ->getJson('/api/v1/databases?workspace_id='.$workspace->id);
 
     $response->assertStatus(200)
         ->assertJsonCount(2);
@@ -78,7 +77,7 @@ test('user cannot see databases from another workspace', function () {
     Database::factory()->create(['workspace_id' => $workspaceB->id, 'name' => 'B Database']);
 
     $response = $this->actingAs($userA)
-        ->getJson('/api/v1/databases?workspace_id=' . $workspaceA->id);
+        ->getJson('/api/v1/databases?workspace_id='.$workspaceA->id);
 
     $response->assertStatus(200)
         ->assertJsonCount(1)
@@ -97,7 +96,7 @@ test('user can update their database', function () {
     $database = Database::factory()->create(['workspace_id' => $workspace->id, 'name' => 'Old Name']);
 
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/databases/' . $database->id, [
+        ->putJson('/api/v1/databases/'.$database->id, [
             'name' => 'New Name',
         ]);
 
@@ -124,7 +123,7 @@ test('user can delete their database', function () {
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
 
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/databases/' . $database->id);
+        ->deleteJson('/api/v1/databases/'.$database->id);
 
     $response->assertStatus(204);
 

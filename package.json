@@ -11,7 +11,6 @@
     "dev:stack": "node scripts/dev-stack.mjs",
     "dev:stack:fresh": "node scripts/dev-stack.mjs --fresh",
     "build": "pnpm --filter client build",
-    "parity:matrix": "node tests/parity/generate-matrix.mjs",
     "test": "pnpm -r test",
     "prepare": "husky"
   },

@@ -17,7 +17,7 @@ describe('design system primitives', () => {
             <button type="button">Ajouter</button>
           </PageActions>
         }
-      />,
+      />
     );
 
     expect(screen.getByRole('heading', { level: 1, name: 'Ouvrages' })).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('design system primitives', () => {
     const { container } = render(
       <SurfaceCard variant="toolbar" className="mb-3">
         Contenu
-      </SurfaceCard>,
+      </SurfaceCard>
     );
 
     expect(container.querySelector('.card.hap-records-toolbar.mb-3')).toBeInTheDocument();

@@ -10,11 +10,11 @@ class UrlType implements FieldTypeInterface
             return ['valid' => true, 'error' => null];
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return ['valid' => false, 'error' => 'Value must be a string'];
         }
 
-        if (!filter_var($value, FILTER_VALIDATE_URL)) {
+        if (! filter_var($value, FILTER_VALIDATE_URL)) {
             return ['valid' => false, 'error' => 'Value must be a valid URL'];
         }
 
@@ -27,7 +27,7 @@ class UrlType implements FieldTypeInterface
             return null;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return null;
         }
 

@@ -2,12 +2,15 @@
 
 use App\Models\Database;
 use App\Models\Field;
+use App\Models\Record;
 use App\Models\Report;
 use App\Models\Table;
+use App\Models\Template;
 use App\Models\User;
 use App\Models\View;
 use App\Models\Workspace;
 use App\Models\WorkspaceMember;
+use Database\Seeders\TemplateSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 
@@ -382,7 +385,7 @@ test('non-owner workspace members cannot export or install templates', function 
 
 test('user can list seeded templates', function () {
     [$user, $workspace] = createWorkspaceOwner();
-    $this->seed(\Database\Seeders\TemplateSeeder::class);
+    $this->seed(TemplateSeeder::class);
 
     $response = $this->actingAs($user)
         ->getJson('/api/v1/templates');
@@ -395,9 +398,9 @@ test('user can list seeded templates', function () {
 
 test('installing template creates database tables fields and maps demo records successfully', function () {
     [$user, $workspace] = createWorkspaceOwner();
-    $this->seed(\Database\Seeders\TemplateSeeder::class);
+    $this->seed(TemplateSeeder::class);
 
-    $templateModel = App\Models\Template::where('name', 'Boîte à Recettes')->firstOrFail();
+    $templateModel = Template::where('name', 'Boîte à Recettes')->firstOrFail();
 
     $installResponse = $this->actingAs($user)
         ->postJson('/api/v1/workspaces/'.$workspace->id.'/install-template', [
@@ -423,8 +426,8 @@ test('installing template creates database tables fields and maps demo records s
     ]);
 
     // Assert demo records created
-    $recipesTable = App\Models\Table::where('database_id', $databaseId)->where('name', 'Recettes')->firstOrFail();
-    $ingredientsTable = App\Models\Table::where('database_id', $databaseId)->where('name', 'Ingrédients')->firstOrFail();
+    $recipesTable = Table::where('database_id', $databaseId)->where('name', 'Recettes')->firstOrFail();
+    $ingredientsTable = Table::where('database_id', $databaseId)->where('name', 'Ingrédients')->firstOrFail();
 
     $this->assertDatabaseHas('records', [
         'table_id' => $recipesTable->id,
@@ -434,12 +437,12 @@ test('installing template creates database tables fields and maps demo records s
     ]);
 
     // Check relationship is correctly mapped in the records
-    $recipeRecord = App\Models\Record::where('table_id', $recipesTable->id)->firstOrFail();
-    $ingredientRecord = App\Models\Record::where('table_id', $ingredientsTable->id)->firstOrFail();
+    $recipeRecord = Record::where('table_id', $recipesTable->id)->firstOrFail();
+    $ingredientRecord = Record::where('table_id', $ingredientsTable->id)->firstOrFail();
 
     expect($recipeRecord->data['Titre de la recette'])->toBe('Gâteau au Chocolat Moelleux');
     expect($ingredientRecord->data['Recette associée'])->toBe($recipeRecord->id);
-    
+
     // Check record links populated
     $this->assertDatabaseHas('record_links', [
         'from_record' => $ingredientRecord->id,

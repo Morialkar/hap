@@ -12,6 +12,7 @@ class View extends Model
     use HasFactory;
 
     protected $keyType = 'uuid';
+
     public $incrementing = false;
 
     protected $fillable = ['name', 'type', 'config', 'table_id', 'is_default'];

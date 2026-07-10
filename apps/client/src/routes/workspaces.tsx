@@ -86,10 +86,12 @@ function Workspaces() {
   const workspaceMember =
     workspaceUser?.workspace_members?.find((member) => member.role === 'owner') ||
     workspaceUser?.workspace_members?.[0];
-  const workspaceId = workspaceMember?.workspace_id || databasesQuery.data?.[0]?.workspace_id || generateId();
+  const workspaceId =
+    workspaceMember?.workspace_id || databasesQuery.data?.[0]?.workspace_id || generateId();
 
   const createDatabase = useMutation({
-    mutationFn: (name: string) => apiClient.post<Database>('/databases', { name, workspace_id: workspaceId }),
+    mutationFn: (name: string) =>
+      apiClient.post<Database>('/databases', { name, workspace_id: workspaceId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['databases'] });
       setSuccessMsg(null);
@@ -97,7 +99,7 @@ function Workspaces() {
     },
     onError: (err) => {
       setErrorMsg(err.message || 'Error creating database');
-    }
+    },
   });
 
   const installTemplate = useMutation({
@@ -120,7 +122,7 @@ function Workspaces() {
     onError: (err) => {
       setErrorMsg(err.message || 'Error installing template');
       setSuccessMsg(null);
-    }
+    },
   });
 
   const createTable = useMutation({
@@ -142,11 +144,14 @@ function Workspaces() {
 
   const isLoading = databasesQuery.isLoading || tablesQuery.isLoading;
 
-  const tablesByDatabase = (tablesQuery.data ?? []).reduce<Record<string, Table[]>>((acc, table) => {
-    if (!acc[table.database_id]) acc[table.database_id] = [];
-    acc[table.database_id].push(table);
-    return acc;
-  }, {});
+  const tablesByDatabase = (tablesQuery.data ?? []).reduce<Record<string, Table[]>>(
+    (acc, table) => {
+      if (!acc[table.database_id]) acc[table.database_id] = [];
+      acc[table.database_id].push(table);
+      return acc;
+    },
+    {}
+  );
 
   if (isLoading) {
     return (
@@ -163,20 +168,34 @@ function Workspaces() {
       {errorMsg && (
         <div className="alert alert-danger alert-dismissible" role="alert">
           <div className="d-flex">
-            <div><i className="ti ti-alert-triangle me-2" /></div>
+            <div>
+              <i className="ti ti-alert-triangle me-2" />
+            </div>
             <div>{errorMsg}</div>
           </div>
-          <button type="button" className="btn-close" onClick={() => setErrorMsg(null)} aria-label="Close" />
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setErrorMsg(null)}
+            aria-label="Close"
+          />
         </div>
       )}
 
       {successMsg && (
         <div className="alert alert-success alert-dismissible" role="alert">
           <div className="d-flex">
-            <div><i className="ti ti-check me-2" /></div>
+            <div>
+              <i className="ti ti-check me-2" />
+            </div>
             <div>{successMsg}</div>
           </div>
-          <button type="button" className="btn-close" onClick={() => setSuccessMsg(null)} aria-label="Close" />
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setSuccessMsg(null)}
+            aria-label="Close"
+          />
         </div>
       )}
 
@@ -187,7 +206,11 @@ function Workspaces() {
               <button
                 type="button"
                 className={`nav-link ${activeTab === 'empty' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('empty'); setErrorMsg(null); setSuccessMsg(null); }}
+                onClick={() => {
+                  setActiveTab('empty');
+                  setErrorMsg(null);
+                  setSuccessMsg(null);
+                }}
               >
                 <i className="ti ti-database me-2" />
                 {t('workspaces.newDatabase.placeholder')}
@@ -197,7 +220,11 @@ function Workspaces() {
               <button
                 type="button"
                 className={`nav-link ${activeTab === 'template' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('template'); setErrorMsg(null); setSuccessMsg(null); }}
+                onClick={() => {
+                  setActiveTab('template');
+                  setErrorMsg(null);
+                  setSuccessMsg(null);
+                }}
               >
                 <i className="ti ti-template me-2" />
                 {t('workspaces.createFromTemplate')}
@@ -246,16 +273,22 @@ function Workspaces() {
               ) : (
                 <div className="row row-cards">
                   {(templatesQuery.data ?? []).map((template) => {
-                    const dbName = templateDbNames[template.id] !== undefined
-                      ? templateDbNames[template.id]
-                      : template.name;
+                    const dbName =
+                      templateDbNames[template.id] !== undefined
+                        ? templateDbNames[template.id]
+                        : template.name;
                     const isLiterary = template.name.toLowerCase().includes('litt');
                     const iconClass = isLiterary ? 'ti-books text-azure' : 'ti-soup text-orange';
-                    const translationKey = isLiterary ? 'workspaces.template.literary' : 'workspaces.template.recipe';
+                    const translationKey = isLiterary
+                      ? 'workspaces.template.literary'
+                      : 'workspaces.template.recipe';
 
                     return (
                       <div className="col-md-6" key={template.id}>
-                        <div className="card h-100 border-0 shadow-sm" style={{ background: 'var(--tblr-bg-surface-secondary)' }}>
+                        <div
+                          className="card h-100 border-0 shadow-sm"
+                          style={{ background: 'var(--tblr-bg-surface-secondary)' }}
+                        >
                           <div className="card-body d-flex flex-column">
                             <div className="d-flex align-items-center mb-3">
                               <span className="avatar avatar-md bg-transparent me-3">
@@ -267,24 +300,35 @@ function Workspaces() {
                               </div>
                             </div>
                             <p className="text-muted flex-grow-1">{template.description}</p>
-                            
+
                             <div className="mt-3">
-                              <label className="form-label small text-muted">Nom de la base de données</label>
+                              <label className="form-label small text-muted">
+                                Nom de la base de données
+                              </label>
                               <div className="input-group">
                                 <input
                                   type="text"
                                   className="form-control"
                                   value={dbName}
-                                  onChange={(e) => setTemplateDbNames(prev => ({ ...prev, [template.id]: e.target.value }))}
+                                  onChange={(e) =>
+                                    setTemplateDbNames((prev) => ({
+                                      ...prev,
+                                      [template.id]: e.target.value,
+                                    }))
+                                  }
                                   placeholder={template.name}
                                 />
                                 <button
                                   type="button"
                                   className="btn btn-primary"
-                                  onClick={() => installTemplate.mutate({ template, dbName: dbName.trim() })}
+                                  onClick={() =>
+                                    installTemplate.mutate({ template, dbName: dbName.trim() })
+                                  }
                                   disabled={!dbName.trim() || installTemplate.isPending}
                                 >
-                                  {installTemplate.isPending ? t('workspaces.installing') : t('workspaces.install')}
+                                  {installTemplate.isPending
+                                    ? t('workspaces.installing')
+                                    : t('workspaces.install')}
                                 </button>
                               </div>
                             </div>
@@ -325,7 +369,9 @@ function Workspaces() {
                 <div className="card-body">
                   <div className="list-group list-group-flush mb-3">
                     {tables.length === 0 ? (
-                      <div className="list-group-item text-muted">{t('workspaces.tables.empty')}</div>
+                      <div className="list-group-item text-muted">
+                        {t('workspaces.tables.empty')}
+                      </div>
                     ) : (
                       tables.map((table) => (
                         <div
@@ -342,7 +388,10 @@ function Workspaces() {
                             {table.name}
                           </Link>
                           <div className="d-flex align-items-center gap-3">
-                            <div className="form-check form-switch mb-0" title={t('workspaces.table.isFrontFacing')}>
+                            <div
+                              className="form-check form-switch mb-0"
+                              title={t('workspaces.table.isFrontFacing')}
+                            >
                               <input
                                 className="form-check-input cursor-pointer"
                                 type="checkbox"
@@ -358,7 +407,10 @@ function Workspaces() {
                                 disabled={updateTable.isPending}
                                 aria-label={t('workspaces.table.isFrontFacing')}
                               />
-                              <label className="form-check-label small text-muted ms-1 d-none d-sm-inline" htmlFor={`front-facing-${table.id}`}>
+                              <label
+                                className="form-check-label small text-muted ms-1 d-none d-sm-inline"
+                                htmlFor={`front-facing-${table.id}`}
+                              >
                                 {t('workspaces.table.isFrontFacing')}
                               </label>
                             </div>

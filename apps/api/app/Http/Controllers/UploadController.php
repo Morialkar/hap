@@ -15,9 +15,6 @@ class UploadController extends Controller
 
     /**
      * Upload a new file.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -34,14 +31,13 @@ class UploadController extends Controller
     /**
      * Serve the uploaded file.
      *
-     * @param string $hash
      * @return mixed
      */
     public function show(string $hash)
     {
         $path = "uploads/{$hash}";
-        
-        if (!Storage::exists($path)) {
+
+        if (! Storage::exists($path)) {
             return response()->json([
                 'error' => 'File not found',
             ], 404);
@@ -58,14 +54,13 @@ class UploadController extends Controller
     /**
      * Serve the file thumbnail.
      *
-     * @param string $hash
      * @return mixed
      */
     public function showThumbnail(string $hash)
     {
         $path = "uploads/thumbnails/{$hash}";
-        
-        if (!Storage::exists($path)) {
+
+        if (! Storage::exists($path)) {
             return response()->json([
                 'error' => 'Thumbnail not found',
             ], 404);

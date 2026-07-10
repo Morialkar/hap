@@ -3,6 +3,7 @@
 namespace Tests\Helpers;
 
 use App\FieldTypes\FieldTypeRegistry;
+use Illuminate\Support\Str;
 
 class PropertyTestGenerator
 {
@@ -10,7 +11,7 @@ class PropertyTestGenerator
 
     public function __construct()
     {
-        $this->fieldTypeRegistry = new FieldTypeRegistry();
+        $this->fieldTypeRegistry = new FieldTypeRegistry;
     }
 
     /**
@@ -64,6 +65,7 @@ class PropertyTestGenerator
         foreach ($fields as $field) {
             $data[$field['name']] = $this->generateFieldValue($field);
         }
+
         return $data;
     }
 
@@ -79,8 +81,8 @@ class PropertyTestGenerator
             "\t", // Tab
             "\n", // Newline
             "\r\n", // Windows newline
-            "éÈœ", // Accents
-            "🎉", // Emoji
+            'éÈœ', // Accents
+            '🎉', // Emoji
             "<script>alert('xss')</script>", // XSS attempt
             "'; DROP TABLE users; --", // SQL injection attempt
             str_repeat('a', 10000), // Very long string
@@ -94,29 +96,29 @@ class PropertyTestGenerator
             "a\nb", // LF
             "a\rb", // CR
             "a\tb", // Tab
-            "a/b", // Forward slash
-            "a\\nb", // Escaped newline
-            "a\\tb", // Escaped tab
-            "a\\rb", // Escaped carriage return
-            "a\\x01b", // Hex control character
-            "a\\x1Fb", // Hex control character
-            "a\\x7Fb", // Hex control character
-            "a\\x80b", // Hex control character
-            "a\\xFFb", // Hex control character
-            "a\\u0080b", // Unicode control character
-            "a\\uFFFFb", // Unicode control character
-            "a\\uD800b", // Unicode surrogate
-            "a\\uDC00b", // Unicode surrogate
-            "a\\uDFFFb", // Unicode surrogate
-            "a\\uDBFFb", // Unicode surrogate
-            "a\\uE000b", // Unicode private use
-            "a\\uF8FFb", // Unicode private use
-            "a\\uF0000b", // Unicode supplementary private use
-            "a\\uFFFFDb", // Unicode supplementary private use
-            "a\\uFFFEb", // Unicode non-character
-            "a\\uFFFFb", // Unicode non-character
-            "a\\uFEFFb", // Unicode BOM
-            "a\\uFFFD", // Unicode replacement character
+            'a/b', // Forward slash
+            'a\\nb', // Escaped newline
+            'a\\tb', // Escaped tab
+            'a\\rb', // Escaped carriage return
+            'a\\x01b', // Hex control character
+            'a\\x1Fb', // Hex control character
+            'a\\x7Fb', // Hex control character
+            'a\\x80b', // Hex control character
+            'a\\xFFb', // Hex control character
+            'a\\u0080b', // Unicode control character
+            'a\\uFFFFb', // Unicode control character
+            'a\\uD800b', // Unicode surrogate
+            'a\\uDC00b', // Unicode surrogate
+            'a\\uDFFFb', // Unicode surrogate
+            'a\\uDBFFb', // Unicode surrogate
+            'a\\uE000b', // Unicode private use
+            'a\\uF8FFb', // Unicode private use
+            'a\\uF0000b', // Unicode supplementary private use
+            'a\\uFFFFDb', // Unicode supplementary private use
+            'a\\uFFFEb', // Unicode non-character
+            'a\\uFFFFb', // Unicode non-character
+            'a\\uFEFFb', // Unicode BOM
+            'a\\uFFFD', // Unicode replacement character
             "a\u{FFFD}b", // Unicode replacement character (PHP 7.0+)
             "a\u{200B}b", // Zero-width space
             "a\u{200C}b", // Zero-width non-joiner
@@ -136,8 +138,8 @@ class PropertyTestGenerator
     {
         $prefixes = ['field_', 'col_', 'attr_', 'prop_', ''];
         $names = ['title', 'name', 'description', 'content', 'value', 'data', 'text', 'number', 'date', 'status', 'type', 'category', 'tag', 'label'];
-        
-        return $prefixes[array_rand($prefixes)] . $names[array_rand($names)] . '_' . rand(1, 999);
+
+        return $prefixes[array_rand($prefixes)].$names[array_rand($names)].'_'.rand(1, 999);
     }
 
     private function generateOptionsForType(string $type): array
@@ -155,7 +157,7 @@ class PropertyTestGenerator
             ],
             'reference' => [
                 'multi' => (bool) rand(0, 1),
-                'target_table' => (string) \Illuminate\Support\Str::uuid(),
+                'target_table' => (string) Str::uuid(),
             ],
             default => [],
         };
@@ -177,12 +179,12 @@ class PropertyTestGenerator
     {
         $maxLength = $options['max_length'] ?? 255;
         $length = rand(1, $maxLength);
-        
+
         // Include accents sometimes
         if (rand(0, 10) === 0) {
             return substr(str_repeat('éÈœ', ceil($length / 3)), 0, $length);
         }
-        
+
         return substr(str_repeat('a', $length), 0, $length);
     }
 
@@ -196,11 +198,11 @@ class PropertyTestGenerator
         $isDecimal = $options['decimal'] ?? false;
         $min = $options['min'] ?? -1000;
         $max = $options['max'] ?? 1000;
-        
+
         if ($isDecimal) {
             return rand($min * 100, $max * 100) / 100;
         }
-        
+
         return rand($min, $max);
     }
 
@@ -212,7 +214,7 @@ class PropertyTestGenerator
             sprintf('%04d-%02d-%02d', rand(1900, 2100), rand(1, 12), rand(1, 28)), // Full date
             'unknown', // Unknown
         ];
-        
+
         return $formats[array_rand($formats)];
     }
 
@@ -225,34 +227,35 @@ class PropertyTestGenerator
     {
         $values = $options['values'] ?? ['option1', 'option2'];
         $isMulti = $options['multi'] ?? false;
-        
+
         if ($isMulti) {
             $count = rand(1, count($values));
+
             return array_slice($values, 0, $count);
         }
-        
+
         return $values[array_rand($values)];
     }
 
     private function generateReferenceValue(array $options): string|array
     {
         $isMulti = $options['multi'] ?? false;
-        
+
         if ($isMulti) {
             return [
-                (string) \Illuminate\Support\Str::uuid(),
-                (string) \Illuminate\Support\Str::uuid(),
+                (string) Str::uuid(),
+                (string) Str::uuid(),
             ];
         }
-        
-        return (string) \Illuminate\Support\Str::uuid();
+
+        return (string) Str::uuid();
     }
 
     private function generateFileMetadata(): array
     {
         return [
-            'path' => '/storage/files/' . \Illuminate\Support\Str::random(40) . '.jpg',
-            'filename' => 'file_' . rand(1, 9999) . '.jpg',
+            'path' => '/storage/files/'.Str::random(40).'.jpg',
+            'filename' => 'file_'.rand(1, 9999).'.jpg',
             'size' => rand(1000, 10000000),
             'mime_type' => 'image/jpeg',
         ];
@@ -262,15 +265,15 @@ class PropertyTestGenerator
     {
         $domains = ['example.com', 'test.org', 'demo.net'];
         $paths = ['', '/path', '/to/resource', '/api/v1/endpoint'];
-        
-        return 'https://' . $domains[array_rand($domains)] . $paths[array_rand($paths)];
+
+        return 'https://'.$domains[array_rand($domains)].$paths[array_rand($paths)];
     }
 
     private function generateEmailValue(): string
     {
         $domains = ['example.com', 'test.org', 'demo.net'];
         $usernames = ['user', 'test', 'admin', 'demo'];
-        
-        return $usernames[array_rand($usernames)] . '@' . $domains[array_rand($domains)];
+
+        return $usernames[array_rand($usernames)].'@'.$domains[array_rand($domains)];
     }
 }

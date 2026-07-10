@@ -3,7 +3,6 @@
 use App\Models\Database;
 use App\Models\Field;
 use App\Models\Record;
-use App\Models\RecordLink;
 use App\Models\Table;
 use App\Models\User;
 use App\Models\Workspace;
@@ -23,7 +22,7 @@ test('record links are synced on record creation with reference field', function
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     $referenceField = Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'author',
@@ -61,7 +60,7 @@ test('record links are synced on record update', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     $referenceField = Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'author',
@@ -75,7 +74,7 @@ test('record links are synced on record update', function () {
     $record = Record::factory()->create(['table_id' => $table->id]);
 
     $this->actingAs($user)
-        ->putJson('/api/v1/records/' . $record->id, [
+        ->putJson('/api/v1/records/'.$record->id, [
             'data' => [
                 'author' => $targetRecord1->id,
             ],
@@ -88,7 +87,7 @@ test('record links are synced on record update', function () {
     ]);
 
     $this->actingAs($user)
-        ->putJson('/api/v1/records/' . $record->id, [
+        ->putJson('/api/v1/records/'.$record->id, [
             'data' => [
                 'author' => $targetRecord2->id,
             ],
@@ -118,7 +117,7 @@ test('record links support multi-reference fields', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     $referenceField = Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'authors',
@@ -163,7 +162,7 @@ test('deleting a referenced record is blocked with error counts', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     $referenceField = Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'author',
@@ -182,7 +181,7 @@ test('deleting a referenced record is blocked with error counts', function () {
         ]);
 
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/records/' . $targetRecord->id);
+        ->deleteJson('/api/v1/records/'.$targetRecord->id);
 
     $response->assertStatus(409)
         ->assertJson([
@@ -210,7 +209,7 @@ test('reverse-lookup endpoint returns records referencing a record', function ()
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     $referenceField = Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'author',
@@ -229,7 +228,7 @@ test('reverse-lookup endpoint returns records referencing a record', function ()
         ]);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records/' . $targetRecord->id . '/referencing-records');
+        ->getJson('/api/v1/records/'.$targetRecord->id.'/referencing-records');
 
     $response->assertStatus(200)
         ->assertJsonStructure([
@@ -263,7 +262,7 @@ test('reassign endpoint moves links from one record to another', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     $referenceField = Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'author',
@@ -290,7 +289,7 @@ test('reassign endpoint moves links from one record to another', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->postJson('/api/v1/records/' . $fromRecord->id . '/reassign-links', [
+        ->postJson('/api/v1/records/'.$fromRecord->id.'/reassign-links', [
             'to_record_id' => $toRecord->id,
         ]);
 
@@ -324,7 +323,7 @@ test('reassign endpoint requires records from same table', function () {
     $toRecord = Record::factory()->create(['table_id' => $table2->id]);
 
     $response = $this->actingAs($user)
-        ->postJson('/api/v1/records/' . $fromRecord->id . '/reassign-links', [
+        ->postJson('/api/v1/records/'.$fromRecord->id.'/reassign-links', [
             'to_record_id' => $toRecord->id,
         ]);
 

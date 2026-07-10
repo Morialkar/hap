@@ -19,7 +19,7 @@ const mockFields: BuilderField[] = [
     name: 'Titre',
     type: 'text',
     position: 0,
-    options: { placeholder: 'Titre de l\'œuvre', max_length: 100 },
+    options: { placeholder: "Titre de l'œuvre", max_length: 100 },
     validation: { required: true },
   },
   {
@@ -44,11 +44,7 @@ describe('RecordForm', () => {
   it('renders input fields with labels', () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <RecordForm
-          tableId="tbl-1"
-          fields={mockFields}
-          onCancel={vi.fn()}
-        />
+        <RecordForm tableId="tbl-1" fields={mockFields} onCancel={vi.fn()} />
       </QueryClientProvider>
     );
 
@@ -65,11 +61,7 @@ describe('RecordForm', () => {
   it('displays character counter when max_length option is defined', () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <RecordForm
-          tableId="tbl-1"
-          fields={[mockFields[0]]}
-          onCancel={vi.fn()}
-        />
+        <RecordForm tableId="tbl-1" fields={[mockFields[0]]} onCancel={vi.fn()} />
       </QueryClientProvider>
     );
 
@@ -81,11 +73,7 @@ describe('RecordForm', () => {
   it('renders boolean fields as toggle switches', () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <RecordForm
-          tableId="tbl-1"
-          fields={[mockFields[2]]}
-          onCancel={vi.fn()}
-        />
+        <RecordForm tableId="tbl-1" fields={[mockFields[2]]} onCancel={vi.fn()} />
       </QueryClientProvider>
     );
 

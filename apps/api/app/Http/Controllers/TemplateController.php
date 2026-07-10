@@ -23,6 +23,7 @@ class TemplateController extends Controller
     public function index(): JsonResponse
     {
         $templates = Template::orderBy('name')->get();
+
         return response()->json(TemplateResource::collection($templates));
     }
 

@@ -15,16 +15,16 @@ return new class extends Migration
             $table->ulid('from_record');
             $table->uuid('field_id');
             $table->ulid('to_record');
-            
+
             $table->foreign('from_record')->references('id')->on('records')->onDelete('cascade');
             $table->foreign('field_id')->references('id')->on('fields')->onDelete('cascade');
             $table->foreign('to_record')->references('id')->on('records')->onDelete('cascade');
-            
+
             $table->timestamps();
-            
+
             // Unique constraint to prevent duplicate links
             $table->unique(['from_record', 'field_id', 'to_record'], 'record_links_unique');
-            
+
             // Indexes for reverse lookups
             $table->index('to_record', 'record_links_to_record_index');
             $table->index('field_id', 'record_links_field_id_index');

@@ -27,7 +27,10 @@ function parseInputValue(type: FieldOptionSchema['type'], raw: string): unknown 
     case 'boolean':
       return raw === 'true';
     case 'string[]':
-      return raw.split('\n').map((v) => v.trim()).filter(Boolean);
+      return raw
+        .split('\n')
+        .map((v) => v.trim())
+        .filter(Boolean);
     case 'select':
     case 'table':
     case 'string':
@@ -274,7 +277,10 @@ export function FieldOptionPanel({ field, availableTables, onChange }: FieldOpti
               checked={field.is_filterable !== false}
               onChange={(e) => updateField({ is_filterable: e.target.checked })}
             />
-            <label className="form-check-label cursor-pointer text-muted small" htmlFor="field-is-filterable">
+            <label
+              className="form-check-label cursor-pointer text-muted small"
+              htmlFor="field-is-filterable"
+            >
               {t('fieldType.isFilterable')}
             </label>
           </div>

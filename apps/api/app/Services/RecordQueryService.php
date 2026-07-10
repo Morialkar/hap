@@ -2,10 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Database;
 use App\Models\Field;
 use App\Models\Record;
-use App\Models\RecordLink;
 use App\Models\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -21,17 +19,17 @@ class RecordQueryService
         $query = Record::where('table_id', $table->id);
 
         // Apply search
-        if (!empty($params['search'])) {
+        if (! empty($params['search'])) {
             $this->applySearch($query, $params['search']);
         }
 
         // Apply filters
-        if (!empty($params['filters'])) {
+        if (! empty($params['filters'])) {
             $this->applyFilters($query, $table, $params['filters']);
         }
 
         // Apply sorting
-        if (!empty($params['sort'])) {
+        if (! empty($params['sort'])) {
             $this->applySort($query, $table, $params['sort'], $params['sort_dir'] ?? 'asc');
         }
 
@@ -79,8 +77,8 @@ class RecordQueryService
     {
         foreach ($filters as $filter) {
             $field = $table->fields->where('name', $filter['field'])->first();
-            
-            if (!$field) {
+
+            if (! $field) {
                 continue;
             }
 
@@ -98,6 +96,7 @@ class RecordQueryService
         // Handle reference field filtering via record_links
         if ($field->type === 'reference') {
             $this->applyReferenceFilter($query, $field, $operator, $value);
+
             return;
         }
 
@@ -132,11 +131,11 @@ class RecordQueryService
         match ($operator) {
             'eq' => $query->whereHas('linksFrom', function ($q) use ($field, $targetIds) {
                 $q->where('field_id', $field->id)
-                  ->whereIn('to_record', $targetIds);
+                    ->whereIn('to_record', $targetIds);
             }),
             'neq' => $query->whereDoesntHave('linksFrom', function ($q) use ($field, $targetIds) {
                 $q->where('field_id', $field->id)
-                  ->whereIn('to_record', $targetIds);
+                    ->whereIn('to_record', $targetIds);
             }),
             default => null,
         };
@@ -148,10 +147,11 @@ class RecordQueryService
     private function applySort(Builder $query, Table $table, string $sortField, string $direction): void
     {
         $field = $table->fields->where('name', $sortField)->first();
-        
-        if (!$field) {
+
+        if (! $field) {
             // Default to created_at
             $query->orderBy('created_at', $direction);
+
             return;
         }
 
@@ -190,7 +190,7 @@ class RecordQueryService
     private function applyCursorPagination(Builder $query, string $cursor, string $sortField, string $direction): void
     {
         $cursorData = json_decode(base64_decode($cursor), true);
-        
+
         if ($direction === 'asc') {
             $query->where($sortField, '>', $cursorData[$sortField]);
         } else {
@@ -208,6 +208,7 @@ class RecordQueryService
         }
 
         $lastRecord = $records->last();
+
         return base64_encode(json_encode([$sortField => $lastRecord->$sortField]));
     }
 
@@ -221,6 +222,7 @@ class RecordQueryService
         }
 
         $firstRecord = $records->first();
+
         return base64_encode(json_encode([$sortField => $firstRecord->$sortField]));
     }
 }

@@ -15,13 +15,13 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('table_id');
             $table->foreign('table_id')->references('id')->on('tables')->onDelete('cascade');
-            
+
             $table->enum('change_type', ['add_field', 'delete_field', 'rename_field', 'change_type', 'reorder']);
             $table->json('details');
-            
+
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            
+
             $table->timestamps();
         });
     }

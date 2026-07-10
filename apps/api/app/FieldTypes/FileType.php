@@ -13,17 +13,17 @@ class FileType implements FieldTypeInterface
         $isMulti = ($options['multi'] ?? false) === true;
 
         if ($isMulti) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 return ['valid' => false, 'error' => 'Value must be an array for multi-file'];
             }
 
             foreach ($value as $item) {
-                if (!$this->isValidFileMetadata($item)) {
+                if (! $this->isValidFileMetadata($item)) {
                     return ['valid' => false, 'error' => 'Invalid file metadata structure'];
                 }
             }
         } else {
-            if (!$this->isValidFileMetadata($value)) {
+            if (! $this->isValidFileMetadata($value)) {
                 return ['valid' => false, 'error' => 'Invalid file metadata structure'];
             }
         }
@@ -40,11 +40,11 @@ class FileType implements FieldTypeInterface
         $isMulti = ($options['multi'] ?? false) === true;
 
         if ($isMulti) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 return null;
             }
 
-            return array_values(array_filter($value, fn($v) => $v !== null && $v !== ''));
+            return array_values(array_filter($value, fn ($v) => $v !== null && $v !== ''));
         }
 
         return $value;
@@ -62,7 +62,7 @@ class FileType implements FieldTypeInterface
 
     private function isValidFileMetadata(mixed $value): bool
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             return false;
         }
 

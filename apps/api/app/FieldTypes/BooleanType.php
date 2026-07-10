@@ -10,7 +10,7 @@ class BooleanType implements FieldTypeInterface
             return ['valid' => true, 'error' => null];
         }
 
-        if (!is_bool($value) && !in_array($value, [0, 1, '0', '1', true, false], true)) {
+        if (! is_bool($value) && ! in_array($value, [0, 1, '0', '1', true, false], true)) {
             return ['valid' => false, 'error' => 'Value must be a boolean'];
         }
 

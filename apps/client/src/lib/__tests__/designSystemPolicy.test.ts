@@ -67,16 +67,12 @@ describe('design system dependency policy', () => {
       ...readSourceFiles(join(repoRoot, 'apps/client/src')),
       ...readSourceFiles(join(repoRoot, 'packages/theme/src')),
     ];
-    const forbiddenPatterns = [
-      /\bmaxton\b/i,
-      /\bjQuery\b/,
-      /\$\(\s*['"`.[#a-zA-Z]/,
-    ];
+    const forbiddenPatterns = [/\bmaxton\b/i, /\bjQuery\b/, /\$\(\s*['"`.[#a-zA-Z]/];
 
     const violations = files.flatMap((file) =>
       forbiddenPatterns
         .filter((pattern) => pattern.test(file.contents))
-        .map((pattern) => `${relative(repoRoot, file.path)}: ${pattern}`),
+        .map((pattern) => `${relative(repoRoot, file.path)}: ${pattern}`)
     );
 
     expect(violations).toEqual([]);

@@ -25,7 +25,7 @@ test('field deletion without confirmation is blocked', function () {
     $field = Field::factory()->create(['table_id' => $table->id, 'name' => 'test_field']);
 
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/fields/' . $field->id);
+        ->deleteJson('/api/v1/fields/'.$field->id);
 
     $response->assertStatus(409)
         ->assertJson([
@@ -58,7 +58,7 @@ test('impact preview returns correct counts', function () {
     $field = Field::factory()->create(['table_id' => $table->id, 'name' => 'test_field']);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/fields/' . $field->id . '/preview-impact');
+        ->getJson('/api/v1/fields/'.$field->id.'/preview-impact');
 
     $response->assertStatus(200)
         ->assertJson([
@@ -86,7 +86,7 @@ test('confirmation token generation', function () {
     $field = Field::factory()->create(['table_id' => $table->id]);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/fields/' . $field->id . '/confirmation-token');
+        ->getJson('/api/v1/fields/'.$field->id.'/confirmation-token');
 
     $response->assertStatus(200)
         ->assertJsonStructure([
@@ -113,12 +113,12 @@ test('field deletion with valid confirmation token succeeds', function () {
 
     // Get confirmation token
     $tokenResponse = $this->actingAs($user)
-        ->getJson('/api/v1/fields/' . $field->id . '/confirmation-token');
+        ->getJson('/api/v1/fields/'.$field->id.'/confirmation-token');
     $token = $tokenResponse->json('token');
 
     // Delete with token
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/fields/' . $field->id, [
+        ->deleteJson('/api/v1/fields/'.$field->id, [
             'confirmation_token' => $token,
         ]);
 
@@ -141,7 +141,7 @@ test('field deletion with invalid confirmation token is blocked', function () {
     $field = Field::factory()->create(['table_id' => $table->id]);
 
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/fields/' . $field->id, [
+        ->deleteJson('/api/v1/fields/'.$field->id, [
             'confirmation_token' => 'invalid_token',
         ]);
 
@@ -165,12 +165,12 @@ test('schema change is logged after destructive change', function () {
 
     // Get confirmation token
     $tokenResponse = $this->actingAs($user)
-        ->getJson('/api/v1/fields/' . $field->id . '/confirmation-token');
+        ->getJson('/api/v1/fields/'.$field->id.'/confirmation-token');
     $token = $tokenResponse->json('token');
 
     // Delete with token
     $this->actingAs($user)
-        ->deleteJson('/api/v1/fields/' . $field->id, [
+        ->deleteJson('/api/v1/fields/'.$field->id, [
             'confirmation_token' => $token,
         ]);
 

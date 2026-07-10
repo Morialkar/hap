@@ -86,7 +86,7 @@ class RecordActivityService
         foreach ($newData as $field => $newValue) {
             $oldValue = $oldData[$field] ?? null;
 
-            if (!array_key_exists($field, $oldData)) {
+            if (! array_key_exists($field, $oldData)) {
                 $diff[$field] = [
                     'type' => 'added',
                     'new' => $newValue,
@@ -102,7 +102,7 @@ class RecordActivityService
 
         // Find removed fields
         foreach ($oldData as $field => $oldValue) {
-            if (!array_key_exists($field, $newData)) {
+            if (! array_key_exists($field, $newData)) {
                 $diff[$field] = [
                     'type' => 'removed',
                     'old' => $oldValue,

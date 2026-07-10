@@ -10,7 +10,7 @@ class DateType implements FieldTypeInterface
             return ['valid' => true, 'error' => null];
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return ['valid' => false, 'error' => 'Value must be a string'];
         }
 
@@ -20,9 +20,9 @@ class DateType implements FieldTypeInterface
         }
 
         // Validate partial date formats: YYYY, YYYY-MM, YYYY-MM-DD
-        if (!preg_match('/^\d{4}$/', $value) && 
-            !preg_match('/^\d{4}-\d{2}$/', $value) && 
-            !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+        if (! preg_match('/^\d{4}$/', $value) &&
+            ! preg_match('/^\d{4}-\d{2}$/', $value) &&
+            ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
             return ['valid' => false, 'error' => 'Date must be in YYYY, YYYY-MM, or YYYY-MM-DD format, or "unknown"'];
         }
 
@@ -37,11 +37,11 @@ class DateType implements FieldTypeInterface
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
             $month = (int) substr($value, 5, 2);
             $day = (int) substr($value, 8, 2);
-            
+
             if ($month < 1 || $month > 12) {
                 return ['valid' => false, 'error' => 'Invalid month'];
             }
-            
+
             if ($day < 1 || $day > 31) {
                 return ['valid' => false, 'error' => 'Invalid day'];
             }
@@ -56,7 +56,7 @@ class DateType implements FieldTypeInterface
             return null;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return null;
         }
 

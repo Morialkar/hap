@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
         Route::model('table', Table::class);
         Route::model('field', Field::class);
         Route::model('record', Record::class);
-        
+
         // Custom binding for soft-deleted records
         Route::bind('recordWithTrashed', function ($value) {
             return Record::withTrashed()->findOrFail($value);

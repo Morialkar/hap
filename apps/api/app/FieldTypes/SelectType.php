@@ -18,17 +18,17 @@ class SelectType implements FieldTypeInterface
         }
 
         if ($isMulti) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 return ['valid' => false, 'error' => 'Value must be an array for multi-select'];
             }
 
             foreach ($value as $item) {
-                if (!in_array($item, $allowedValues, true)) {
+                if (! in_array($item, $allowedValues, true)) {
                     return ['valid' => false, 'error' => "Invalid option: {$item}"];
                 }
             }
         } else {
-            if (!in_array($value, $allowedValues, true)) {
+            if (! in_array($value, $allowedValues, true)) {
                 return ['valid' => false, 'error' => "Invalid option: {$value}"];
             }
         }
@@ -45,11 +45,11 @@ class SelectType implements FieldTypeInterface
         $isMulti = ($options['multi'] ?? false) === true;
 
         if ($isMulti) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 return null;
             }
 
-            return array_values(array_filter($value, fn($v) => $v !== null && $v !== ''));
+            return array_values(array_filter($value, fn ($v) => $v !== null && $v !== ''));
         }
 
         return $value;

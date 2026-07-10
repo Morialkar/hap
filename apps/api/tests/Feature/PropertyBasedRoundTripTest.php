@@ -13,7 +13,7 @@ use Tests\Helpers\PropertyTestGenerator;
 uses(RefreshDatabase::class);
 
 test('property-based round-trip test for field types', function () {
-    $generator = new PropertyTestGenerator();
+    $generator = new PropertyTestGenerator;
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create();
     WorkspaceMember::factory()->create([
@@ -29,7 +29,7 @@ test('property-based round-trip test for field types', function () {
     for ($i = 0; $i < 500; $i++) {
         try {
             $fieldDefinition = $generator->generateFieldDefinition();
-            
+
             $field = Field::create([
                 'table_id' => $table->id,
                 'name' => $fieldDefinition['name'],
@@ -40,7 +40,7 @@ test('property-based round-trip test for field types', function () {
             ]);
 
             $originalValue = $generator->generateFieldValue($fieldDefinition);
-            
+
             $record = Record::create([
                 'table_id' => $table->id,
                 'data' => [$fieldDefinition['name'] => $originalValue],
@@ -56,7 +56,7 @@ test('property-based round-trip test for field types', function () {
             // Clean up for next iteration
             $record->delete();
             $field->delete();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Skip iteration if encoding error occurs
             continue;
         }
@@ -64,7 +64,7 @@ test('property-based round-trip test for field types', function () {
 })->group('property-based');
 
 test('property-based round-trip test with partial dates', function () {
-    $generator = new PropertyTestGenerator();
+    $generator = new PropertyTestGenerator;
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create();
     WorkspaceMember::factory()->create([
@@ -113,7 +113,7 @@ test('property-based round-trip test with partial dates', function () {
 })->group('property-based');
 
 test('property-based round-trip test with accents', function () {
-    $generator = new PropertyTestGenerator();
+    $generator = new PropertyTestGenerator;
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create();
     WorkspaceMember::factory()->create([
@@ -175,7 +175,7 @@ test('property-based round-trip test with accents', function () {
 })->group('property-based');
 
 test('property-based round-trip test with multi-values', function () {
-    $generator = new PropertyTestGenerator();
+    $generator = new PropertyTestGenerator;
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create();
     WorkspaceMember::factory()->create([
@@ -222,7 +222,7 @@ test('property-based round-trip test with multi-values', function () {
 })->group('property-based');
 
 test('property-based round-trip test with max-length boundaries', function () {
-    $generator = new PropertyTestGenerator();
+    $generator = new PropertyTestGenerator;
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create();
     WorkspaceMember::factory()->create([
@@ -264,7 +264,7 @@ test('property-based round-trip test with max-length boundaries', function () {
 })->group('property-based');
 
 test('property-based round-trip test with nasty strings', function () {
-    $generator = new PropertyTestGenerator();
+    $generator = new PropertyTestGenerator;
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create();
     WorkspaceMember::factory()->create([
@@ -288,7 +288,7 @@ test('property-based round-trip test with nasty strings', function () {
     // Test 100 nasty strings
     for ($i = 0; $i < 100; $i++) {
         $nastyString = $generator->generateNastyString();
-        
+
         $record = Record::create([
             'table_id' => $table->id,
             'data' => ['dangerous_field' => $nastyString],

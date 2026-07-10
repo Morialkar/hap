@@ -14,7 +14,7 @@ class NumberType implements FieldTypeInterface
         $min = $options['min'] ?? null;
         $max = $options['max'] ?? null;
 
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return ['valid' => false, 'error' => 'Value must be a number'];
         }
 
@@ -28,7 +28,7 @@ class NumberType implements FieldTypeInterface
             return ['valid' => false, 'error' => "Value must be at most {$max}"];
         }
 
-        if (!$isDecimal && !is_int($value * 1)) {
+        if (! $isDecimal && ! is_int($value * 1)) {
             return ['valid' => false, 'error' => 'Value must be an integer'];
         }
 
@@ -43,7 +43,7 @@ class NumberType implements FieldTypeInterface
 
         $isDecimal = ($options['decimal'] ?? false) === true;
 
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return null;
         }
 

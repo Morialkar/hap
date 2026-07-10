@@ -37,7 +37,11 @@ test('all appearance and accent combinations meet contrast requirements', async 
   const failures = await page.evaluate(
     ({ testedAppearances, testedAccents }) => {
       function luminance(color: string) {
-        const channels = color.match(/[\d.]+/g)?.slice(0, 3).map(Number) ?? [];
+        const channels =
+          color
+            .match(/[\d.]+/g)
+            ?.slice(0, 3)
+            .map(Number) ?? [];
         const normalizedChannels = color.startsWith('color(srgb')
           ? channels.map((channel) => channel * 255)
           : channels;
@@ -113,7 +117,7 @@ test('all appearance and accent combinations meet contrast requirements', async 
       surfaceProbe.remove();
       return results;
     },
-    { testedAppearances: appearances, testedAccents: accents },
+    { testedAppearances: appearances, testedAccents: accents }
   );
 
   expect(failures).toEqual([]);

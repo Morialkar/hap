@@ -3,8 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Workspace;
+use App\Models\WorkspaceMember;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,14 +25,14 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create a default workspace for local development
-        $workspace = new \App\Models\Workspace();
-        $workspace->id = (string) \Illuminate\Support\Str::uuid();
+        $workspace = new Workspace;
+        $workspace->id = (string) Str::uuid();
         $workspace->name = 'Mon espace de travail';
         $workspace->save();
 
         // Add the test user as the owner of this workspace
-        $member = new \App\Models\WorkspaceMember();
-        $member->id = (string) \Illuminate\Support\Str::uuid();
+        $member = new WorkspaceMember;
+        $member->id = (string) Str::uuid();
         $member->workspace_id = $workspace->id;
         $member->user_id = $user->id;
         $member->role = 'owner';

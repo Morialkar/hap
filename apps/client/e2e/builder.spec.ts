@@ -1,26 +1,54 @@
 import { test, expect } from '@playwright/test';
 
-const mockUser = { id: '00000000-0000-0000-0000-000000000000', name: 'Test User', email: 'test@example.com' };
+const mockUser = {
+  id: '00000000-0000-0000-0000-000000000000',
+  name: 'Test User',
+  email: 'test@example.com',
+};
 
 let databases: Array<{ id: string; name: string; workspace_id: string }> = [];
 let tables: Array<{ id: string; name: string; database_id: string }> = [];
-let fields: Array<{ id: string; name: string; type: string; position: number; options: Record<string, unknown>; validation: Record<string, unknown>; table_id: string }> = [];
+let fields: Array<{
+  id: string;
+  name: string;
+  type: string;
+  position: number;
+  options: Record<string, unknown>;
+  validation: Record<string, unknown>;
+  table_id: string;
+}> = [];
 
 function mockRoutes(page: import('@playwright/test').Page) {
   page.route('**/api/v1/user', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockUser) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(mockUser),
+    });
   });
 
   page.route('**/api/v1/databases**', async (route) => {
     const req = route.request();
     if (req.method() === 'POST') {
       const body = await req.postDataJSON();
-      const db = { id: `db-${Date.now()}`, name: body.name, workspace_id: body.workspace_id || 'workspace-1' };
+      const db = {
+        id: `db-${Date.now()}`,
+        name: body.name,
+        workspace_id: body.workspace_id || 'workspace-1',
+      };
       databases.push(db);
-      await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(db) });
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(db),
+      });
       return;
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(databases) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(databases),
+    });
   });
 
   page.route('**/api/v1/tables**', async (route) => {
@@ -29,10 +57,18 @@ function mockRoutes(page: import('@playwright/test').Page) {
       const body = await req.postDataJSON();
       const table = { id: `tbl-${Date.now()}`, name: body.name, database_id: body.database_id };
       tables.push(table);
-      await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(table) });
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(table),
+      });
       return;
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(tables) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(tables),
+    });
   });
 
   page.route('**/api/v1/fields**', async (route) => {
@@ -41,10 +77,18 @@ function mockRoutes(page: import('@playwright/test').Page) {
       const body = await req.postDataJSON();
       const field = { id: `fld-${Date.now()}`, ...body };
       fields.push(field);
-      await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(field) });
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(field),
+      });
       return;
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fields) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(fields),
+    });
   });
 
   page.route('**/api/v1/fields/*', async (route) => {
@@ -63,15 +107,27 @@ function mockRoutes(page: import('@playwright/test').Page) {
     } else {
       fields.push({ id, ...body });
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fields.find((f) => f.id === id)) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(fields.find((f) => f.id === id)),
+    });
   });
 
   page.route('**/api/v1/fields/*/preview-impact', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ affected_records: 0, orphaned_values: 0, coercion_required: false }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ affected_records: 0, orphaned_values: 0, coercion_required: false }),
+    });
   });
 
   page.route('**/api/v1/fields/*/confirmation-token', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token: 'token-123' }) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ token: 'token-123' }),
+    });
   });
 }
 
@@ -105,7 +161,7 @@ test.describe('Structure Builder', () => {
     await addText.click();
 
     await page.fill('#field-name', 'Titre');
-    await page.fill('#option-placeholder', 'Titre de l\'œuvre');
+    await page.fill('#option-placeholder', "Titre de l'œuvre");
     await page.fill('#option-max_length', '255');
 
     await page.click('button:has-text("Enregistrer")');
@@ -129,7 +185,11 @@ test.describe('Structure Builder', () => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ affected_records: 12, orphaned_values: 3, coercion_required: false }),
+        body: JSON.stringify({
+          affected_records: 12,
+          orphaned_values: 3,
+          coercion_required: false,
+        }),
       });
     });
 

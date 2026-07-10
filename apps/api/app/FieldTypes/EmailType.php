@@ -10,11 +10,11 @@ class EmailType implements FieldTypeInterface
             return ['valid' => true, 'error' => null];
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return ['valid' => false, 'error' => 'Value must be a string'];
         }
 
-        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+        if (! filter_var($value, FILTER_VALIDATE_EMAIL)) {
             return ['valid' => false, 'error' => 'Value must be a valid email address'];
         }
 
@@ -27,7 +27,7 @@ class EmailType implements FieldTypeInterface
             return null;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return null;
         }
 

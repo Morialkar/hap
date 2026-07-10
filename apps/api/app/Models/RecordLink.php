@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class RecordLink extends Model
 {
     public $incrementing = false;
+
     protected $primaryKey = null; // Composite key
 
     protected $fillable = [

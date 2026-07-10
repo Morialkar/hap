@@ -3,7 +3,7 @@
 use App\FieldTypes\NumberType;
 
 test('validates null value', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->validate(null);
 
     expect($result['valid'])->toBeTrue();
@@ -11,7 +11,7 @@ test('validates null value', function () {
 });
 
 test('validates integer', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->validate(42);
 
     expect($result['valid'])->toBeTrue();
@@ -19,7 +19,7 @@ test('validates integer', function () {
 });
 
 test('validates decimal when decimal option is true', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->validate(3.14, ['decimal' => true]);
 
     expect($result['valid'])->toBeTrue();
@@ -27,7 +27,7 @@ test('validates decimal when decimal option is true', function () {
 });
 
 test('rejects decimal when decimal option is false', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->validate(3.14, ['decimal' => false]);
 
     expect($result['valid'])->toBeFalse();
@@ -35,7 +35,7 @@ test('rejects decimal when decimal option is false', function () {
 });
 
 test('rejects non-numeric value', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->validate('not a number');
 
     expect($result['valid'])->toBeFalse();
@@ -43,7 +43,7 @@ test('rejects non-numeric value', function () {
 });
 
 test('enforces minimum value', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->validate(5, ['min' => 10]);
 
     expect($result['valid'])->toBeFalse();
@@ -51,7 +51,7 @@ test('enforces minimum value', function () {
 });
 
 test('enforces maximum value', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->validate(15, ['max' => 10]);
 
     expect($result['valid'])->toBeFalse();
@@ -59,35 +59,35 @@ test('enforces maximum value', function () {
 });
 
 test('allows value within min and max', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->validate(5, ['min' => 0, 'max' => 10]);
 
     expect($result['valid'])->toBeTrue();
 });
 
 test('normalizes null to null', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->normalize(null);
 
     expect($result)->toBeNull();
 });
 
 test('normalizes string number to integer', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->normalize('42');
 
     expect($result)->toBe(42);
 });
 
 test('normalizes string number to decimal when decimal option is true', function () {
-    $type = new NumberType();
+    $type = new NumberType;
     $result = $type->normalize('3.14', ['decimal' => true]);
 
     expect($result)->toBe(3.14);
 });
 
 test('returns correct type identifier', function () {
-    $type = new NumberType();
+    $type = new NumberType;
 
     expect($type->getType())->toBe('number');
 });

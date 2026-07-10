@@ -64,12 +64,12 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   const [selectedViewId, setSelectedViewId] = useState<string | null>(null);
   const [newViewName, setNewViewName] = useState('');
   const [columnCount, setColumnCount] = useState<number>(1);
-  
+
   // Unified state for all drag-and-drop containers
   const [layoutItems, setLayoutItems] = useState<Record<string, string[]>>({
     unassigned: [],
   });
-  
+
   // Dragging states
   const [activeId, setActiveId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -112,15 +112,13 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
 
     if (config && config.columns && typeof config.columnCount === 'number') {
       setColumnCount(config.columnCount);
-      
+
       const newItems: Record<string, string[]> = {
         unassigned: [],
       };
 
       // Load columns
-      const loadedColumns = config.columns.map((col) =>
-        col.filter((id) => fieldIdsMap.has(id))
-      );
+      const loadedColumns = config.columns.map((col) => col.filter((id) => fieldIdsMap.has(id)));
 
       // Pad columns to match current columnCount
       while (loadedColumns.length < config.columnCount) {
@@ -136,9 +134,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
 
       // Find any fields in table that are not placed in columns
       const placedIds = new Set(loadedColumns.flat());
-      newItems.unassigned = fields
-        .map((f) => f.id)
-        .filter((id) => !placedIds.has(id));
+      newItems.unassigned = fields.map((f) => f.id).filter((id) => !placedIds.has(id));
 
       setLayoutItems(newItems);
     } else {
@@ -155,7 +151,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
     setColumnCount(newCount);
     setLayoutItems((prev) => {
       const next = { ...prev };
-      
+
       // Ensure all columns exist up to newCount
       for (let i = 0; i < newCount; i++) {
         if (!next[`column-${i}`]) {
@@ -284,8 +280,8 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
         [overContainer]: [
           ...overItems.slice(0, newIndex),
           activeIdStr,
-          ...overItems.slice(newIndex)
-        ]
+          ...overItems.slice(newIndex),
+        ],
       };
     });
   };
@@ -323,20 +319,20 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
         const activeItems = prev[activeContainer] || [];
         const overItems = prev[overContainer] || [];
         const overIndex = overItems.indexOf(overIdStr);
-        
+
         let newIndex = overItems.length;
         if (overIndex !== -1) {
           newIndex = overIndex;
         }
-        
+
         return {
           ...prev,
           [activeContainer]: activeItems.filter((item) => item !== activeIdStr),
           [overContainer]: [
             ...overItems.slice(0, newIndex),
             activeIdStr,
-            ...overItems.slice(newIndex)
-          ]
+            ...overItems.slice(newIndex),
+          ],
         };
       });
     }
@@ -481,7 +477,10 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                     onChange={(e) => toggleDefaultMutation.mutate(e.target.checked)}
                     disabled={toggleDefaultMutation.isPending}
                   />
-                  <label className="form-check-label text-muted small cursor-pointer" htmlFor="isDefaultViewSwitch">
+                  <label
+                    className="form-check-label text-muted small cursor-pointer"
+                    htmlFor="isDefaultViewSwitch"
+                  >
                     {t('layout.isDefault')}
                   </label>
                 </div>
@@ -512,7 +511,11 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                     </div>
                     <div className="card-body p-2" style={{ minHeight: '400px' }}>
                       <SortableContext items={unassigned} strategy={verticalListSortingStrategy}>
-                        <DroppableColumn id="unassigned" className="vstack gap-2 h-100" style={{ minHeight: '380px' }}>
+                        <DroppableColumn
+                          id="unassigned"
+                          className="vstack gap-2 h-100"
+                          style={{ minHeight: '380px' }}
+                        >
                           {unassigned.length === 0 ? (
                             <div className="text-center py-4 text-muted small">
                               {t('layout.unassignedFields.empty')}
@@ -544,9 +547,15 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                             </div>
                             <div
                               className="card-body p-2"
-                              style={{ minHeight: '350px', backgroundColor: 'var(--bs-light-bg-subtle)' }}
+                              style={{
+                                minHeight: '350px',
+                                backgroundColor: 'var(--bs-light-bg-subtle)',
+                              }}
                             >
-                              <SortableContext items={colItems} strategy={verticalListSortingStrategy}>
+                              <SortableContext
+                                items={colItems}
+                                strategy={verticalListSortingStrategy}
+                              >
                                 <DroppableColumn
                                   id={`column-${colIdx}`}
                                   className="vstack gap-2 h-100"
@@ -570,7 +579,9 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                                               const unassignedItems = prev.unassigned || [];
                                               return {
                                                 ...prev,
-                                                [activeContainer]: activeItems.filter((item) => item !== id),
+                                                [activeContainer]: activeItems.filter(
+                                                  (item) => item !== id
+                                                ),
                                                 unassigned: [...unassignedItems, id],
                                               };
                                             });

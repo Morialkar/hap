@@ -54,7 +54,7 @@ test('user can update table is_front_facing', function () {
     $table = Table::factory()->create(['database_id' => $database->id, 'is_front_facing' => false]);
 
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/tables/' . $table->id, [
+        ->putJson('/api/v1/tables/'.$table->id, [
             'is_front_facing' => true,
         ]);
 

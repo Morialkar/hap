@@ -15,13 +15,13 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->uuid('table_id');
             $table->foreign('table_id')->references('id')->on('tables')->onDelete('cascade');
-            
+
             $table->jsonb('data');
             $table->bigInteger('version')->default(1);
-            
+
             $table->timestamps();
             $table->softDeletes();
-            
+
             // GIN index for JSONB queries
             $table->index('data', 'records_data_gin', 'gin');
         });

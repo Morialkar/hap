@@ -132,7 +132,8 @@ function NavigationModePage() {
   const isLoading =
     databaseQuery.isLoading ||
     tablesQuery.isLoading ||
-    (!!selectedTableId && (fieldsQuery.isLoading || viewsQuery.isLoading || recordsQuery.isLoading));
+    (!!selectedTableId &&
+      (fieldsQuery.isLoading || viewsQuery.isLoading || recordsQuery.isLoading));
 
   // Handlers for sorting/filtering/layout
   const handleTableChange = (tableId: string) => {
@@ -203,7 +204,7 @@ function NavigationModePage() {
       } else {
         updated = [...current, value];
       }
-      
+
       const next = { ...prev };
       if (updated.length === 0) {
         delete next[fieldName];
@@ -220,7 +221,7 @@ function NavigationModePage() {
 
   // Maps for dynamic layout field resolution
   const fields = useMemo(() => fieldsQuery.data || [], [fieldsQuery.data]);
-  
+
   const views = viewsQuery.data || [];
   const cardViews = useMemo(() => views.filter((v) => v.type === 'card' || !v.type), [views]);
 
@@ -258,7 +259,11 @@ function NavigationModePage() {
 
   const filterableFields = useMemo(() => {
     return fields.filter(
-      (f) => f.type !== 'image' && f.type !== 'file' && f.type !== 'long_text' && f.is_filterable !== false
+      (f) =>
+        f.type !== 'image' &&
+        f.type !== 'file' &&
+        f.type !== 'long_text' &&
+        f.is_filterable !== false
     );
   }, [fields]);
 
@@ -378,10 +383,7 @@ function NavigationModePage() {
   if (frontFacingTables.length === 0) {
     return (
       <div>
-        <PageHeader
-          pretitle={databaseQuery.data?.name}
-          title={t('nav.navigation')}
-        />
+        <PageHeader pretitle={databaseQuery.data?.name} title={t('nav.navigation')} />
         <SurfaceCard className="p-5">
           <EmptyState
             icon="folders-off"
@@ -389,10 +391,7 @@ function NavigationModePage() {
             description={t('navigation.emptyState.description')}
           />
           <div className="text-center mt-3">
-            <Link
-              to="/workspaces"
-              className="btn btn-primary"
-            >
+            <Link to="/workspaces" className="btn btn-primary">
               <i className="ti ti-folders me-1" aria-hidden="true" />
               {t('nav.workspaces')}
             </Link>
@@ -407,17 +406,17 @@ function NavigationModePage() {
     columnsCount === 3
       ? 'col-lg-4 col-md-6 col-12'
       : columnsCount === 2
-      ? 'col-md-6 col-12'
-      : 'col-12';
+        ? 'col-md-6 col-12'
+        : 'col-12';
 
   const colWidthClass =
     columnsLayout.length === 4
       ? 'col-md-3 col-6'
       : columnsLayout.length === 3
-      ? 'col-md-4 col-12'
-      : columnsLayout.length === 2
-      ? 'col-md-6 col-12'
-      : 'col-12';
+        ? 'col-md-4 col-12'
+        : columnsLayout.length === 2
+          ? 'col-md-6 col-12'
+          : 'col-12';
 
   const records = filteredRecords;
 
@@ -454,10 +453,7 @@ function NavigationModePage() {
         }
       `}</style>
 
-      <PageHeader
-        pretitle={databaseQuery.data?.name}
-        title={t('nav.navigation')}
-      />
+      <PageHeader pretitle={databaseQuery.data?.name} title={t('nav.navigation')} />
 
       {/* Tabs for Front-Facing Tables */}
       <ul className="nav nav-tabs hap-navigation-tabs mb-4 border-bottom">
@@ -529,16 +525,17 @@ function NavigationModePage() {
                   }
                   title={t(`navigation.sortDir.${sortDir}`)}
                 >
-                  <i className={`ti ti-sort-${sortDir === 'asc' ? 'ascending' : 'descending'}`} aria-hidden="true" />
+                  <i
+                    className={`ti ti-sort-${sortDir === 'asc' ? 'ascending' : 'descending'}`}
+                    aria-hidden="true"
+                  />
                 </button>
               )}
             </div>
 
             {/* Layout Selector */}
             <div className="col-md-3 d-flex align-items-center gap-2">
-              <label className="form-label mb-0 text-nowrap small text-muted">
-                Disposition :
-              </label>
+              <label className="form-label mb-0 text-nowrap small text-muted">Disposition :</label>
               <select
                 className="form-select form-select-sm"
                 value={activeView?.id || ''}
@@ -641,7 +638,7 @@ function NavigationModePage() {
                         style={{ transition: 'transform 0.2s' }}
                       />
                     </div>
-                    
+
                     {!isCollapsed && (
                       <div className="d-flex flex-column gap-1 mt-2">
                         {sortedValues.map(([val, count]) => {
@@ -658,11 +655,21 @@ function NavigationModePage() {
                                   checked={isChecked}
                                   onChange={() => toggleFilterValue(field.name, val)}
                                 />
-                                <span className="text-body text-truncate" style={{ maxWidth: '140px' }} title={val === '--' ? 'Sans valeur' : val}>
+                                <span
+                                  className="text-body text-truncate"
+                                  style={{ maxWidth: '140px' }}
+                                  title={val === '--' ? 'Sans valeur' : val}
+                                >
                                   {field.type === 'reference' ? (
-                                    <ReferenceLabel targetRecordId={val} fallback={val} className="" />
+                                    <ReferenceLabel
+                                      targetRecordId={val}
+                                      fallback={val}
+                                      className=""
+                                    />
+                                  ) : val === '--' ? (
+                                    'Sans valeur'
                                   ) : (
-                                    val === '--' ? 'Sans valeur' : val
+                                    val
                                   )}
                                 </span>
                               </div>
@@ -718,7 +725,9 @@ function NavigationModePage() {
                                       <div className="small text-muted fw-bold mb-1 text-uppercase hap-fiche-field-header py-1">
                                         {fieldDef.name}
                                       </div>
-                                      <div className="lh-sm mt-1">{renderFieldValue(fieldDef.name, rec.data || {})}</div>
+                                      <div className="lh-sm mt-1">
+                                        {renderFieldValue(fieldDef.name, rec.data || {})}
+                                      </div>
                                     </div>
                                   );
                                 })}
@@ -728,22 +737,22 @@ function NavigationModePage() {
                         </div>
                       </div>
                       {/* Footer linking back to full record detail table */}
-                    <div className="card-footer bg-light-subtle py-2 px-3 border-top-0 d-flex justify-content-between align-items-center">
-                      <span className="text-muted small">v{rec.version}</span>
-                      <Link
-                        to="/tables/$databaseId/$tableId"
-                        params={{ databaseId, tableId: selectedTable!.id }}
-                        search={{ action: 'edit', recordId: rec.id }}
-                        className="btn btn-xs btn-link p-0 text-decoration-none"
-                      >
-                        <i className="ti ti-edit me-1" />
-                        Éditer la fiche
-                      </Link>
+                      <div className="card-footer bg-light-subtle py-2 px-3 border-top-0 d-flex justify-content-between align-items-center">
+                        <span className="text-muted small">v{rec.version}</span>
+                        <Link
+                          to="/tables/$databaseId/$tableId"
+                          params={{ databaseId, tableId: selectedTable!.id }}
+                          search={{ action: 'edit', recordId: rec.id }}
+                          className="btn btn-xs btn-link p-0 text-decoration-none"
+                        >
+                          <i className="ti ti-edit me-1" />
+                          Éditer la fiche
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
             </div>
           )}
         </div>
@@ -759,7 +768,10 @@ function NavigationModePage() {
           onClick={() => setActiveLightboxHash(null)}
           data-testid="lightbox"
         >
-          <div className="modal-dialog modal-dialog-centered modal-xl" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-dialog modal-dialog-centered modal-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-content border-0 bg-transparent text-center position-relative">
               <button
                 type="button"
@@ -820,20 +832,36 @@ function ReferenceLabel({
 
   // Find the field of type 'title'
   const titleField = fields.find((f) => f.type === 'title');
-  if (titleField && rData[titleField.name] !== undefined && rData[titleField.name] !== null && rData[titleField.name] !== '') {
+  if (
+    titleField &&
+    rData[titleField.name] !== undefined &&
+    rData[titleField.name] !== null &&
+    rData[titleField.name] !== ''
+  ) {
     return <span className={className}>{String(rData[titleField.name])}</span>;
   }
 
   // Find the first field (by position or just first in list)
   const sortedFields = [...fields].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   const firstField = sortedFields[0];
-  if (firstField && rData[firstField.name] !== undefined && rData[firstField.name] !== null && rData[firstField.name] !== '') {
+  if (
+    firstField &&
+    rData[firstField.name] !== undefined &&
+    rData[firstField.name] !== null &&
+    rData[firstField.name] !== ''
+  ) {
     return <span className={className}>{String(rData[firstField.name])}</span>;
   }
 
   // Fallback if no fields exist or values are empty
   const defaultLabel =
-    rData.name || rData.title || rData.nom || rData.titre || Object.values(rData)[0] || fallback || targetRecordId;
+    rData.name ||
+    rData.title ||
+    rData.nom ||
+    rData.titre ||
+    Object.values(rData)[0] ||
+    fallback ||
+    targetRecordId;
 
   return <span className={className}>{String(defaultLabel)}</span>;
 }

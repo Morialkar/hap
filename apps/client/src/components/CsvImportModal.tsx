@@ -116,8 +116,8 @@ export function CsvImportModal({ tableId, fields, onClose, onImported }: CsvImpo
                   field_type: 'text',
                 },
           ];
-        }),
-      ),
+        })
+      )
     );
   };
 
@@ -139,7 +139,12 @@ export function CsvImportModal({ tableId, fields, onClose, onImported }: CsvImpo
         : null;
 
   return (
-    <div className="modal modal-blur d-block" role="dialog" aria-modal="true" aria-labelledby="csv-import-title">
+    <div
+      className="modal modal-blur d-block"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="csv-import-title"
+    >
       <div className="modal-dialog modal-xl modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
@@ -209,7 +214,9 @@ export function CsvImportModal({ tableId, fields, onClose, onImported }: CsvImpo
                                 className="form-select"
                                 value={config.field}
                                 data-testid={`csv-map-field-${header}`}
-                                onChange={(event) => updateMapping(header, { field: event.target.value })}
+                                onChange={(event) =>
+                                  updateMapping(header, { field: event.target.value })
+                                }
                               >
                                 {fields.map((field) => (
                                   <option key={field.id} value={field.name}>
@@ -222,7 +229,9 @@ export function CsvImportModal({ tableId, fields, onClose, onImported }: CsvImpo
                                 type="text"
                                 className="form-control"
                                 value={config.field}
-                                onChange={(event) => updateMapping(header, { field: event.target.value })}
+                                onChange={(event) =>
+                                  updateMapping(header, { field: event.target.value })
+                                }
                               />
                             ) : (
                               <span className="text-muted">--</span>
@@ -234,16 +243,18 @@ export function CsvImportModal({ tableId, fields, onClose, onImported }: CsvImpo
                                 className="form-select"
                                 value={config.field_type ?? 'text'}
                                 onChange={(event) =>
-                                  updateMapping(header, { field_type: event.target.value as FieldType })
+                                  updateMapping(header, {
+                                    field_type: event.target.value as FieldType,
+                                  })
                                 }
                               >
-                                {FIELD_TYPE_ORDER.filter((type) => !['image', 'file', 'reference'].includes(type)).map(
-                                  (type) => (
-                                    <option key={type} value={type}>
-                                      {type}
-                                    </option>
-                                  ),
-                                )}
+                                {FIELD_TYPE_ORDER.filter(
+                                  (type) => !['image', 'file', 'reference'].includes(type)
+                                ).map((type) => (
+                                  <option key={type} value={type}>
+                                    {type}
+                                  </option>
+                                ))}
                               </select>
                             ) : (
                               <span className="text-muted">--</span>
@@ -268,7 +279,9 @@ export function CsvImportModal({ tableId, fields, onClose, onImported }: CsvImpo
                                     className="form-check-input"
                                     checked={config.match_or_create ?? false}
                                     onChange={(event) =>
-                                      updateMapping(header, { match_or_create: event.target.checked })
+                                      updateMapping(header, {
+                                        match_or_create: event.target.checked,
+                                      })
                                     }
                                   />
                                   <span className="form-check-label">Créer</span>

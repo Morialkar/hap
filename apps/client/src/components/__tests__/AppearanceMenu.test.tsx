@@ -32,7 +32,7 @@ describe('AppearanceMenu', () => {
     render(
       <ThemeProvider>
         <AppearanceMenu />
-      </ThemeProvider>,
+      </ThemeProvider>
     );
 
     fireEvent.click(screen.getByTestId('appearance-menu-toggle'));
@@ -51,7 +51,7 @@ describe('AppearanceMenu', () => {
     render(
       <ThemeProvider>
         <AppearanceMenu />
-      </ThemeProvider>,
+      </ThemeProvider>
     );
 
     const trigger = screen.getByTestId('appearance-menu-toggle');

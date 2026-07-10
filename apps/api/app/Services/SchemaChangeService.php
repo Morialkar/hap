@@ -48,7 +48,7 @@ class SchemaChangeService
             'email' => ['text'],
         ];
 
-        return !in_array($newType, $compatible[$oldType] ?? []);
+        return ! in_array($newType, $compatible[$oldType] ?? []);
     }
 
     /**
@@ -63,13 +63,13 @@ class SchemaChangeService
         ];
 
         // Check if records table exists
-        if (!Schema::hasTable('records')) {
+        if (! Schema::hasTable('records')) {
             return $impact;
         }
 
         // Count records with values in this field
         $fieldName = $field->name;
-        
+
         $affectedRecords = DB::table('records')
             ->where('table_id', $field->table_id)
             ->whereNotNull("data->{$fieldName}")
@@ -93,7 +93,8 @@ class SchemaChangeService
     public function validateConfirmationToken(Table $table, string $token): bool
     {
         // Token should be a hash of table_id + timestamp
-        $expected = hash('sha256', $table->id . date('Y-m-d'));
+        $expected = hash('sha256', $table->id.date('Y-m-d'));
+
         return hash_equals($expected, $token);
     }
 
@@ -102,7 +103,7 @@ class SchemaChangeService
      */
     public function generateConfirmationToken(Table $table): string
     {
-        return hash('sha256', $table->id . date('Y-m-d'));
+        return hash('sha256', $table->id.date('Y-m-d'));
     }
 
     /**
@@ -128,7 +129,7 @@ class SchemaChangeService
     public function retainOrphanedValues(Field $field): void
     {
         // Check if records table exists
-        if (!Schema::hasTable('records')) {
+        if (! Schema::hasTable('records')) {
             return;
         }
 

@@ -468,4 +468,3 @@ export const FIELD_TYPE_ORDER: FieldType[] = [
   'url',
   'email',
 ];
-

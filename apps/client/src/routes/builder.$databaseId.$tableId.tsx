@@ -183,110 +183,129 @@ function StructureBuilder() {
     }
   }, [fieldsQuery.data]);
 
-  const previewTypeChange = useCallback(async (field: BuilderField) => {
-    if (!field.persistedId) return;
+  const previewTypeChange = useCallback(
+    async (field: BuilderField) => {
+      if (!field.persistedId) return;
 
-    try {
-      const impact = await apiClient.get<SchemaImpact>(`/fields/${field.persistedId}/preview-impact`);
-
-      if (impact.affected_records > 0) {
-        const token = await apiClient.get<{ token: string }>(
-          `/fields/${field.persistedId}/confirmation-token`
+      try {
+        const impact = await apiClient.get<SchemaImpact>(
+          `/fields/${field.persistedId}/preview-impact`
         );
 
-        setPendingAction({
-          fieldId: field.id,
-          action: 'type-change',
-          newType: field.type,
-          token: token.token,
-          impact,
-          title: t('builder.destructive.title'),
-          message: t('builder.destructive.typeChangeMessage'),
-        });
-      }
-    } catch {
-      // Non-destructive or preview unavailable; allow change.
-    }
-  }, [t]);
+        if (impact.affected_records > 0) {
+          const token = await apiClient.get<{ token: string }>(
+            `/fields/${field.persistedId}/confirmation-token`
+          );
 
-  const handleFieldChange = useCallback((updatedField: BuilderField) => {
-    setFields((prev) =>
-      prev.map((f) => {
-        if (f.id !== updatedField.id) return f;
-
-        const typeChanged = f.type !== updatedField.type;
-        if (typeChanged && f.persistedId) {
-          void previewTypeChange(updatedField);
+          setPendingAction({
+            fieldId: field.id,
+            action: 'type-change',
+            newType: field.type,
+            token: token.token,
+            impact,
+            title: t('builder.destructive.title'),
+            message: t('builder.destructive.typeChangeMessage'),
+          });
         }
+      } catch {
+        // Non-destructive or preview unavailable; allow change.
+      }
+    },
+    [t]
+  );
 
-        return updatedField;
-      })
-    );
-  }, [previewTypeChange]);
+  const handleFieldChange = useCallback(
+    (updatedField: BuilderField) => {
+      setFields((prev) =>
+        prev.map((f) => {
+          if (f.id !== updatedField.id) return f;
 
-  const handleAdd = useCallback((type: FieldType, insertIndex?: number) => {
-    const index = insertIndex ?? fields.length;
-    const newField = createNewField(type, index);
+          const typeChanged = f.type !== updatedField.type;
+          if (typeChanged && f.persistedId) {
+            void previewTypeChange(updatedField);
+          }
 
-    setFields((prev) => {
-      const before = prev.filter((f) => f.position < index);
-      const after = prev.filter((f) => f.position >= index).map((f) => ({
-        ...f,
-        position: f.position + 1,
-      }));
-      return [...before, newField, ...after];
-    });
+          return updatedField;
+        })
+      );
+    },
+    [previewTypeChange]
+  );
 
-    setSelectedFieldId(newField.id);
-  }, [fields.length]);
+  const handleAdd = useCallback(
+    (type: FieldType, insertIndex?: number) => {
+      const index = insertIndex ?? fields.length;
+      const newField = createNewField(type, index);
+
+      setFields((prev) => {
+        const before = prev.filter((f) => f.position < index);
+        const after = prev
+          .filter((f) => f.position >= index)
+          .map((f) => ({
+            ...f,
+            position: f.position + 1,
+          }));
+        return [...before, newField, ...after];
+      });
+
+      setSelectedFieldId(newField.id);
+    },
+    [fields.length]
+  );
 
   const handleReorder = useCallback((reordered: BuilderField[]) => {
     setFields(reordered);
   }, []);
 
-  const confirmRemove = useCallback((fieldId: string) => {
-    const field = fields.find((f) => f.id === fieldId);
-    if (!field) return;
+  const confirmRemove = useCallback(
+    (fieldId: string) => {
+      const field = fields.find((f) => f.id === fieldId);
+      if (!field) return;
 
-    if (field.persistedId) {
-      deleteFieldMutation.mutate(field);
-    }
+      if (field.persistedId) {
+        deleteFieldMutation.mutate(field);
+      }
 
-    setFields((prev) => prev.filter((f) => f.id !== fieldId));
-    if (selectedFieldId === fieldId) {
-      setSelectedFieldId(null);
-    }
-  }, [deleteFieldMutation, fields, selectedFieldId]);
+      setFields((prev) => prev.filter((f) => f.id !== fieldId));
+      if (selectedFieldId === fieldId) {
+        setSelectedFieldId(null);
+      }
+    },
+    [deleteFieldMutation, fields, selectedFieldId]
+  );
 
-  const handleRemove = useCallback((fieldId: string) => {
-    const field = fields.find((f) => f.id === fieldId);
-    if (!field) return;
+  const handleRemove = useCallback(
+    (fieldId: string) => {
+      const field = fields.find((f) => f.id === fieldId);
+      if (!field) return;
 
-    if (field.persistedId) {
-      apiClient
-        .get<SchemaImpact>(`/fields/${field.persistedId}/preview-impact`)
-        .then(async (impact) => {
-          if (impact.affected_records > 0) {
-            const tokenResponse = await apiClient.get<{ token: string }>(
-              `/fields/${field.persistedId}/confirmation-token`
-            );
-            setPendingAction({
-              fieldId,
-              action: 'delete',
-              token: tokenResponse.token,
-              impact,
-              title: t('builder.destructive.title'),
-              message: t('builder.destructive.deleteMessage'),
-            });
-          } else {
-            confirmRemove(fieldId);
-          }
-        })
-        .catch(() => confirmRemove(fieldId));
-    } else {
-      confirmRemove(fieldId);
-    }
-  }, [fields, t, confirmRemove]);
+      if (field.persistedId) {
+        apiClient
+          .get<SchemaImpact>(`/fields/${field.persistedId}/preview-impact`)
+          .then(async (impact) => {
+            if (impact.affected_records > 0) {
+              const tokenResponse = await apiClient.get<{ token: string }>(
+                `/fields/${field.persistedId}/confirmation-token`
+              );
+              setPendingAction({
+                fieldId,
+                action: 'delete',
+                token: tokenResponse.token,
+                impact,
+                title: t('builder.destructive.title'),
+                message: t('builder.destructive.deleteMessage'),
+              });
+            } else {
+              confirmRemove(fieldId);
+            }
+          })
+          .catch(() => confirmRemove(fieldId));
+      } else {
+        confirmRemove(fieldId);
+      }
+    },
+    [fields, t, confirmRemove]
+  );
 
   const handleConfirmDestructive = () => {
     if (!pendingAction) return;
@@ -342,7 +361,10 @@ function StructureBuilder() {
 
   if (databaseQuery.isLoading || tableQuery.isLoading || fieldsQuery.isLoading) {
     return (
-      <div className="d-flex align-items-center justify-content-center" style={{ minHeight: '60vh' }}>
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ minHeight: '60vh' }}
+      >
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -356,7 +378,10 @@ function StructureBuilder() {
         description={t('builder.title')}
         actions={
           <PageActions>
-            <div className="form-check form-switch me-3 d-inline-flex align-items-center mb-0" title={t('builder.isFrontFacing')}>
+            <div
+              className="form-check form-switch me-3 d-inline-flex align-items-center mb-0"
+              title={t('builder.isFrontFacing')}
+            >
               <input
                 className="form-check-input me-2 cursor-pointer"
                 type="checkbox"
@@ -366,7 +391,10 @@ function StructureBuilder() {
                 onChange={(e) => updateTableMutation.mutate(e.target.checked)}
                 disabled={updateTableMutation.isPending}
               />
-              <label className="form-check-label text-muted small cursor-pointer" htmlFor="isFrontFacingSwitch">
+              <label
+                className="form-check-label text-muted small cursor-pointer"
+                htmlFor="isFrontFacingSwitch"
+              >
                 {t('builder.isFrontFacing')}
               </label>
             </div>
@@ -415,34 +443,34 @@ function StructureBuilder() {
 
       {activeTab === 'structure' ? (
         <BuilderDndProvider fields={fields} onAdd={handleAdd} onReorder={handleReorder}>
-        <div className="row g-3" style={{ minHeight: '70vh' }}>
-          <div className="col-md-3">
-            <FieldPalette onAdd={handleAdd} />
-          </div>
+          <div className="row g-3" style={{ minHeight: '70vh' }}>
+            <div className="col-md-3">
+              <FieldPalette onAdd={handleAdd} />
+            </div>
 
-          <div className="col-md-5">
-            <FieldCanvas
-              fields={fields}
-              selectedId={selectedFieldId}
-              onSelect={setSelectedFieldId}
-              onRemove={handleRemove}
-            />
-          </div>
-
-          <div className="col-md-4">
-            {selectedField ? (
-              <FieldOptionPanel
-                field={selectedField}
-                availableTables={availableTables}
-                onChange={handleFieldChange}
+            <div className="col-md-5">
+              <FieldCanvas
+                fields={fields}
+                selectedId={selectedFieldId}
+                onSelect={setSelectedFieldId}
+                onRemove={handleRemove}
               />
-            ) : (
-              <SurfaceCard className="h-100">
-                <EmptyState icon="forms" title={t('builder.canvas.empty')} />
-              </SurfaceCard>
-            )}
+            </div>
+
+            <div className="col-md-4">
+              {selectedField ? (
+                <FieldOptionPanel
+                  field={selectedField}
+                  availableTables={availableTables}
+                  onChange={handleFieldChange}
+                />
+              ) : (
+                <SurfaceCard className="h-100">
+                  <EmptyState icon="forms" title={t('builder.canvas.empty')} />
+                </SurfaceCard>
+              )}
+            </div>
           </div>
-        </div>
         </BuilderDndProvider>
       ) : (
         <CardLayoutBuilder tableId={tableId} fields={fields} />

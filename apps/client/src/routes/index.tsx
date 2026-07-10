@@ -61,7 +61,7 @@ function HomePage() {
         title="Heritage Archives Patrimoine"
         description="Open-source platform for cataloguing and preserving literary and cultural heritage collections."
       />
-      
+
       <div className="row row-cards mt-4">
         {frontFacingTables.map((table) => {
           const db = databasesMap.get(table.database_id);
@@ -69,8 +69,14 @@ function HomePage() {
 
           return (
             <div className="col-md-4" key={table.id}>
-              <SurfaceCard className="h-100 border-0 shadow-sm" style={{ background: 'var(--tblr-bg-surface-secondary)' }}>
-                <div className="card-body d-flex flex-column justify-content-between h-100" style={{ minHeight: 140 }}>
+              <SurfaceCard
+                className="h-100 border-0 shadow-sm"
+                style={{ background: 'var(--tblr-bg-surface-secondary)' }}
+              >
+                <div
+                  className="card-body d-flex flex-column justify-content-between h-100"
+                  style={{ minHeight: 140 }}
+                >
                   <div>
                     <div className="text-muted small text-uppercase fw-bold mb-1">{dbName}</div>
                     <h3 className="card-title mb-3 fs-2">{table.name}</h3>
@@ -95,7 +101,10 @@ function HomePage() {
         {/* API Status card - always ends the list */}
         <div className="col-md-4">
           <SurfaceCard className="h-100">
-            <div className="card-body d-flex flex-column justify-content-between h-100" style={{ minHeight: 140 }}>
+            <div
+              className="card-body d-flex flex-column justify-content-between h-100"
+              style={{ minHeight: 140 }}
+            >
               <div>
                 <div className="text-muted small text-uppercase fw-bold mb-1">System</div>
                 <h3 className="card-title mb-3 fs-2">API Status</h3>

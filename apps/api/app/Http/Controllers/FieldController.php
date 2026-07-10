@@ -6,7 +6,6 @@ use App\Http\Requests\StoreFieldRequest;
 use App\Http\Requests\UpdateFieldRequest;
 use App\Http\Resources\FieldResource;
 use App\Models\Field;
-use App\Models\Table;
 use App\Services\SchemaChangeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -55,10 +54,10 @@ class FieldController extends Controller
 
         if ($isDestructive) {
             $token = $request->input('confirmation_token');
-            
-            if (!$token || !$this->schemaChangeService->validateConfirmationToken($table, $token)) {
+
+            if (! $token || ! $this->schemaChangeService->validateConfirmationToken($table, $token)) {
                 $impact = $this->schemaChangeService->calculateDataImpact($field, ['_delete' => true]);
-                
+
                 return response()->json([
                     'error' => 'Destructive change requires confirmation',
                     'impact' => $impact,

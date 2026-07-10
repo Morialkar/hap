@@ -275,266 +275,277 @@ export function RecordForm({
         onKeyDown={handleKeyDown}
         className="vstack gap-3"
       >
-      {recordFields.map((field) => {
-        const options = field.options || {};
-        const FormField = dynamicForm.Field;
-        return (
-          <FormField
-            key={field.id}
-            name={`data.${field.name}`}
-          >
-            {((fieldApi: DynamicFieldApi) => {
-              const value = fieldApi.state.value || '';
-              const isRequired = field.validation?.required === true;
+        {recordFields.map((field) => {
+          const options = field.options || {};
+          const FormField = dynamicForm.Field;
+          return (
+            <FormField key={field.id} name={`data.${field.name}`}>
+              {(fieldApi: DynamicFieldApi) => {
+                const value = fieldApi.state.value || '';
+                const isRequired = field.validation?.required === true;
 
-              return (
-                <div className="mb-2">
-                  <label className="form-label d-flex justify-content-between align-items-center">
-                    <span>
-                      {field.name}{' '}
-                      {isRequired && <span className="text-danger">*</span>}
-                    </span>
-                    {/* Character Counter for short and long text */}
-                    {(field.type === 'text' || field.type === 'long_text') && !!options.max_length && (
-                      <span
-                        className={`small ${
-                          String(value).length > Number(options.max_length) - 10
-                            ? 'text-danger fw-bold'
-                            : 'text-muted'
-                        }`}
-                      >
-                        {t('records.charCounter', {
-                          count: String(value).length,
-                          max: options.max_length,
-                        })}
+                return (
+                  <div className="mb-2">
+                    <label className="form-label d-flex justify-content-between align-items-center">
+                      <span>
+                        {field.name} {isRequired && <span className="text-danger">*</span>}
                       </span>
-                    )}
-                  </label>
-
-                  {/* Render Editor based on Field Type */}
-                  {(() => {
-                    switch (field.type) {
-                      case 'title':
-                      case 'text':
-                        return (
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder={String(options.placeholder || '')}
-                            value={String(value)}
-                            onChange={(e) => fieldApi.handleChange(e.target.value)}
-                            maxLength={options.max_length ? Number(options.max_length) : undefined}
-                            data-testid={`field-input-${field.name}`}
-                          />
-                        );
-
-                      case 'long_text':
-                        return (
-                          <textarea
-                            className="form-control"
-                            rows={options.rows ? Number(options.rows) : 4}
-                            value={String(value)}
-                            onChange={(e) => fieldApi.handleChange(e.target.value)}
-                            maxLength={options.max_length ? Number(options.max_length) : undefined}
-                            data-testid={`field-input-${field.name}`}
-                          />
-                        );
-
-                      case 'number':
-                        return (
-                          <input
-                            type="number"
-                            className="form-control"
-                            min={options.min !== undefined ? Number(options.min) : undefined}
-                            max={options.max !== undefined ? Number(options.max) : undefined}
-                            step={options.step !== undefined ? Number(options.step) : 'any'}
-                            value={value === '' ? '' : Number(value)}
-                            onChange={(e) =>
-                              fieldApi.handleChange(e.target.value === '' ? '' : Number(e.target.value))
-                            }
-                            data-testid={`field-input-${field.name}`}
-                          />
-                        );
-
-                      case 'date':
-                        return (
-                          <input
-                            type={options.includeTime ? 'datetime-local' : 'date'}
-                            className="form-control"
-                            value={String(value)}
-                            onChange={(e) => fieldApi.handleChange(e.target.value)}
-                            data-testid={`field-input-${field.name}`}
-                          />
-                        );
-
-                      case 'boolean':
-                        return (
-                          <div className="form-check form-switch">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              role="switch"
-                              checked={!!value}
-                              onChange={(e) => fieldApi.handleChange(e.target.checked)}
-                              data-testid={`field-input-${field.name}`}
-                            />
-                          </div>
-                        );
-
-                      case 'select': {
-                        const vals = Array.isArray(options.values) ? options.values : [];
-                        return (
-                          <select
-                            className="form-select"
-                            value={String(value)}
-                            onChange={(e) => fieldApi.handleChange(e.target.value)}
-                            data-testid={`field-input-${field.name}`}
+                      {/* Character Counter for short and long text */}
+                      {(field.type === 'text' || field.type === 'long_text') &&
+                        !!options.max_length && (
+                          <span
+                            className={`small ${
+                              String(value).length > Number(options.max_length) - 10
+                                ? 'text-danger fw-bold'
+                                : 'text-muted'
+                            }`}
                           >
-                            <option value="">-- Select --</option>
-                            {vals.map((v) => (
-                              <option key={v} value={v}>
-                                {v}
-                              </option>
-                            ))}
-                          </select>
-                        );
-                      }
+                            {t('records.charCounter', {
+                              count: String(value).length,
+                              max: options.max_length,
+                            })}
+                          </span>
+                        )}
+                    </label>
 
-                      case 'reference':
-                        return (
-                          <ReferenceFieldEditor
-                            field={field}
-                            value={String(value)}
-                            onChange={(val) => fieldApi.handleChange(val)}
-                            onOpenInlineModal={(targetTableId) =>
-                              setInlineModalConfig({ targetTableId, fieldKey: field.name })
-                            }
-                          />
-                        );
-
-                      case 'image':
-                      case 'file': {
-                        const isImage = field.type === 'image';
-                        const multi = !!options.multi;
-                        const uploadedHashes = (Array.isArray(value)
-                          ? value
-                          : value
-                          ? [value]
-                          : []).map(String);
-
-                        return (
-                          <div className="border rounded p-3 bg-light-subtle">
+                    {/* Render Editor based on Field Type */}
+                    {(() => {
+                      switch (field.type) {
+                        case 'title':
+                        case 'text':
+                          return (
                             <input
-                              type="file"
-                              className="form-control mb-2"
-                              multiple={multi}
-                              accept={isImage ? 'image/*' : undefined}
-                              onChange={(e) => handleFileUpload(field.name, e.target.files, multi)}
+                              type="text"
+                              className="form-control"
+                              placeholder={String(options.placeholder || '')}
+                              value={String(value)}
+                              onChange={(e) => fieldApi.handleChange(e.target.value)}
+                              maxLength={
+                                options.max_length ? Number(options.max_length) : undefined
+                              }
                               data-testid={`field-input-${field.name}`}
                             />
-                            <div className="text-muted small mb-2">{t('records.upload.hint')}</div>
+                          );
 
-                            {/* Render Upload Previews / Items */}
-                            {uploadedHashes.length > 0 && (
-                              <div className="d-flex flex-wrap gap-2 mt-2">
-                                {uploadedHashes.map((hash) => (
-                                  <div
-                                    key={hash}
-                                    className="position-relative border rounded p-1 bg-white d-flex align-items-center gap-2"
-                                    style={{ minWidth: 100 }}
-                                  >
-                                    {isImage ? (
-                                      <img
-                                        src={`/api/v1/uploads/${hash}/thumbnail`}
-                                        alt="Preview"
-                                        className="rounded"
-                                        style={{ width: 48, height: 48, objectFit: 'cover' }}
-                                        onError={(e) => {
-                                          // Fallback if GD thumbnail not served
-                                          (e.target as HTMLImageElement).src = `/api/v1/uploads/${hash}`;
-                                        }}
-                                      />
-                                    ) : (
-                                      <i className="ti ti-file fs-2 text-primary" />
-                                    )}
-                                    <span className="text-truncate small" style={{ maxWidth: 80 }} title={hash}>
-                                      {hash.slice(0, 8)}...
-                                    </span>
-                                    <button
-                                      type="button"
-                                      className="btn btn-sm btn-link text-danger p-0"
-                                      onClick={() => handleRemoveUpload(field.name, hash, multi)}
-                                      title={t('common.remove')}
+                        case 'long_text':
+                          return (
+                            <textarea
+                              className="form-control"
+                              rows={options.rows ? Number(options.rows) : 4}
+                              value={String(value)}
+                              onChange={(e) => fieldApi.handleChange(e.target.value)}
+                              maxLength={
+                                options.max_length ? Number(options.max_length) : undefined
+                              }
+                              data-testid={`field-input-${field.name}`}
+                            />
+                          );
+
+                        case 'number':
+                          return (
+                            <input
+                              type="number"
+                              className="form-control"
+                              min={options.min !== undefined ? Number(options.min) : undefined}
+                              max={options.max !== undefined ? Number(options.max) : undefined}
+                              step={options.step !== undefined ? Number(options.step) : 'any'}
+                              value={value === '' ? '' : Number(value)}
+                              onChange={(e) =>
+                                fieldApi.handleChange(
+                                  e.target.value === '' ? '' : Number(e.target.value)
+                                )
+                              }
+                              data-testid={`field-input-${field.name}`}
+                            />
+                          );
+
+                        case 'date':
+                          return (
+                            <input
+                              type={options.includeTime ? 'datetime-local' : 'date'}
+                              className="form-control"
+                              value={String(value)}
+                              onChange={(e) => fieldApi.handleChange(e.target.value)}
+                              data-testid={`field-input-${field.name}`}
+                            />
+                          );
+
+                        case 'boolean':
+                          return (
+                            <div className="form-check form-switch">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                checked={!!value}
+                                onChange={(e) => fieldApi.handleChange(e.target.checked)}
+                                data-testid={`field-input-${field.name}`}
+                              />
+                            </div>
+                          );
+
+                        case 'select': {
+                          const vals = Array.isArray(options.values) ? options.values : [];
+                          return (
+                            <select
+                              className="form-select"
+                              value={String(value)}
+                              onChange={(e) => fieldApi.handleChange(e.target.value)}
+                              data-testid={`field-input-${field.name}`}
+                            >
+                              <option value="">-- Select --</option>
+                              {vals.map((v) => (
+                                <option key={v} value={v}>
+                                  {v}
+                                </option>
+                              ))}
+                            </select>
+                          );
+                        }
+
+                        case 'reference':
+                          return (
+                            <ReferenceFieldEditor
+                              field={field}
+                              value={String(value)}
+                              onChange={(val) => fieldApi.handleChange(val)}
+                              onOpenInlineModal={(targetTableId) =>
+                                setInlineModalConfig({ targetTableId, fieldKey: field.name })
+                              }
+                            />
+                          );
+
+                        case 'image':
+                        case 'file': {
+                          const isImage = field.type === 'image';
+                          const multi = !!options.multi;
+                          const uploadedHashes = (
+                            Array.isArray(value) ? value : value ? [value] : []
+                          ).map(String);
+
+                          return (
+                            <div className="border rounded p-3 bg-light-subtle">
+                              <input
+                                type="file"
+                                className="form-control mb-2"
+                                multiple={multi}
+                                accept={isImage ? 'image/*' : undefined}
+                                onChange={(e) =>
+                                  handleFileUpload(field.name, e.target.files, multi)
+                                }
+                                data-testid={`field-input-${field.name}`}
+                              />
+                              <div className="text-muted small mb-2">
+                                {t('records.upload.hint')}
+                              </div>
+
+                              {/* Render Upload Previews / Items */}
+                              {uploadedHashes.length > 0 && (
+                                <div className="d-flex flex-wrap gap-2 mt-2">
+                                  {uploadedHashes.map((hash) => (
+                                    <div
+                                      key={hash}
+                                      className="position-relative border rounded p-1 bg-white d-flex align-items-center gap-2"
+                                      style={{ minWidth: 100 }}
                                     >
-                                      <i className="ti ti-x" />
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
+                                      {isImage ? (
+                                        <img
+                                          src={`/api/v1/uploads/${hash}/thumbnail`}
+                                          alt="Preview"
+                                          className="rounded"
+                                          style={{ width: 48, height: 48, objectFit: 'cover' }}
+                                          onError={(e) => {
+                                            // Fallback if GD thumbnail not served
+                                            (e.target as HTMLImageElement).src =
+                                              `/api/v1/uploads/${hash}`;
+                                          }}
+                                        />
+                                      ) : (
+                                        <i className="ti ti-file fs-2 text-primary" />
+                                      )}
+                                      <span
+                                        className="text-truncate small"
+                                        style={{ maxWidth: 80 }}
+                                        title={hash}
+                                      >
+                                        {hash.slice(0, 8)}...
+                                      </span>
+                                      <button
+                                        type="button"
+                                        className="btn btn-sm btn-link text-danger p-0"
+                                        onClick={() => handleRemoveUpload(field.name, hash, multi)}
+                                        title={t('common.remove')}
+                                      >
+                                        <i className="ti ti-x" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
 
-                            {/* Uploading states spinner */}
-                            {(uploadsState[field.name] || []).filter((u) => u.isUploading).length > 0 && (
-                              <div className="d-flex align-items-center gap-2 mt-2 text-muted small">
-                                <LoadingSpinner size="sm" />
-                                <span>Uploading...</span>
-                              </div>
-                            )}
-                          </div>
-                        );
+                              {/* Uploading states spinner */}
+                              {(uploadsState[field.name] || []).filter((u) => u.isUploading)
+                                .length > 0 && (
+                                <div className="d-flex align-items-center gap-2 mt-2 text-muted small">
+                                  <LoadingSpinner size="sm" />
+                                  <span>Uploading...</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
+
+                        default:
+                          return (
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={String(value)}
+                              onChange={(e) => fieldApi.handleChange(e.target.value)}
+                            />
+                          );
                       }
+                    })()}
+                  </div>
+                );
+              }}
+            </FormField>
+          );
+        })}
 
-                      default:
-                        return (
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={String(value)}
-                            onChange={(e) => fieldApi.handleChange(e.target.value)}
-                          />
-                        );
-                    }
-                  })()}
-                </div>
-              );
-            })}
-          </FormField>
-        );
-      })}
-
-      {/* Form Submission Buttons */}
-      <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-        <button type="button" className="btn btn-secondary btn-sm" onClick={onCancel}>
-          {t('common.cancel')}
-        </button>
-
-        <div className="d-flex gap-2">
-          {!isEditing && !isInline && (
-            <button
-              type="button"
-              className="btn btn-outline-primary btn-sm"
-              onClick={handleSaveAndAddAnother}
-              disabled={createMutation.isPending}
-              data-testid="save-add-another"
-            >
-              {t('records.saveAndAddAnother')}
-            </button>
-          )}
-
-          <button
-            type="submit"
-            className="btn btn-primary btn-sm"
-            disabled={createMutation.isPending || updateMutation.isPending}
-            data-testid="save-record"
-          >
-            {createMutation.isPending || updateMutation.isPending ? (
-              <LoadingSpinner size="sm" />
-            ) : (
-              t('common.save')
-            )}
+        {/* Form Submission Buttons */}
+        <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+          <button type="button" className="btn btn-secondary btn-sm" onClick={onCancel}>
+            {t('common.cancel')}
           </button>
+
+          <div className="d-flex gap-2">
+            {!isEditing && !isInline && (
+              <button
+                type="button"
+                className="btn btn-outline-primary btn-sm"
+                onClick={handleSaveAndAddAnother}
+                disabled={createMutation.isPending}
+                data-testid="save-add-another"
+              >
+                {t('records.saveAndAddAnother')}
+              </button>
+            )}
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-sm"
+              disabled={createMutation.isPending || updateMutation.isPending}
+              data-testid="save-record"
+            >
+              {createMutation.isPending || updateMutation.isPending ? (
+                <LoadingSpinner size="sm" />
+              ) : (
+                t('common.save')
+              )}
+            </button>
+          </div>
         </div>
-      </div>
       </form>
 
       {/* Inline Reference Creator Modal */}
@@ -561,7 +572,12 @@ interface ReferenceFieldEditorProps {
   onOpenInlineModal: (targetTableId: string) => void;
 }
 
-function ReferenceFieldEditor({ field, value, onChange, onOpenInlineModal }: ReferenceFieldEditorProps) {
+function ReferenceFieldEditor({
+  field,
+  value,
+  onChange,
+  onOpenInlineModal,
+}: ReferenceFieldEditorProps) {
   const { t } = useI18n();
   const targetTableId = String(field.options?.target_table || '');
   const [searchQuery, setSearchQuery] = useState('');

@@ -70,13 +70,13 @@ test('user can list views filtered by table', function () {
 
     $view1 = View::factory()->create(['table_id' => $table->id, 'name' => 'View 1']);
     $view2 = View::factory()->create(['table_id' => $table->id, 'name' => 'View 2']);
-    
+
     // Create another view in different table
     $otherTable = Table::factory()->create(['database_id' => $database->id]);
     $view3 = View::factory()->create(['table_id' => $otherTable->id, 'name' => 'View 3']);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/views?table_id=' . $table->id);
+        ->getJson('/api/v1/views?table_id='.$table->id);
 
     $response->assertStatus(200)
         ->assertJsonCount(2);
@@ -96,7 +96,7 @@ test('user can update view config and name', function () {
     $view = View::factory()->create(['table_id' => $table->id, 'name' => 'Old Name']);
 
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/views/' . $view->id, [
+        ->putJson('/api/v1/views/'.$view->id, [
             'name' => 'New Name',
             'config' => [
                 'columnCount' => 3,
@@ -133,7 +133,7 @@ test('user can delete view', function () {
     $view = View::factory()->create(['table_id' => $table->id]);
 
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/views/' . $view->id);
+        ->deleteJson('/api/v1/views/'.$view->id);
 
     $response->assertStatus(204);
 
@@ -192,7 +192,7 @@ test('setting a view as default resets other default views on the same table', f
     ]);
 
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/views/' . $view2->id, [
+        ->putJson('/api/v1/views/'.$view2->id, [
             'is_default' => true,
         ]);
 

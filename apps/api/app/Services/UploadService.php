@@ -9,30 +9,27 @@ class UploadService
 {
     /**
      * Store an uploaded file.
-     *
-     * @param UploadedFile $file
-     * @return array
      */
     public function store(UploadedFile $file): array
     {
         // 1. Calculate SHA-256 hash of file content
         $hash = hash_file('sha256', $file->getRealPath());
-        
+
         // Determine file details
         $originalFilename = $file->getClientOriginalName();
         $mimeType = $file->getMimeType() ?: $file->getClientMimeType();
         $size = $file->getSize();
-        
+
         // 2. Put file to storage (content-addressed, uploads/{hash})
         $path = "uploads/{$hash}";
-        
-        if (!Storage::exists($path)) {
+
+        if (! Storage::exists($path)) {
             // Using read stream for memory efficiency
             $stream = fopen($file->getRealPath(), 'r');
             Storage::put($path, $stream);
             fclose($stream);
         }
-        
+
         $metadata = [
             'path' => $path,
             'filename' => $originalFilename,
@@ -41,35 +38,29 @@ class UploadService
             'hash' => $hash,
             'url' => url("/api/v1/uploads/{$hash}"),
         ];
-        
+
         // 3. Generate thumbnail if image
         if (str_starts_with($mimeType, 'image/')) {
             $thumbnailPath = "uploads/thumbnails/{$hash}";
-            if (!Storage::exists($thumbnailPath)) {
+            if (! Storage::exists($thumbnailPath)) {
                 $this->generateThumbnail($file->getRealPath(), $thumbnailPath, $mimeType);
             }
-            
+
             $metadata['thumbnail_path'] = $thumbnailPath;
             $metadata['thumbnail_url'] = url("/api/v1/uploads/{$hash}/thumbnail");
         }
-        
+
         return $metadata;
     }
-    
+
     /**
      * Generate image thumbnail using GD.
-     *
-     * @param string $sourcePath
-     * @param string $targetPath
-     * @param string $mimeType
-     * @param int $maxSize
-     * @return bool
      */
     private function generateThumbnail(string $sourcePath, string $targetPath, string $mimeType, int $maxSize = 200): bool
     {
         // Get original image dimensions
-        list($width, $height) = getimagesize($sourcePath);
-        if (!$width || !$height) {
+        [$width, $height] = getimagesize($sourcePath);
+        if (! $width || ! $height) {
             return false;
         }
 
@@ -77,10 +68,10 @@ class UploadService
         $ratio = $width / $height;
         if ($width > $height) {
             $newWidth = $maxSize;
-            $newHeight = (int)($maxSize / $ratio);
+            $newHeight = (int) ($maxSize / $ratio);
         } else {
             $newHeight = $maxSize;
-            $newWidth = (int)($maxSize * $ratio);
+            $newWidth = (int) ($maxSize * $ratio);
         }
 
         // Create image from source
@@ -92,7 +83,7 @@ class UploadService
             default => null,
         };
 
-        if (!$sourceImage) {
+        if (! $sourceImage) {
             return false;
         }
 
@@ -128,6 +119,7 @@ class UploadService
             Storage::put($targetPath, $stream);
             fclose($stream);
             unlink($tempFile);
+
             return true;
         }
 

@@ -19,12 +19,9 @@ class ApiClient {
     this.baseUrl = window.__APP__?.apiBase || '/api/v1';
   }
 
-  async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const response = await fetch(url, {
       ...options,
       credentials: 'include',
@@ -48,7 +45,7 @@ class ApiClient {
       throw new ApiError(error.message || 'Request failed', response.status, error);
     }
 
-    return await response.json().catch(() => undefined) as T;
+    return (await response.json().catch(() => undefined)) as T;
   }
 
   async get<T>(endpoint: string): Promise<T> {
@@ -84,7 +81,7 @@ class ApiClient {
       throw new ApiError(error.message || 'Request failed', response.status, error);
     }
 
-    return await response.json().catch(() => undefined) as T;
+    return (await response.json().catch(() => undefined)) as T;
   }
 
   async put<T>(endpoint: string, data?: unknown): Promise<T> {

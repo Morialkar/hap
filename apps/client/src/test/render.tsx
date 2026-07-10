@@ -11,4 +11,3 @@ export function render(ui: React.ReactNode, options?: RenderOptions) {
   i18n.changeLanguage('en');
   return rtlRender(<Providers>{ui}</Providers>, options);
 }
-

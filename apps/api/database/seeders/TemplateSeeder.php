@@ -2,20 +2,23 @@
 
 namespace Database\Seeders;
 
+use App\Models\Database;
 use App\Models\Template;
+use App\Models\Workspace;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class TemplateSeeder extends Seeder
 {
     public function run(): void
     {
         // Create a system workspace and database to satisfy database_id constraints
-        $systemWorkspace = \App\Models\Workspace::firstOrCreate(
+        $systemWorkspace = Workspace::firstOrCreate(
             ['name' => 'Modèles de Système'],
             ['id' => '018f3a3d-4c3a-4467-9c97-6a1a0c0a0000']
         );
 
-        $systemDatabase = \App\Models\Database::firstOrCreate(
+        $systemDatabase = Database::firstOrCreate(
             ['name' => 'Base de données système', 'workspace_id' => $systemWorkspace->id],
             ['id' => '018f3a3d-4c3a-4467-9c97-6a1a0c0a0001', 'locale' => 'fr-CA']
         );
@@ -366,8 +369,8 @@ class TemplateSeeder extends Seeder
         ];
 
         // Seed templates into the database using new and save
-        $t1 = new Template();
-        $t1->id = (string) \Illuminate\Support\Str::uuid();
+        $t1 = new Template;
+        $t1->id = (string) Str::uuid();
         $t1->database_id = $systemDatabase->id;
         $t1->name = 'Catalogue Littéraire';
         $t1->description = 'Modèle complet pour cataloguer des oeuvres littéraires, périodiques, auteurs, éditeurs, imprimeurs, localisations, etc. (Basé sur la base de données historique Éusèbe Sénécal).';
@@ -378,8 +381,8 @@ class TemplateSeeder extends Seeder
         $t1->includes_demo_records = true;
         $t1->save();
 
-        $t2 = new Template();
-        $t2->id = (string) \Illuminate\Support\Str::uuid();
+        $t2 = new Template;
+        $t2->id = (string) Str::uuid();
         $t2->database_id = $systemDatabase->id;
         $t2->name = 'Boîte à Recettes';
         $t2->description = 'Modèle simple et générique pour gérer vos recettes de cuisine préférées, leurs ingrédients et catégories.';

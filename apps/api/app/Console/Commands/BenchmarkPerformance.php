@@ -12,21 +12,25 @@ use Illuminate\Support\Facades\DB;
 class BenchmarkPerformance extends Command
 {
     protected $signature = 'app:benchmark-performance';
+
     protected $description = 'Benchmark performance of key operations';
+
     protected $iterations = 100;
+
     protected $warmupIterations = 10;
 
     public function handle()
     {
         $this->info('Starting performance benchmark...');
-        $this->info('This will run ' . $this->iterations . ' iterations for each operation.');
+        $this->info('This will run '.$this->iterations.' iterations for each operation.');
         $this->newLine();
 
         // Get the scale test table
         $table = Table::where('name', 'Scale Test Table')->first();
-        
-        if (!$table) {
+
+        if (! $table) {
             $this->error('Scale Test Table not found. Run the scale seeder first: php artisan db:seed --class=ScaleFixtureSeeder');
+
             return 1;
         }
 
@@ -106,8 +110,9 @@ class BenchmarkPerformance extends Command
         $latencies = [];
         $record = Record::where('table_id', $table->id)->first();
 
-        if (!$record) {
+        if (! $record) {
             $this->error('No records found in table');
+
             return [];
         }
 
@@ -132,8 +137,9 @@ class BenchmarkPerformance extends Command
         $latencies = [];
         $record = Record::where('table_id', $table->id)->first();
 
-        if (!$record) {
+        if (! $record) {
             $this->error('No records found in table');
+
             return [];
         }
 
@@ -156,15 +162,15 @@ class BenchmarkPerformance extends Command
     {
         sort($latencies);
         $count = count($latencies);
-        
+
         $mean = array_sum($latencies) / $count;
         $min = $latencies[0];
         $max = $latencies[$count - 1];
-        
+
         // Calculate p95
         $p95Index = (int) floor(0.95 * $count);
         $p95 = $latencies[$p95Index];
-        
+
         // Calculate p99
         $p99Index = (int) floor(0.99 * $count);
         $p99 = $latencies[$p99Index];
@@ -208,9 +214,9 @@ class BenchmarkPerformance extends Command
     {
         $reportPath = base_path('docs/PERFORMANCE.md');
         $content = "# Performance Benchmark Report\n\n";
-        $content .= "Generated: " . now()->toDateTimeString() . "\n\n";
+        $content .= 'Generated: '.now()->toDateTimeString()."\n\n";
         $content .= "## Test Environment\n\n";
-        $content .= "- Database: " . DB::connection()->getDriverName() . "\n";
+        $content .= '- Database: '.DB::connection()->getDriverName()."\n";
         $content .= "- Records: 100,000\n";
         $content .= "- Fields: 50\n";
         $content .= "- Iterations: {$this->iterations}\n\n";
@@ -236,7 +242,7 @@ class BenchmarkPerformance extends Command
 
         $allPassed = true;
         foreach ($results as $stats) {
-            if (!empty($stats) && !$stats['passed']) {
+            if (! empty($stats) && ! $stats['passed']) {
                 $allPassed = false;
                 break;
             }
@@ -253,7 +259,7 @@ class BenchmarkPerformance extends Command
         }
 
         // Ensure docs directory exists
-        if (!is_dir(base_path('docs'))) {
+        if (! is_dir(base_path('docs'))) {
             mkdir(base_path('docs'), 0755, true);
         }
 

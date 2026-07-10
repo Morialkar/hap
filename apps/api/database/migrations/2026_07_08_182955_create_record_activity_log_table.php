@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('action'); // create, update, delete, restore
             $table->jsonb('changes')->nullable(); // Field-level diff
             $table->timestamps();
-            
+
             $table->foreign('record_id')->references('id')->on('records')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            
+
             // Indexes for efficient querying
             $table->index('record_id', 'record_activity_log_record_id_index');
             $table->index('user_id', 'record_activity_log_user_id_index');

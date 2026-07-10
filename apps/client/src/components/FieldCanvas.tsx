@@ -39,7 +39,12 @@ interface BuilderDndProviderProps {
   children: React.ReactNode;
 }
 
-export function BuilderDndProvider({ fields, onAdd, onReorder, children }: BuilderDndProviderProps) {
+export function BuilderDndProvider({
+  fields,
+  onAdd,
+  onReorder,
+  children,
+}: BuilderDndProviderProps) {
   const [draggedType, setDraggedType] = useState<FieldType | null>(null);
   const { t } = useI18n();
 
@@ -80,9 +85,10 @@ export function BuilderDndProvider({ fields, onAdd, onReorder, children }: Build
       const oldIndex = orderedFields.findIndex((f) => f.id === active.id);
       const newIndex = orderedFields.findIndex((f) => f.id === over.id);
       if (oldIndex !== -1 && newIndex !== -1) {
-        const reordered = arrayMove(orderedFields, oldIndex, newIndex).map(
-          (f, idx) => ({ ...f, position: idx })
-        );
+        const reordered = arrayMove(orderedFields, oldIndex, newIndex).map((f, idx) => ({
+          ...f,
+          position: idx,
+        }));
         onReorder(reordered);
       }
     }
@@ -113,14 +119,9 @@ interface SortableFieldItemProps {
 function SortableFieldItem({ field, isSelected, onSelect, onRemove }: SortableFieldItemProps) {
   const { t } = useI18n();
   const definition = FIELD_TYPES[field.type];
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: field.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: field.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -151,9 +152,7 @@ function SortableFieldItem({ field, isSelected, onSelect, onRemove }: SortableFi
         <span className="text-truncate">{field.name}</span>
       </div>
       <div className="d-flex align-items-center gap-1">
-        <span className="badge text-bg-secondary text-nowrap">
-          {t(definition.labelKey)}
-        </span>
+        <span className="badge text-bg-secondary text-nowrap">{t(definition.labelKey)}</span>
         <button
           type="button"
           className="btn btn-sm btn-link text-danger p-0 ms-1"
@@ -180,7 +179,15 @@ function EmptyCanvas({ children }: { children: React.ReactNode }) {
   );
 }
 
-function DroppableCanvasList({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) {
+function DroppableCanvasList({
+  id,
+  children,
+  className,
+}: {
+  id: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   const { setNodeRef } = useDroppable({ id });
   return (
     <div ref={setNodeRef} className={className} style={{ minHeight: '300px' }}>
@@ -219,11 +226,14 @@ export function FieldCanvas({
     <div className="card h-100">
       <div className="card-header d-flex justify-content-between align-items-center">
         <h4 className="card-title mb-0">{t('builder.canvas.title')}</h4>
-        <span className="text-muted small">
-          {t('builder.saveDraft.label')}
-        </span>
+        <span className="text-muted small">{t('builder.saveDraft.label')}</span>
       </div>
-      <div className="card-body p-0" role="list" aria-label={t('builder.canvas.title')} style={{ minHeight: '300px' }}>
+      <div
+        className="card-body p-0"
+        role="list"
+        aria-label={t('builder.canvas.title')}
+        style={{ minHeight: '300px' }}
+      >
         {orderedFields.length === 0 ? (
           <EmptyCanvas>{t('builder.canvas.empty')}</EmptyCanvas>
         ) : (

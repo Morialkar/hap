@@ -76,7 +76,11 @@ export function RecordHistoryPanel({ recordId, onRestoreSuccess }: RecordHistory
           {logs.map((log) => {
             const dateText = formatDistanceToNow(new Date(log.created_at), { addSuffix: true });
             return (
-              <div key={log.id} className="list-group-item p-3" data-testid={`history-item-${log.id}`}>
+              <div
+                key={log.id}
+                className="list-group-item p-3"
+                data-testid={`history-item-${log.id}`}
+              >
                 <div className="d-flex justify-content-between align-items-start mb-2">
                   <div>
                     <span className="badge bg-secondary-subtle text-secondary me-2">

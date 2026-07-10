@@ -1,17 +1,41 @@
 import { test, expect } from '@playwright/test';
 
-const mockUser = { id: '00000000-0000-0000-0000-000000000000', name: 'Test User', email: 'test@example.com' };
+const mockUser = {
+  id: '00000000-0000-0000-0000-000000000000',
+  name: 'Test User',
+  email: 'test@example.com',
+};
 
-let databases = [
-  { id: 'db-1', name: 'Catalogue', workspace_id: 'w1' }
-];
-let tables = [
-  { id: 'tbl-1', name: 'Ouvrages', database_id: 'db-1' }
-];
+let databases = [{ id: 'db-1', name: 'Catalogue', workspace_id: 'w1' }];
+let tables = [{ id: 'tbl-1', name: 'Ouvrages', database_id: 'db-1' }];
 let fields = [
-  { id: 'fld-1', name: 'Titre', type: 'text', position: 0, options: {}, validation: {}, table_id: 'tbl-1' },
-  { id: 'fld-2', name: 'Auteur', type: 'text', position: 1, options: {}, validation: {}, table_id: 'tbl-1' },
-  { id: 'fld-3', name: 'Année', type: 'number', position: 2, options: {}, validation: {}, table_id: 'tbl-1' }
+  {
+    id: 'fld-1',
+    name: 'Titre',
+    type: 'text',
+    position: 0,
+    options: {},
+    validation: {},
+    table_id: 'tbl-1',
+  },
+  {
+    id: 'fld-2',
+    name: 'Auteur',
+    type: 'text',
+    position: 1,
+    options: {},
+    validation: {},
+    table_id: 'tbl-1',
+  },
+  {
+    id: 'fld-3',
+    name: 'Année',
+    type: 'number',
+    position: 2,
+    options: {},
+    validation: {},
+    table_id: 'tbl-1',
+  },
 ];
 type MockView = {
   id: string;
@@ -25,23 +49,43 @@ let views: MockView[] = [];
 
 function mockRoutes(page: import('@playwright/test').Page) {
   page.route('**/api/v1/user', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(mockUser) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(mockUser),
+    });
   });
 
   page.route('**/api/v1/databases/*', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(databases[0]) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(databases[0]),
+    });
   });
 
   page.route('**/api/v1/tables/*', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(tables[0]) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(tables[0]),
+    });
   });
 
   page.route(/.*\/api\/v1\/tables(?:\?.*)?$/, async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(tables) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(tables),
+    });
   });
 
   page.route('**/api/v1/fields**', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fields) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(fields),
+    });
   });
 
   page.route('**/api/v1/views**', async (route) => {
@@ -50,10 +94,18 @@ function mockRoutes(page: import('@playwright/test').Page) {
       const body = await req.postDataJSON();
       const view = { id: `view-${Date.now()}`, ...body };
       views.push(view);
-      await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(view) });
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(view),
+      });
       return;
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(views) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(views),
+    });
   });
 
   page.route('**/api/v1/views/*', async (route) => {
@@ -70,7 +122,11 @@ function mockRoutes(page: import('@playwright/test').Page) {
     if (index !== -1) {
       views[index] = { ...views[index], ...body };
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(views.find((v) => v.id === id)) });
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(views.find((v) => v.id === id)),
+    });
   });
 }
 
@@ -100,7 +156,7 @@ test.describe('Card Layout Builder', () => {
     // View should be selected and columns control visible
     await expect(page.locator('select')).toHaveValue(/view-.*/);
     await expect(page.locator('text=Nombre de colonnes')).toBeVisible();
-    
+
     // Choose 2 columns
     await page.click('button:has-text("2 colonnes")');
     await expect(page.locator('text=Colonne 1')).toBeVisible();

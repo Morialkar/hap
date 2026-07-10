@@ -12,7 +12,7 @@ return new class extends Migration
     {
         if (DB::getDriverName() === 'pgsql') {
             DB::statement('DROP TRIGGER IF EXISTS records_search_vector_update ON records');
-            
+
             DB::statement("
                 CREATE OR REPLACE FUNCTION records_search_vector_update_fn()
                 RETURNS TRIGGER AS $$
@@ -23,12 +23,12 @@ return new class extends Migration
                 $$ LANGUAGE plpgsql;
             ");
 
-            DB::statement("
+            DB::statement('
                 CREATE TRIGGER records_search_vector_update 
                 BEFORE INSERT OR UPDATE ON records 
                 FOR EACH ROW 
                 EXECUTE FUNCTION records_search_vector_update_fn()
-            ");
+            ');
         }
     }
 
@@ -40,7 +40,7 @@ return new class extends Migration
         if (DB::getDriverName() === 'pgsql') {
             DB::statement('DROP TRIGGER IF EXISTS records_search_vector_update ON records');
             DB::statement('DROP FUNCTION IF EXISTS records_search_vector_update_fn()');
-            
+
             DB::statement("
                 CREATE TRIGGER records_search_vector_update 
                 BEFORE INSERT OR UPDATE ON records 

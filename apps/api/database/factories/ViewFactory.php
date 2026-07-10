@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Table;
 use App\Models\View;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -20,7 +21,7 @@ class ViewFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'table_id' => \App\Models\Table::factory(),
+            'table_id' => Table::factory(),
             'name' => fake()->word(),
             'type' => 'card',
             'config' => null,

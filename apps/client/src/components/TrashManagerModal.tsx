@@ -151,7 +151,12 @@ export function TrashManagerModal({
               )}
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary btn-sm" onClick={onClose} data-testid="trash-close-btn">
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={onClose}
+                data-testid="trash-close-btn"
+              >
                 {t('common.close')}
               </button>
             </div>

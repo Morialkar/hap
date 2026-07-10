@@ -20,7 +20,7 @@ class FieldTypeRegistry
 
     public function get(string $type): FieldTypeInterface
     {
-        if (!isset($this->types[$type])) {
+        if (! isset($this->types[$type])) {
             throw new InvalidArgumentException("Unknown field type: {$type}");
         }
 
@@ -39,17 +39,17 @@ class FieldTypeRegistry
 
     private function registerDefaultTypes(): void
     {
-        $this->register('text', new ShortTextType());
-        $this->register('title', new ShortTextType());
-        $this->register('long_text', new LongTextType());
-        $this->register('number', new NumberType());
-        $this->register('date', new DateType());
-        $this->register('boolean', new BooleanType());
-        $this->register('select', new SelectType());
-        $this->register('reference', new ReferenceType());
-        $this->register('image', new ImageType());
-        $this->register('file', new FileType());
-        $this->register('url', new UrlType());
-        $this->register('email', new EmailType());
+        $this->register('text', new ShortTextType);
+        $this->register('title', new ShortTextType);
+        $this->register('long_text', new LongTextType);
+        $this->register('number', new NumberType);
+        $this->register('date', new DateType);
+        $this->register('boolean', new BooleanType);
+        $this->register('select', new SelectType);
+        $this->register('reference', new ReferenceType);
+        $this->register('image', new ImageType);
+        $this->register('file', new FileType);
+        $this->register('url', new UrlType);
+        $this->register('email', new EmailType);
     }
 }

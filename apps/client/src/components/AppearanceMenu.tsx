@@ -88,11 +88,7 @@ export function AppearanceMenu() {
                   onClick={() => setAccent(option)}
                   data-testid={`accent-${option}`}
                 >
-                  <span
-                    className="hap-accent-swatch"
-                    data-hap-accent={option}
-                    aria-hidden="true"
-                  />
+                  <span className="hap-accent-swatch" data-hap-accent={option} aria-hidden="true" />
                   <span>{t(`theme.accent.${option}`)}</span>
                   {accent === option && <i className="ti ti-check ms-auto" aria-hidden="true" />}
                 </button>

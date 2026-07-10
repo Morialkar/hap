@@ -18,7 +18,7 @@ class ScaleFixtureSeeder extends Seeder
     public function run(): void
     {
         $recordCount = env('SCALE_RECORD_COUNT', 100000);
-        
+
         $this->command->info('Creating scale fixture...');
         $this->command->info("Record count: {$recordCount}");
 
@@ -88,7 +88,7 @@ class ScaleFixtureSeeder extends Seeder
         // Add additional fields to reach 50
         for ($i = 14; $i < 50; $i++) {
             $fieldTypes[] = [
-                'name' => 'field_' . $i,
+                'name' => 'field_'.$i,
                 'type' => ['text', 'number', 'boolean', 'select', 'date'][array_rand(['text', 'number', 'boolean', 'select', 'date'])],
                 'options' => $this->getOptionsForType($fieldTypes[$i]['type']),
             ];
@@ -139,18 +139,18 @@ class ScaleFixtureSeeder extends Seeder
 
             for ($i = 0; $i < $currentBatchSize; $i++) {
                 $data = $this->generateRealisticData($fields, $recordIds);
-                
+
                 $record = Record::create([
                     'table_id' => $table->id,
                     'data' => $data,
                     'version' => 1,
                 ]);
-                
+
                 $recordIds[] = $record->id;
             }
 
             if (($batch + 1) % 10 === 0) {
-                $this->command->info("Created " . (($batch + 1) * $batchSize) . " records...");
+                $this->command->info('Created '.(($batch + 1) * $batchSize).' records...');
             }
         }
 
@@ -185,15 +185,15 @@ class ScaleFixtureSeeder extends Seeder
                 'boolean' => (bool) rand(0, 1),
                 'select' => $this->generateSelect($field->options),
                 'date' => $this->generateDate($field->options['precision'] ?? 'full'),
-                'url' => 'https://example.com/' . Str::random(10),
-                'email' => Str::random(10) . '@example.com',
+                'url' => 'https://example.com/'.Str::random(10),
+                'email' => Str::random(10).'@example.com',
                 'image' => [
-                    'path' => 'uploads/images/' . Str::random(10) . '.jpg',
-                    'name' => 'image_' . Str::random(10) . '.jpg',
+                    'path' => 'uploads/images/'.Str::random(10).'.jpg',
+                    'name' => 'image_'.Str::random(10).'.jpg',
                     'size' => rand(100000, 5000000),
                 ],
                 'file' => $this->generateFiles(),
-                'reference' => !empty($existingRecordIds) ? $existingRecordIds[array_rand($existingRecordIds)] : null,
+                'reference' => ! empty($existingRecordIds) ? $existingRecordIds[array_rand($existingRecordIds)] : null,
                 default => null,
             };
         }
@@ -206,8 +206,9 @@ class ScaleFixtureSeeder extends Seeder
         $words = ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'lazy', 'dog', 'time', 'flies', 'when', 'having', 'fun'];
         $text = '';
         while (strlen($text) < $maxLength) {
-            $text .= $words[array_rand($words)] . ' ';
+            $text .= $words[array_rand($words)].' ';
         }
+
         return substr(trim($text), 0, $maxLength);
     }
 
@@ -216,8 +217,9 @@ class ScaleFixtureSeeder extends Seeder
         $min = $options['min'] ?? 0;
         $max = $options['max'] ?? 100;
         $decimal = $options['decimal'] ?? false;
-        
+
         $value = rand($min, $max);
+
         return $decimal ? $value / 10 : $value;
     }
 
@@ -225,24 +227,25 @@ class ScaleFixtureSeeder extends Seeder
     {
         $selectOptions = $options['options'] ?? ['A', 'B', 'C'];
         $multi = $options['multi'] ?? false;
-        
+
         if ($multi) {
             $count = rand(1, min(3, count($selectOptions)));
+
             return array_rand(array_flip($selectOptions), $count);
         }
-        
+
         return $selectOptions[array_rand($selectOptions)];
     }
 
     private function generateDate(string $precision): string
     {
         $year = rand(1800, 2024);
-        
+
         return match ($precision) {
-            'year' => $year . '-00-00',
-            'year-month' => $year . '-' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . '-00',
-            'full' => $year . '-' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . '-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
-            default => $year . '-00-00',
+            'year' => $year.'-00-00',
+            'year-month' => $year.'-'.str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT).'-00',
+            'full' => $year.'-'.str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT).'-'.str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
+            default => $year.'-00-00',
         };
     }
 
@@ -250,15 +253,15 @@ class ScaleFixtureSeeder extends Seeder
     {
         $files = [];
         $count = rand(1, 3);
-        
+
         for ($i = 0; $i < $count; $i++) {
             $files[] = [
-                'path' => 'uploads/files/' . Str::random(10) . '.pdf',
-                'name' => 'file_' . Str::random(10) . '.pdf',
+                'path' => 'uploads/files/'.Str::random(10).'.pdf',
+                'name' => 'file_'.Str::random(10).'.pdf',
                 'size' => rand(100000, 10000000),
             ];
         }
-        
+
         return $files;
     }
 
@@ -267,7 +270,7 @@ class ScaleFixtureSeeder extends Seeder
         $this->command->info('Creating record links...');
 
         $referenceFields = $table->fields->where('type', 'reference');
-        
+
         if ($referenceFields->isEmpty()) {
             return;
         }

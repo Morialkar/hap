@@ -13,17 +13,17 @@ class ImageType implements FieldTypeInterface
         $isMulti = ($options['multi'] ?? false) === true;
 
         if ($isMulti) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 return ['valid' => false, 'error' => 'Value must be an array for multi-image'];
             }
 
             foreach ($value as $item) {
-                if (!$this->isValidImageMetadata($item)) {
+                if (! $this->isValidImageMetadata($item)) {
                     return ['valid' => false, 'error' => 'Invalid image metadata structure'];
                 }
             }
         } else {
-            if (!$this->isValidImageMetadata($value)) {
+            if (! $this->isValidImageMetadata($value)) {
                 return ['valid' => false, 'error' => 'Invalid image metadata structure'];
             }
         }
@@ -40,11 +40,11 @@ class ImageType implements FieldTypeInterface
         $isMulti = ($options['multi'] ?? false) === true;
 
         if ($isMulti) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 return null;
             }
 
-            return array_values(array_filter($value, fn($v) => $v !== null && $v !== ''));
+            return array_values(array_filter($value, fn ($v) => $v !== null && $v !== ''));
         }
 
         return $value;
@@ -62,7 +62,7 @@ class ImageType implements FieldTypeInterface
 
     private function isValidImageMetadata(mixed $value): bool
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             return false;
         }
 

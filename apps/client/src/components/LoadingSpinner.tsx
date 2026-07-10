@@ -7,7 +7,7 @@ interface LoadingSpinnerProps {
 
 export function LoadingSpinner({ size = 'md', text }: LoadingSpinnerProps) {
   const { t } = useI18n();
-  
+
   const sizeClasses = {
     sm: 'spinner-border-sm',
     md: '',

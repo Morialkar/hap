@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Record;
+use App\Models\Table;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,7 @@ class RecordFactory extends Factory
     public function definition(): array
     {
         return [
-            'table_id' => \App\Models\Table::factory(),
+            'table_id' => Table::factory(),
             'data' => [],
             'version' => 1,
         ];

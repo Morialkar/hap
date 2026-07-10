@@ -10,7 +10,7 @@ class LongTextType implements FieldTypeInterface
             return ['valid' => true, 'error' => null];
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return ['valid' => false, 'error' => 'Value must be a string'];
         }
 
@@ -23,7 +23,7 @@ class LongTextType implements FieldTypeInterface
             return null;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return (string) $value;
         }
 

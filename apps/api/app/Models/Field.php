@@ -12,6 +12,7 @@ class Field extends Model
     use HasFactory;
 
     protected $keyType = 'uuid';
+
     public $incrementing = false;
 
     protected $fillable = ['type', 'name', 'position', 'options', 'validation', 'table_id', 'is_filterable'];

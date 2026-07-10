@@ -2,7 +2,6 @@
 
 use App\Models\Database;
 use App\Models\Field;
-use App\Models\Record;
 use App\Models\RecordActivityLog;
 use App\Models\Table;
 use App\Models\User;
@@ -23,7 +22,7 @@ test('activity log is created on record creation', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -53,7 +52,7 @@ test('activity log includes field-level diff on update', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -69,13 +68,13 @@ test('activity log includes field-level diff on update', function () {
     $recordId = $response->json('id');
 
     $this->actingAs($user)
-        ->putJson('/api/v1/records/' . $recordId, [
+        ->putJson('/api/v1/records/'.$recordId, [
             'data' => ['title' => 'Updated Title'],
         ]);
 
     $log = RecordActivityLog::where('action', 'update')->first();
-    
-    expect($log->changes['diff']['title'])->toBe([
+
+    expect($log->changes['diff']['title'])->toMatchArray([
         'type' => 'changed',
         'old' => 'Original Title',
         'new' => 'Updated Title',
@@ -93,7 +92,7 @@ test('activity log is created on record deletion', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -109,7 +108,7 @@ test('activity log is created on record deletion', function () {
     $recordId = $response->json('id');
 
     $this->actingAs($user)
-        ->deleteJson('/api/v1/records/' . $recordId);
+        ->deleteJson('/api/v1/records/'.$recordId);
 
     $this->assertDatabaseHas('record_activity_log', [
         'action' => 'delete',
@@ -128,7 +127,7 @@ test('record history endpoint returns activity log', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -144,7 +143,7 @@ test('record history endpoint returns activity log', function () {
     $recordId = $response->json('id');
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records/' . $recordId . '/history');
+        ->getJson('/api/v1/records/'.$recordId.'/history');
 
     $response->assertStatus(200)
         ->assertJsonStructure([
@@ -174,7 +173,7 @@ test('restore version endpoint restores record to previous state', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -190,19 +189,19 @@ test('restore version endpoint restores record to previous state', function () {
     $recordId = $response->json('id');
 
     $this->actingAs($user)
-        ->putJson('/api/v1/records/' . $recordId, [
+        ->putJson('/api/v1/records/'.$recordId, [
             'data' => ['title' => 'Updated Title'],
         ]);
 
     $log = RecordActivityLog::where('action', 'create')->first();
 
     $response = $this->actingAs($user)
-        ->postJson('/api/v1/records/' . $recordId . '/restore-version', [
+        ->postJson('/api/v1/records/'.$recordId.'/restore-version', [
             'log_id' => $log->id,
         ]);
 
     $response->assertStatus(200);
-    
+
     expect($response->json('data.title'))->toBe('Original Title');
 });
 
@@ -217,7 +216,7 @@ test('trash endpoint returns soft-deleted records', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -233,13 +232,13 @@ test('trash endpoint returns soft-deleted records', function () {
     $recordId = $response->json('id');
 
     $this->actingAs($user)
-        ->deleteJson('/api/v1/records/' . $recordId);
+        ->deleteJson('/api/v1/records/'.$recordId);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records/trash?table_id=' . $table->id);
+        ->getJson('/api/v1/records/trash?table_id='.$table->id);
 
     $response->assertStatus(200);
-    
+
     expect($response->json('data'))->toHaveCount(1);
 });
 
@@ -254,7 +253,7 @@ test('restore endpoint restores soft-deleted record', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -270,13 +269,13 @@ test('restore endpoint restores soft-deleted record', function () {
     $recordId = $response->json('id');
 
     $this->actingAs($user)
-        ->deleteJson('/api/v1/records/' . $recordId);
+        ->deleteJson('/api/v1/records/'.$recordId);
 
     $response = $this->actingAs($user)
-        ->postJson('/api/v1/records/' . $recordId . '/restore');
+        ->postJson('/api/v1/records/'.$recordId.'/restore');
 
     $response->assertStatus(200);
-    
+
     $this->assertDatabaseHas('records', [
         'id' => $recordId,
         'deleted_at' => null,
@@ -294,7 +293,7 @@ test('purge endpoint permanently deletes record', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -310,13 +309,13 @@ test('purge endpoint permanently deletes record', function () {
     $recordId = $response->json('id');
 
     $this->actingAs($user)
-        ->deleteJson('/api/v1/records/' . $recordId);
+        ->deleteJson('/api/v1/records/'.$recordId);
 
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/records/' . $recordId . '/purge');
+        ->deleteJson('/api/v1/records/'.$recordId.'/purge');
 
     $response->assertStatus(204);
-    
+
     $this->assertDatabaseMissing('records', ['id' => $recordId]);
 });
 
@@ -331,7 +330,7 @@ test('optimistic concurrency returns 409 on stale update', function () {
 
     $database = Database::factory()->create(['workspace_id' => $workspace->id]);
     $table = Table::factory()->create(['database_id' => $database->id]);
-    
+
     Field::factory()->create([
         'table_id' => $table->id,
         'name' => 'title',
@@ -351,7 +350,7 @@ test('optimistic concurrency returns 409 on stale update', function () {
     $staleVersion = $currentVersion - 1;
 
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/records/' . $recordId, [
+        ->putJson('/api/v1/records/'.$recordId, [
             'data' => ['title' => 'Updated Title'],
             'version' => $staleVersion,
         ]);

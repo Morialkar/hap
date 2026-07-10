@@ -182,7 +182,7 @@ test('user can list records filtered by table', function () {
     $record = Record::factory()->create(['table_id' => $table->id]);
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records?table_id=' . $table->id);
+        ->getJson('/api/v1/records?table_id='.$table->id);
 
     $response->assertStatus(200)
         ->assertJsonCount(1, 'data');
@@ -212,7 +212,7 @@ test('user can update record', function () {
     ]);
 
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/records/' . $record->id, [
+        ->putJson('/api/v1/records/'.$record->id, [
             'data' => [
                 'title' => 'Updated',
             ],
@@ -247,7 +247,7 @@ test('user can soft-delete record', function () {
     $record = Record::factory()->create(['table_id' => $table->id]);
 
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/records/' . $record->id);
+        ->deleteJson('/api/v1/records/'.$record->id);
 
     $response->assertStatus(204);
 
@@ -275,7 +275,7 @@ test('soft-deleted records are excluded from list', function () {
     $record->delete();
 
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/records?table_id=' . $table->id);
+        ->getJson('/api/v1/records?table_id='.$table->id);
 
     $response->assertStatus(200)
         ->assertJsonCount(0, 'data');

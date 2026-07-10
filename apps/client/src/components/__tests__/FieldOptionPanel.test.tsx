@@ -37,9 +37,7 @@ describe('FieldOptionPanel', () => {
     const nameInput = screen.getByLabelText(/field name/i);
     fireEvent.change(nameInput, { target: { value: 'Updated name' } });
 
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Updated name' })
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ name: 'Updated name' }));
   });
 
   it('renders text-specific options (max length, placeholder, char count)', () => {
@@ -125,9 +123,7 @@ describe('FieldOptionPanel', () => {
       type: 'reference',
       options: {},
     };
-    render(
-      <FieldOptionPanel field={field} availableTables={tables} onChange={onChange} />
-    );
+    render(<FieldOptionPanel field={field} availableTables={tables} onChange={onChange} />);
 
     const targetSelect = screen.getByLabelText(/target table/i);
     fireEvent.change(targetSelect, { target: { value: 'db-table-1' } });
@@ -168,8 +164,6 @@ describe('FieldOptionPanel', () => {
     expect(filterToggle).toBeChecked();
 
     fireEvent.click(filterToggle);
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ is_filterable: false })
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ is_filterable: false }));
   });
 });

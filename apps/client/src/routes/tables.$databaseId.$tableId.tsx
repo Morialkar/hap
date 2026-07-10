@@ -205,7 +205,9 @@ function TableRecordsPage() {
 
   // Flattened list of grouped items to virtualize (either Group Headers or Records)
   const flatListItems = useMemo(() => {
-    const list: ({ type: 'header'; key: string; count: number } | { type: 'record'; record: RecordData })[] = [];
+    const list: (
+      { type: 'header'; key: string; count: number } | { type: 'record'; record: RecordData }
+    )[] = [];
 
     groupedRecords.forEach((group) => {
       if (groupByField) {
@@ -293,41 +295,41 @@ function TableRecordsPage() {
         description={t('records.title')}
         actions={
           <PageActions>
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={() => setIsCsvImportOpen(true)}
-                data-testid="csv-import-btn"
-              >
-                <i className="ti ti-file-import me-1" aria-hidden="true" />
-                Importer CSV
-              </button>
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={() => setIsTrashOpen(true)}
-                data-testid="trash-btn"
-              >
-                <i className="ti ti-trash me-1" aria-hidden="true" />
-                {t('records.trash.title')}
-              </button>
-              <Link
-                to="/builder/$databaseId/$tableId"
-                params={{ databaseId, tableId }}
-                className="btn btn-outline-secondary"
-              >
-                <i className="ti ti-stack-2 me-1" aria-hidden="true" />
-                {t('builder.tabs.structure')}
-              </Link>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => navigate({ search: { action: 'create' } as TableSearch })}
-                data-testid="add-record-btn"
-              >
-                <i className="ti ti-plus me-1" aria-hidden="true" />
-                {t('records.add')}
-              </button>
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={() => setIsCsvImportOpen(true)}
+              data-testid="csv-import-btn"
+            >
+              <i className="ti ti-file-import me-1" aria-hidden="true" />
+              Importer CSV
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={() => setIsTrashOpen(true)}
+              data-testid="trash-btn"
+            >
+              <i className="ti ti-trash me-1" aria-hidden="true" />
+              {t('records.trash.title')}
+            </button>
+            <Link
+              to="/builder/$databaseId/$tableId"
+              params={{ databaseId, tableId }}
+              className="btn btn-outline-secondary"
+            >
+              <i className="ti ti-stack-2 me-1" aria-hidden="true" />
+              {t('builder.tabs.structure')}
+            </Link>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => navigate({ search: { action: 'create' } as TableSearch })}
+              data-testid="add-record-btn"
+            >
+              <i className="ti ti-plus me-1" aria-hidden="true" />
+              {t('records.add')}
+            </button>
           </PageActions>
         }
       />
@@ -516,7 +518,9 @@ function TableRecordsPage() {
                             <button
                               type="button"
                               className="btn btn-primary"
-                              onClick={() => navigate({ search: { action: 'create' } as TableSearch })}
+                              onClick={() =>
+                                navigate({ search: { action: 'create' } as TableSearch })
+                              }
                             >
                               <i className="ti ti-plus me-1" aria-hidden="true" />
                               {t('records.add')}
@@ -543,7 +547,10 @@ function TableRecordsPage() {
                           className="bg-light-subtle"
                           style={{ height: `${virtualRow.size}px` }}
                         >
-                          <td colSpan={fields.slice(0, 5).length + 1} className="fw-bold py-2 px-3 text-secondary border-bottom">
+                          <td
+                            colSpan={fields.slice(0, 5).length + 1}
+                            className="fw-bold py-2 px-3 text-secondary border-bottom"
+                          >
                             <i className="ti ti-folder me-2" />
                             {item.key} &mdash; {item.count} {tableQuery.data?.name.toLowerCase()}
                           </td>
@@ -572,7 +579,9 @@ function TableRecordsPage() {
                           return (
                             <td key={f.id}>
                               {Array.isArray(val) ? (
-                                <span className="badge bg-light text-muted">{val.length} files</span>
+                                <span className="badge bg-light text-muted">
+                                  {val.length} files
+                                </span>
                               ) : typeof val === 'boolean' ? (
                                 <i
                                   className={`ti ti-${val ? 'check text-success' : 'x text-danger'}`}
@@ -591,7 +600,10 @@ function TableRecordsPage() {
                               aria-label={t('common.details')}
                               onClick={() =>
                                 navigate({
-                                  search: { action: search.action, recordId: rec.id } as TableSearch,
+                                  search: {
+                                    action: search.action,
+                                    recordId: rec.id,
+                                  } as TableSearch,
                                 })
                               }
                             >
@@ -659,10 +671,10 @@ function TableRecordsPage() {
                   {activeAction === 'create'
                     ? t('records.add')
                     : activeAction === 'edit'
-                    ? t('records.edit')
-                    : activeAction === 'duplicate'
-                    ? t('records.duplicate')
-                    : t('common.details')}
+                      ? t('records.edit')
+                      : activeAction === 'duplicate'
+                        ? t('records.duplicate')
+                        : t('common.details')}
                 </h2>
                 <button
                   type="button"

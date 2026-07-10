@@ -4,18 +4,15 @@ namespace App\Services;
 
 use App\Models\Database;
 use App\Models\Field;
+use App\Models\Record;
 use App\Models\Report;
 use App\Models\Table;
 use App\Models\Template;
 use App\Models\View;
 use App\Models\Workspace;
-use App\Models\Record;
-use App\Services\RecordValidationService;
-use App\Services\RecordLinkService;
-use App\Services\RecordActivityService;
-use Symfony\Component\Uid\Ulid;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Uid\Ulid;
 
 class TemplateInstallService
 {
@@ -105,8 +102,8 @@ class TemplateInstallService
                     }
 
                     foreach ($demoTableGroup['records'] as $index => $recordData) {
-                        $tempKey = $recordData['id'] ?? ($tableKey . '_' . $index);
-                        $recordIdMap[$tempKey] = (string) new Ulid();
+                        $tempKey = $recordData['id'] ?? ($tableKey.'_'.$index);
+                        $recordIdMap[$tempKey] = (string) new Ulid;
                     }
                 }
 
@@ -121,12 +118,12 @@ class TemplateInstallService
                     $tableModel = Table::with('fields')->find($tableId);
                     $tableDef = collect($payload['tables'])->firstWhere('key', $tableKey);
                     $fieldsByKey = $tableDef['fields'] ?? [];
-                    
+
                     $fieldKeyToName = collect($fieldsByKey)->pluck('name', 'key')->all();
                     $fieldKeyToType = collect($fieldsByKey)->pluck('type', 'key')->all();
 
                     foreach ($demoTableGroup['records'] as $index => $recordData) {
-                        $tempKey = $recordData['id'] ?? ($tableKey . '_' . $index);
+                        $tempKey = $recordData['id'] ?? ($tableKey.'_'.$index);
                         $realId = $recordIdMap[$tempKey];
 
                         $normalizedData = [];
@@ -153,7 +150,7 @@ class TemplateInstallService
                             }
                         }
 
-                        $record = new Record();
+                        $record = new Record;
                         $record->id = $realId;
                         $record->table_id = $tableId;
                         $record->data = $this->recordValidationService->normalize($tableModel, $normalizedData);
@@ -161,7 +158,7 @@ class TemplateInstallService
                         $record->save();
 
                         $this->recordLinkService->syncLinks($record);
-                        
+
                         if (auth()->check()) {
                             $this->recordActivityService->logCreate($record, auth()->user());
                         }
