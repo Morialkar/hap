@@ -16,16 +16,25 @@ const DEFAULT_CENTER: Coordinates = {
   lng: -73.5673,
 };
 
-const LOCAL_STYLE = {
+const OPENSTREETMAP_ATTRIBUTION =
+  '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">&copy; OpenStreetMap contributors</a>';
+
+const OPENSTREETMAP_STYLE = {
   version: 8,
-  sources: {},
+  sources: {
+    openstreetmap: {
+      type: 'raster',
+      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution: OPENSTREETMAP_ATTRIBUTION,
+      maxzoom: 19,
+    },
+  },
   layers: [
     {
-      id: 'background',
-      type: 'background',
-      paint: {
-        'background-color': '#d9e2e7',
-      },
+      id: 'openstreetmap',
+      type: 'raster',
+      source: 'openstreetmap',
     },
   ],
 };
@@ -59,10 +68,12 @@ export function GpsMapPicker({ coordinates, onChange }: GpsMapPickerProps) {
         const center = latestCoordinatesRef.current ?? DEFAULT_CENTER;
         const map = new maplibregl.Map({
           container: containerRef.current,
-          style: LOCAL_STYLE as maplibregl.StyleSpecification,
+          style: OPENSTREETMAP_STYLE as maplibregl.StyleSpecification,
           center: [center.lng, center.lat],
           zoom: latestCoordinatesRef.current ? 8 : 4,
-          attributionControl: false,
+          attributionControl: {
+            compact: true,
+          },
         });
 
         const marker = new maplibregl.Marker({
@@ -147,8 +158,18 @@ export function GpsMapPicker({ coordinates, onChange }: GpsMapPickerProps) {
       ref={containerRef}
       className="rounded border overflow-hidden"
       style={{ height: 220 }}
+      aria-label="OpenStreetMap position picker"
       data-testid="gps-map-picker"
-    />
+    >
+      <a
+        className="visually-hidden"
+        href="https://www.openstreetmap.org/fixthemap"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Report a map issue
+      </a>
+    </div>
   );
 }
 

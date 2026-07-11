@@ -18,6 +18,10 @@ Replace the manual-only editor with a MapLibre GL picker while preserving manual
 - Drag pin updates `{ lat, lng }`.
 - Manual entry updates the pin.
 - No external geocoding service is used.
+- Initial tile source: OpenStreetMap standard raster tiles at
+  `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, with visible OSM attribution.
+  This is for normal interactive viewing only; no prefetch/offline tile download is
+  allowed from OSM tile servers.
 
 ## Story R2-A3 - Embedded gazetteer package
 

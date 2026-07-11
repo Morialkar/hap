@@ -7,10 +7,12 @@ const maplibreMock = vi.hoisted(() => {
   const markerInstances: FakeMarker[] = [];
 
   class FakeMap {
+    options: unknown;
     handlers: Record<string, (event: { lngLat: { lat: number; lng: number } }) => void> = {};
     zoom = 4;
 
-    constructor() {
+    constructor(options: unknown) {
+      this.options = options;
       mapInstances.push(this);
     }
 
@@ -101,6 +103,34 @@ describe('GpsMapPicker', () => {
       lat: 46.812346,
       lng: -71.201235,
     });
+  });
+
+  it('uses OpenStreetMap raster tiles with visible attribution', async () => {
+    const onChange = vi.fn();
+
+    render(<GpsMapPicker coordinates={null} onChange={onChange} />);
+
+    await waitFor(() => expect(maplibreMock.mapInstances).toHaveLength(1));
+
+    const options = maplibreMock.mapInstances[0].options as {
+      attributionControl: { compact: boolean };
+      style: {
+        sources: {
+          openstreetmap: {
+            attribution: string;
+            tiles: string[];
+            type: string;
+          };
+        };
+      };
+    };
+
+    expect(options.attributionControl).toEqual({ compact: true });
+    expect(options.style.sources.openstreetmap).toMatchObject({
+      type: 'raster',
+      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+    });
+    expect(options.style.sources.openstreetmap.attribution).toContain('OpenStreetMap contributors');
   });
 
   it('updates coordinates when the marker drag ends', async () => {
