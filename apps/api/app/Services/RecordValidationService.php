@@ -9,6 +9,8 @@ use Illuminate\Support\Collection;
 
 class RecordValidationService
 {
+    private static array $fieldsCache = [];
+
     public function __construct(private FieldTypeRegistry $fieldTypeRegistry) {}
 
     /**
@@ -28,6 +30,9 @@ class RecordValidationService
         }
 
         foreach ($fieldMap as $fieldName => $field) {
+            if ($field->type === 'compound') {
+                continue;
+            }
             $value = $data[$fieldName] ?? null;
             $fieldType = $this->fieldTypeRegistry->get($field->type);
             $result = $fieldType->validate($value, $field->options ?? []);
@@ -53,17 +58,61 @@ class RecordValidationService
         $normalized = [];
         $fieldMap = $this->fieldsFor($table, $extraFields)->keyBy('name');
 
+        // First pass: serialize non-compound fields
         foreach ($data as $fieldName => $value) {
             if (! isset($fieldMap[$fieldName])) {
                 continue;
             }
 
             $field = $fieldMap[$fieldName];
+            if ($field->type === 'compound') {
+                continue;
+            }
+
             $fieldType = $this->fieldTypeRegistry->get($field->type);
             $normalized[$fieldName] = $fieldType->serialize($value, $field->options ?? []);
         }
 
+        // Second pass: compute compound fields
+        foreach ($fieldMap as $fieldName => $field) {
+            if ($field->type !== 'compound') {
+                continue;
+            }
+
+            $template = $field->options['template'] ?? '';
+            $computedValue = preg_replace_callback('/\$\{([^}]+)\}/', function ($matches) use ($normalized) {
+                $refFieldName = $matches[1];
+                return $normalized[$refFieldName] ?? '';
+            }, $template);
+
+            $normalized[$fieldName] = $computedValue;
+        }
+
         return $normalized;
+    }
+
+    /**
+     * Compute compound fields dynamically for output/display.
+     */
+    public function computeCompoundFields(Table $table, array $data): array
+    {
+        $fieldMap = $this->fieldsFor($table, [])->keyBy('name');
+
+        foreach ($fieldMap as $fieldName => $field) {
+            if ($field->type !== 'compound') {
+                continue;
+            }
+
+            $template = $field->options['template'] ?? '';
+            $computedValue = preg_replace_callback('/\$\{([^}]+)\}/', function ($matches) use ($data) {
+                $refFieldName = $matches[1];
+                return $data[$refFieldName] ?? '';
+            }, $template);
+
+            $data[$fieldName] = $computedValue;
+        }
+
+        return $data;
     }
 
     /**
@@ -72,10 +121,15 @@ class RecordValidationService
      */
     private function fieldsFor(Table $table, array $extraFields): Collection
     {
-        return Field::query()
-            ->where('table_id', $table->id)
-            ->orderBy('position')
-            ->get()
+        $cacheKey = $table->id;
+        if (! isset(self::$fieldsCache[$cacheKey])) {
+            self::$fieldsCache[$cacheKey] = Field::query()
+                ->where('table_id', $table->id)
+                ->orderBy('position')
+                ->get();
+        }
+
+        return self::$fieldsCache[$cacheKey]
             ->concat($extraFields)
             ->values();
     }

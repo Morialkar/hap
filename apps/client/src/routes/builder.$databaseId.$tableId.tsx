@@ -126,7 +126,12 @@ function StructureBuilder() {
         options: field.options,
         validation: field.validation,
         table_id: tableId,
-        is_filterable: field.is_filterable !== false,
+        is_filterable:
+          field.type !== 'title' &&
+          field.type !== 'image' &&
+          field.type !== 'file' &&
+          field.type !== 'long_text' &&
+          field.is_filterable !== false,
       };
 
       if (field.isNew) {
@@ -463,6 +468,7 @@ function StructureBuilder() {
                   field={selectedField}
                   availableTables={availableTables}
                   onChange={handleFieldChange}
+                  fields={fields}
                 />
               ) : (
                 <SurfaceCard className="h-100">

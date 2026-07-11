@@ -37,8 +37,10 @@ interface View {
   config: {
     columnCount: number;
     columns: string[][];
+    hiddenLabels?: Record<string, boolean>;
   } | null;
   is_default?: boolean;
+  is_single_default?: boolean;
 }
 
 interface DroppableColumnProps {
@@ -69,6 +71,8 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   const [layoutItems, setLayoutItems] = useState<Record<string, string[]>>({
     unassigned: [],
   });
+
+  const [hiddenLabels, setHiddenLabels] = useState<Record<string, boolean>>({});
 
   // Dragging states
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -104,6 +108,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
         unassigned: [],
         'column-0': fields.map((f) => f.id),
       });
+      setHiddenLabels({});
       return;
     }
 
@@ -137,12 +142,14 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
       newItems.unassigned = fields.map((f) => f.id).filter((id) => !placedIds.has(id));
 
       setLayoutItems(newItems);
+      setHiddenLabels(config.hiddenLabels ?? {});
     } else {
       setColumnCount(1);
       setLayoutItems({
         unassigned: [],
         'column-0': fields.map((f) => f.id),
       });
+      setHiddenLabels({});
     }
   }, [selectedView, fields]);
 
@@ -200,7 +207,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   });
 
   const saveLayoutMutation = useMutation({
-    mutationFn: (config: { columnCount: number; columns: string[][] }) => {
+    mutationFn: (config: { columnCount: number; columns: string[][]; hiddenLabels?: Record<string, boolean> }) => {
       if (!selectedViewId) return Promise.reject(new Error('No view selected'));
       return apiClient.put(`/views/${selectedViewId}`, {
         config,
@@ -213,8 +220,8 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   });
 
   const toggleDefaultMutation = useMutation({
-    mutationFn: (isDefault: boolean) =>
-      apiClient.put<View>(`/views/${selectedViewId}`, { is_default: isDefault }),
+    mutationFn: (payload: { is_default?: boolean; is_single_default?: boolean }) =>
+      apiClient.put<View>(`/views/${selectedViewId}`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['views', tableId] });
       showToast(t('layout.defaultSetSuccess'));
@@ -345,6 +352,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
     saveLayoutMutation.mutate({
       columnCount,
       columns: colsArray,
+      hiddenLabels,
     });
   };
 
@@ -467,22 +475,44 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                 </div>
               </div>
               <div className="col d-flex justify-content-end align-items-center gap-3">
-                <div className="form-check form-switch mb-0" title={t('layout.isDefault')}>
-                  <input
-                    className="form-check-input cursor-pointer"
-                    type="checkbox"
-                    role="switch"
-                    id="isDefaultViewSwitch"
-                    checked={selectedView?.is_default ?? false}
-                    onChange={(e) => toggleDefaultMutation.mutate(e.target.checked)}
-                    disabled={toggleDefaultMutation.isPending}
-                  />
-                  <label
-                    className="form-check-label text-muted small cursor-pointer"
-                    htmlFor="isDefaultViewSwitch"
-                  >
-                    {t('layout.isDefault')}
-                  </label>
+                <div className="d-flex align-items-center border rounded px-3 py-1 bg-light gap-3">
+                  <span className="small fw-bold text-muted text-uppercase me-1">Defaults</span>
+                  
+                  <div className="form-check form-switch mb-0" title="Front default view">
+                    <input
+                      className="form-check-input cursor-pointer"
+                      type="checkbox"
+                      role="switch"
+                      id="isDefaultViewSwitch"
+                      checked={selectedView?.is_default ?? false}
+                      onChange={(e) => toggleDefaultMutation.mutate({ is_default: e.target.checked })}
+                      disabled={toggleDefaultMutation.isPending}
+                    />
+                    <label
+                      className="form-check-label text-muted small cursor-pointer"
+                      htmlFor="isDefaultViewSwitch"
+                    >
+                      Front
+                    </label>
+                  </div>
+
+                  <div className="form-check form-switch mb-0" title="Single default view">
+                    <input
+                      className="form-check-input cursor-pointer"
+                      type="checkbox"
+                      role="switch"
+                      id="isSingleDefaultViewSwitch"
+                      checked={selectedView?.is_single_default ?? false}
+                      onChange={(e) => toggleDefaultMutation.mutate({ is_single_default: e.target.checked })}
+                      disabled={toggleDefaultMutation.isPending}
+                    />
+                    <label
+                      className="form-check-label text-muted small cursor-pointer"
+                      htmlFor="isSingleDefaultViewSwitch"
+                    >
+                      Single
+                    </label>
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -572,6 +602,13 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                                         <LayoutFieldItem
                                           key={id}
                                           field={field}
+                                          hideLabel={hiddenLabels[id] === true}
+                                          onToggleLabel={() => {
+                                            setHiddenLabels((prev) => ({
+                                              ...prev,
+                                              [id]: !prev[id],
+                                            }));
+                                          }}
                                           onRemove={() => {
                                             setLayoutItems((prev) => {
                                               const activeContainer = `column-${colIdx}`;
@@ -622,7 +659,17 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   );
 }
 
-function LayoutFieldItem({ field, onRemove }: { field: BuilderField; onRemove?: () => void }) {
+function LayoutFieldItem({
+  field,
+  onRemove,
+  hideLabel,
+  onToggleLabel,
+}: {
+  field: BuilderField;
+  onRemove?: () => void;
+  hideLabel?: boolean;
+  onToggleLabel?: () => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id,
   });
@@ -651,6 +698,26 @@ function LayoutFieldItem({ field, onRemove }: { field: BuilderField; onRemove?: 
           <span className="text-truncate fw-medium">{field.name}</span>
         </div>
         <div className="d-flex align-items-center gap-2">
+          {onToggleLabel && (
+            <button
+              type="button"
+              className="btn btn-sm btn-link p-0 border-0 me-2"
+              onPointerDown={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onToggleLabel();
+              }}
+              title={hideLabel ? 'Afficher le libellé' : 'Masquer le libellé'}
+              style={{ cursor: 'pointer' }}
+            >
+              <i
+                className={`ti ti-tag${hideLabel ? '-off text-danger' : ' text-success'} fs-4`}
+                aria-hidden="true"
+              />
+            </button>
+          )}
           <span className="badge text-bg-light border text-muted small">{field.type}</span>
           {onRemove && (
             <button

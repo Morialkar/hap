@@ -86,6 +86,40 @@ test('user can create record with title field type', function () {
         ]);
 });
 
+test('user can create record with gps field type', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create();
+    WorkspaceMember::factory()->create([
+        'user_id' => $user->id,
+        'workspace_id' => $workspace->id,
+        'role' => 'owner',
+    ]);
+
+    $database = Database::factory()->create(['workspace_id' => $workspace->id]);
+    $table = Table::factory()->create(['database_id' => $database->id]);
+    Field::factory()->create([
+        'table_id' => $table->id,
+        'name' => 'Lieu',
+        'type' => 'gps',
+    ]);
+
+    $response = $this->actingAs($user)
+        ->postJson('/api/v1/records', [
+            'table_id' => $table->id,
+            'data' => [
+                'Lieu' => ['lat' => '45.5017', 'lng' => '-73.5673'],
+            ],
+        ]);
+
+    $response->assertStatus(201)
+        ->assertJson([
+            'table_id' => $table->id,
+            'data' => [
+                'Lieu' => ['lat' => 45.5017, 'lng' => -73.5673],
+            ],
+        ]);
+});
+
 test('record validation rejects unknown fields', function () {
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create();

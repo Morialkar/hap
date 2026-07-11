@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RecordForm } from '../RecordForm';
 import { type BuilderField } from '../../lib/fieldTypes';
@@ -80,5 +80,35 @@ describe('RecordForm', () => {
     const checkbox = screen.getByRole('switch');
     expect(checkbox).toBeInTheDocument();
     expect(checkbox).not.toBeChecked();
+  });
+
+  it('renders gps fields as latitude and longitude inputs', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RecordForm
+          tableId="tbl-1"
+          fields={[
+            {
+              id: 'f4',
+              name: 'Lieu',
+              type: 'gps',
+              position: 0,
+              options: {},
+              validation: {},
+            },
+          ]}
+          onCancel={vi.fn()}
+        />
+      </QueryClientProvider>
+    );
+
+    const latitude = screen.getByLabelText('Latitude');
+    const longitude = screen.getByLabelText('Longitude');
+
+    fireEvent.change(latitude, { target: { value: '45.5017' } });
+    fireEvent.change(longitude, { target: { value: '-73.5673' } });
+
+    expect(latitude).toHaveValue(45.5017);
+    expect(longitude).toHaveValue(-73.5673);
   });
 });

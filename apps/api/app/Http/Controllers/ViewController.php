@@ -29,6 +29,7 @@ class ViewController extends Controller
             'type' => 'required|string|in:list,card,map',
             'config' => 'nullable|array',
             'is_default' => 'sometimes|boolean',
+            'is_single_default' => 'sometimes|boolean',
         ]);
 
         $view = View::create($validated);
@@ -37,6 +38,12 @@ class ViewController extends Controller
             View::where('table_id', $view->table_id)
                 ->where('id', '!=', $view->id)
                 ->update(['is_default' => false]);
+        }
+
+        if ($view->is_single_default) {
+            View::where('table_id', $view->table_id)
+                ->where('id', '!=', $view->id)
+                ->update(['is_single_default' => false]);
         }
 
         return response()->json(new ViewResource($view), 201);
@@ -54,6 +61,7 @@ class ViewController extends Controller
             'type' => 'sometimes|required|string|in:list,card,map',
             'config' => 'nullable|array',
             'is_default' => 'sometimes|boolean',
+            'is_single_default' => 'sometimes|boolean',
         ]);
 
         $view->update($validated);
@@ -62,6 +70,12 @@ class ViewController extends Controller
             View::where('table_id', $view->table_id)
                 ->where('id', '!=', $view->id)
                 ->update(['is_default' => false]);
+        }
+
+        if ($view->is_single_default) {
+            View::where('table_id', $view->table_id)
+                ->where('id', '!=', $view->id)
+                ->update(['is_single_default' => false]);
         }
 
         return response()->json(new ViewResource($view));

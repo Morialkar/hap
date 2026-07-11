@@ -61,6 +61,7 @@ class RecordLinkService
             'data' => $links->map(function ($link) {
                 return [
                     'record_id' => $link->from_record,
+                    'table_id' => $link->fromRecord->table_id,
                     'field_id' => $link->field_id,
                     'field_name' => $link->field->name,
                     'record_data' => $link->fromRecord->data,

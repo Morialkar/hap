@@ -2,8 +2,10 @@ import { createFileRoute, useParams, useSearch, useNavigate, Link } from '@tanst
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo, useEffect } from 'react';
 import { useI18n } from '../contexts/I18nContext';
+import { GpsMapPicker } from '../components/GpsMapPicker';
 import { apiClient } from '../lib/apiClient';
 import type { ApiRecord, ApiRecordData } from '../lib/apiTypes';
+import { parseGpsValue } from '../lib/fieldDisplay';
 import { type BuilderField } from '../lib/fieldTypes';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -49,6 +51,7 @@ interface ViewSchema {
   config: {
     columnCount: number;
     columns: string[][];
+    hiddenLabels?: Record<string, boolean>;
   } | null;
   is_default?: boolean;
 }
@@ -253,7 +256,7 @@ function NavigationModePage() {
     return activeView.config.columns;
   }, [activeView, fields]);
 
-  const titleField = useMemo(() => fields.find((f) => f.type === 'title'), [fields]);
+  const titleField = useMemo(() => fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title'), [fields]);
 
   const rawRecords = useMemo(() => recordsQuery.data?.data || [], [recordsQuery.data]);
 
@@ -263,6 +266,7 @@ function NavigationModePage() {
         f.type !== 'image' &&
         f.type !== 'file' &&
         f.type !== 'long_text' &&
+        f.type !== 'title' &&
         f.is_filterable !== false
     );
   }, [fields]);
@@ -321,7 +325,16 @@ function NavigationModePage() {
         return <span className="badge text-bg-secondary px-2 py-1">{String(value)}</span>;
 
       case 'reference':
-        return <ReferenceLabel targetRecordId={String(value)} />;
+        return <ReferenceLabel targetRecordId={String(value)} databaseId={databaseId} />;
+
+      case 'gps': {
+        const coordinates = parseGpsValue(value);
+        return coordinates ? (
+          <GpsMapPicker coordinates={coordinates} height={160} readOnly />
+        ) : (
+          <span className="text-muted small">--</span>
+        );
+      }
 
       case 'image':
       case 'file': {
@@ -665,6 +678,7 @@ function NavigationModePage() {
                                       targetRecordId={val}
                                       fallback={val}
                                       className=""
+                                      databaseId={databaseId}
                                     />
                                   ) : val === '--' ? (
                                     'Sans valeur'
@@ -707,7 +721,13 @@ function NavigationModePage() {
                         {cardTitle && (
                           <div className="border-bottom pb-2 mb-3">
                             <h3 className="card-title fw-bold fs-3 mb-0 text-primary">
-                              {String(cardTitle)}
+                              <Link
+                                to="/navigation/$databaseId/record/$recordId"
+                                params={{ databaseId, recordId: rec.id }}
+                                className="text-primary text-decoration-none"
+                              >
+                                {String(cardTitle)}
+                              </Link>
                             </h3>
                           </div>
                         )}
@@ -720,11 +740,15 @@ function NavigationModePage() {
                                   const fieldDef = fieldsByIdMap.get(cleanId);
                                   if (!fieldDef || fieldDef.type === 'title') return null;
 
+                                  const hideLabel = activeView?.config?.hiddenLabels?.[cleanId] === true;
+
                                   return (
                                     <div key={cleanId} className="hap-fiche-field">
-                                      <div className="small text-muted fw-bold mb-1 text-uppercase hap-fiche-field-header py-1">
-                                        {fieldDef.name}
-                                      </div>
+                                      {!hideLabel && (
+                                        <div className="small text-muted fw-bold mb-1 text-uppercase hap-fiche-field-header py-1">
+                                          {fieldDef.name}
+                                        </div>
+                                      )}
                                       <div className="lh-sm mt-1">
                                         {renderFieldValue(fieldDef.name, rec.data || {})}
                                       </div>
@@ -739,15 +763,25 @@ function NavigationModePage() {
                       {/* Footer linking back to full record detail table */}
                       <div className="card-footer bg-light-subtle py-2 px-3 border-top-0 d-flex justify-content-between align-items-center">
                         <span className="text-muted small">v{rec.version}</span>
-                        <Link
-                          to="/tables/$databaseId/$tableId"
-                          params={{ databaseId, tableId: selectedTable!.id }}
-                          search={{ action: 'edit', recordId: rec.id }}
-                          className="btn btn-xs btn-link p-0 text-decoration-none"
-                        >
-                          <i className="ti ti-edit me-1" />
-                          Éditer la fiche
-                        </Link>
+                        <div className="d-flex gap-3">
+                          <Link
+                            to="/navigation/$databaseId/record/$recordId"
+                            params={{ databaseId, recordId: rec.id }}
+                            className="btn btn-xs btn-link p-0 text-decoration-none text-secondary"
+                          >
+                            <i className="ti ti-eye me-1" />
+                            Voir la fiche
+                          </Link>
+                          <Link
+                            to="/tables/$databaseId/$tableId"
+                            params={{ databaseId, tableId: selectedTable!.id }}
+                            search={{ action: 'edit', recordId: rec.id }}
+                            className="btn btn-xs btn-link p-0 text-decoration-none"
+                          >
+                            <i className="ti ti-edit me-1" />
+                            Éditer la fiche
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -796,10 +830,12 @@ function ReferenceLabel({
   targetRecordId,
   fallback,
   className = 'fw-medium text-primary small',
+  databaseId,
 }: {
   targetRecordId: string;
   fallback?: string;
   className?: string;
+  databaseId: string;
 }) {
   const recordQuery = useQuery<ApiRecord, Error>({
     queryKey: ['records', targetRecordId],
@@ -830,38 +866,52 @@ function ReferenceLabel({
   const rData = recordQuery.data.data || {};
   const fields = fieldsQuery.data || [];
 
-  // Find the field of type 'title'
-  const titleField = fields.find((f) => f.type === 'title');
+  // Determine the label to display
+  let labelText = '';
+  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     rData[titleField.name] !== undefined &&
     rData[titleField.name] !== null &&
     rData[titleField.name] !== ''
   ) {
-    return <span className={className}>{String(rData[titleField.name])}</span>;
+    labelText = String(rData[titleField.name]);
+  } else {
+    const sortedFields = [...fields].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+    const firstField = sortedFields[0];
+    if (
+      firstField &&
+      rData[firstField.name] !== undefined &&
+      rData[firstField.name] !== null &&
+      rData[firstField.name] !== ''
+    ) {
+      labelText = String(rData[firstField.name]);
+    } else {
+      labelText = String(
+        rData.name ||
+        rData.title ||
+        rData.nom ||
+        rData.titre ||
+        Object.values(rData)[0] ||
+        fallback ||
+        targetRecordId
+      );
+    }
   }
 
-  // Find the first field (by position or just first in list)
-  const sortedFields = [...fields].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
-  const firstField = sortedFields[0];
-  if (
-    firstField &&
-    rData[firstField.name] !== undefined &&
-    rData[firstField.name] !== null &&
-    rData[firstField.name] !== ''
-  ) {
-    return <span className={className}>{String(rData[firstField.name])}</span>;
+
+
+  if (databaseId && targetTableId) {
+    return (
+      <Link
+        to="/navigation/$databaseId/record/$recordId"
+        params={{ databaseId, recordId: targetRecordId }}
+        className={`${className} text-decoration-none`}
+      >
+        {labelText}
+      </Link>
+    );
   }
 
-  // Fallback if no fields exist or values are empty
-  const defaultLabel =
-    rData.name ||
-    rData.title ||
-    rData.nom ||
-    rData.titre ||
-    Object.values(rData)[0] ||
-    fallback ||
-    targetRecordId;
-
-  return <span className={className}>{String(defaultLabel)}</span>;
+  return <span className={className}>{labelText}</span>;
 }

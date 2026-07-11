@@ -235,6 +235,7 @@ test('reverse-lookup endpoint returns records referencing a record', function ()
             'data' => [
                 '*' => [
                     'record_id',
+                    'table_id',
                     'field_id',
                     'field_name',
                     'record_data',

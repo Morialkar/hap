@@ -172,9 +172,14 @@ class ImportEusebe extends Command
     {
         $sqlPath = $this->argument('file');
         if (! file_exists($sqlPath)) {
-            $this->error("SQL file not found at: {$sqlPath}");
+            $containerFallback = storage_path('app/eusebe_dump.sql');
+            if ($sqlPath === '/Users/nao/Eusebe/sql/eusebe.sql' && file_exists($containerFallback)) {
+                $sqlPath = $containerFallback;
+            } else {
+                $this->error("SQL file not found at: {$sqlPath}");
 
-            return 1;
+                return 1;
+            }
         }
 
         // Get or create workspace

@@ -727,7 +727,7 @@ function TableRecordsPage() {
                 ) : activeRecordId ? (
                   /* Detail card layout or history panel */
                   activeTab === 'details' ? (
-                    <RecordDetailView tableId={tableId} recordId={activeRecordId} />
+                    <RecordDetailView databaseId={databaseId} tableId={tableId} recordId={activeRecordId} />
                   ) : (
                     <RecordHistoryPanel
                       recordId={activeRecordId}

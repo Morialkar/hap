@@ -16,7 +16,7 @@ class RecordQueryService
      */
     public function queryRecords(Table $table, array $params): array
     {
-        $query = Record::where('table_id', $table->id);
+        $query = Record::with('table')->where('table_id', $table->id);
 
         // Apply search
         if (! empty($params['search'])) {

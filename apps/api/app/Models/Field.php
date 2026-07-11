@@ -32,6 +32,12 @@ class Field extends Model
                 $model->id = (string) Str::uuid();
             }
         });
+
+        static::saving(function ($model) {
+            if (in_array($model->type, ['title', 'image', 'file', 'long_text'])) {
+                $model->is_filterable = false;
+            }
+        });
     }
 
     public function table(): BelongsTo
