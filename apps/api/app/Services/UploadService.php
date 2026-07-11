@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Storage;
 
 class UploadService
 {
+    public function __construct(private ExifGpsService $exifGpsService) {}
+
     /**
      * Store an uploaded file.
      */
@@ -41,6 +43,9 @@ class UploadService
 
         // 3. Generate thumbnail if image
         if (str_starts_with($mimeType, 'image/')) {
+            if ($gps = $this->exifGpsService->extract($file->getRealPath(), $mimeType)) {
+                $metadata['gps'] = $gps;
+            }
             $thumbnailPath = "uploads/thumbnails/{$hash}";
             if (! Storage::exists($thumbnailPath)) {
                 $this->generateThumbnail($file->getRealPath(), $thumbnailPath, $mimeType);

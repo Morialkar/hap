@@ -21,6 +21,7 @@ export const Route = createFileRoute('/tables/$databaseId/$tableId')({
   validateSearch: (search: Record<string, unknown>): TableSearch => ({
     action: search.action as string | undefined,
     recordId: search.recordId as string | undefined,
+    returnTo: search.returnTo === 'single-record' ? 'single-record' : undefined,
   }),
   component: TableRecordsPage,
 });
@@ -41,6 +42,7 @@ type RecordData = ApiRecord;
 type TableSearch = {
   action?: string;
   recordId?: string;
+  returnTo?: 'single-record';
 };
 
 interface FilterItem {
@@ -165,7 +167,16 @@ function TableRecordsPage() {
     setIsFormDirty(false);
   };
 
-  const handleSaveSuccess = () => {
+  const handleSaveSuccess = (record: ApiRecord) => {
+    if (search.returnTo === 'single-record') {
+      setIsFormDirty(false);
+      navigate({
+        to: '/navigation/$databaseId/record/$recordId',
+        params: { databaseId, recordId: record.id },
+      });
+      return;
+    }
+
     showToast(t('common.save'));
     navigate({ search: {} as TableSearch });
     setIsFormDirty(false);

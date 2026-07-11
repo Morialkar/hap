@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo, useEffect } from 'react';
 import { useI18n } from '../contexts/I18nContext';
 import { GpsMapPicker } from '../components/GpsMapPicker';
+import { GpsLocalityLabel } from '../components/GpsLocalityLabel';
+import { DatabaseMapView, type DatabaseMapPoint } from '../components/DatabaseMapView';
 import { apiClient } from '../lib/apiClient';
 import type { ApiRecord, ApiRecordData } from '../lib/apiTypes';
 import { parseGpsValue } from '../lib/fieldDisplay';
@@ -11,6 +13,7 @@ import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
 import { PageHeader } from '../components/ui/PageHeader';
 import { SurfaceCard } from '../components/ui/SurfaceCard';
+import { loadBundledGazetteerResolver, type LocalitySnapshot } from '@hap/core';
 
 interface NavigationSearch {
   tableId?: string;
@@ -56,6 +59,16 @@ interface ViewSchema {
   is_default?: boolean;
 }
 
+type GpsFacetDimension = 'country' | 'region' | 'city';
+
+interface SidebarFacet {
+  key: string;
+  label: string;
+  field?: BuilderField;
+  gpsFieldName?: string;
+  dimension?: GpsFacetDimension;
+}
+
 function NavigationModePage() {
   const { databaseId } = useParams({ from: '/navigation/$databaseId' });
   const searchParams = useSearch({ from: '/navigation/$databaseId' });
@@ -63,6 +76,7 @@ function NavigationModePage() {
   const { t } = useI18n();
 
   const [activeLightboxHash, setActiveLightboxHash] = useState<string | null>(null);
+  const [showMap, setShowMap] = useState(false);
 
   // Search parameters from URL state
   const activeTableId = searchParams.tableId;
@@ -131,6 +145,12 @@ function NavigationModePage() {
     enabled: !!selectedTableId,
   });
 
+  const mapPointsQuery = useQuery<{ data: DatabaseMapPoint[] }, Error>({
+    queryKey: ['database-map-points', databaseId],
+    queryFn: () => apiClient.get(`/databases/${databaseId}/map-points`),
+    enabled: !!databaseId,
+  });
+
   // Loading state
   const isLoading =
     databaseQuery.isLoading ||
@@ -183,6 +203,10 @@ function NavigationModePage() {
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
   const [customViewId, setCustomViewId] = useState<string | null>(null);
   const [collapsedFields, setCollapsedFields] = useState<Record<string, boolean>>({});
+  const [gpsLocalities, setGpsLocalities] = useState<
+    Record<string, Record<string, LocalitySnapshot>>
+  >({});
+  const [gpsLocalitiesReady, setGpsLocalitiesReady] = useState(false);
 
   const toggleFieldCollapse = (fieldId: string) => {
     setCollapsedFields((prev) => ({
@@ -267,40 +291,99 @@ function NavigationModePage() {
         f.type !== 'file' &&
         f.type !== 'long_text' &&
         f.type !== 'title' &&
+        f.type !== 'gps' &&
         f.is_filterable !== false
     );
   }, [fields]);
 
+  const gpsFilterableFields = useMemo(
+    () => fields.filter((field) => field.type === 'gps' && field.is_filterable !== false),
+    [fields]
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (gpsFilterableFields.length === 0 || rawRecords.length === 0) {
+      setGpsLocalities({});
+      setGpsLocalitiesReady(true);
+      return;
+    }
+
+    setGpsLocalitiesReady(false);
+    void loadBundledGazetteerResolver().then((resolver) => {
+      if (cancelled) return;
+
+      const next: Record<string, Record<string, LocalitySnapshot>> = {};
+      rawRecords.forEach((record) => {
+        const localities: Record<string, LocalitySnapshot> = {};
+        gpsFilterableFields.forEach((field) => {
+          const coordinates = parseGpsValue(record.data?.[field.name]);
+          if (coordinates) localities[field.name] = resolver.resolve(coordinates);
+        });
+        if (Object.keys(localities).length > 0) next[record.id] = localities;
+      });
+      setGpsLocalities(next);
+      setGpsLocalitiesReady(true);
+    }).catch(() => {
+      if (!cancelled) setGpsLocalitiesReady(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [gpsFilterableFields, rawRecords]);
+
+  const sidebarFacets = useMemo<SidebarFacet[]>(() => [
+    ...filterableFields.map((field) => ({ key: field.name, label: field.name, field })),
+    ...(gpsLocalitiesReady ? gpsFilterableFields.flatMap((field) => [
+      { key: `${field.name}.__locality.country`, label: `${field.name} — Pays`, gpsFieldName: field.name, dimension: 'country' as const },
+      { key: `${field.name}.__locality.region`, label: `${field.name} — Région`, gpsFieldName: field.name, dimension: 'region' as const },
+      { key: `${field.name}.__locality.city`, label: `${field.name} — Ville`, gpsFieldName: field.name, dimension: 'city' as const },
+    ]) : []),
+  ], [filterableFields, gpsFilterableFields, gpsLocalitiesReady]);
+
+  const facetsByKey = useMemo(
+    () => new Map(sidebarFacets.map((facet) => [facet.key, facet])),
+    [sidebarFacets]
+  );
+
   const facetCounts = useMemo(() => {
     const counts: Record<string, Record<string, number>> = {};
-    filterableFields.forEach((f) => {
-      counts[f.name] = {};
+    sidebarFacets.forEach((facet) => {
+      counts[facet.key] = {};
     });
 
     rawRecords.forEach((rec) => {
-      filterableFields.forEach((f) => {
-        const val = rec.data?.[f.name];
+      sidebarFacets.forEach((facet) => {
+        const val = facet.dimension
+          ? gpsLocalities[rec.id]?.[facet.gpsFieldName!]?.[facet.dimension]
+          : rec.data?.[facet.field!.name];
         const strVal = val === undefined || val === null || val === '' ? '--' : String(val);
-        counts[f.name][strVal] = (counts[f.name][strVal] || 0) + 1;
+        counts[facet.key][strVal] = (counts[facet.key][strVal] || 0) + 1;
       });
     });
 
     return counts;
-  }, [rawRecords, filterableFields]);
+  }, [rawRecords, sidebarFacets, gpsLocalities]);
 
   const filteredRecords = useMemo(() => {
     let recs = rawRecords;
     Object.entries(activeFilters).forEach(([fieldName, selectedValues]) => {
+      const facet = facetsByKey.get(fieldName);
+      if (!facet) return;
       if (selectedValues.length > 0) {
         recs = recs.filter((rec) => {
-          const val = rec.data?.[fieldName];
+          const val = facet.dimension
+            ? gpsLocalities[rec.id]?.[facet.gpsFieldName!]?.[facet.dimension]
+            : rec.data?.[facet.field!.name];
           const strVal = val === undefined || val === null || val === '' ? '--' : String(val);
           return selectedValues.includes(strVal);
         });
       }
     });
     return recs;
-  }, [rawRecords, activeFilters]);
+  }, [rawRecords, activeFilters, facetsByKey, gpsLocalities]);
 
   // Render helpers
   const renderFieldValue = (fieldName: string, recordData: ApiRecordData) => {
@@ -330,7 +413,10 @@ function NavigationModePage() {
       case 'gps': {
         const coordinates = parseGpsValue(value);
         return coordinates ? (
-          <GpsMapPicker coordinates={coordinates} height={160} readOnly />
+          <>
+            <GpsMapPicker coordinates={coordinates} height={160} readOnly />
+            {field.options?.show_locality === true && <GpsLocalityLabel coordinates={coordinates} />}
+          </>
         ) : (
           <span className="text-muted small">--</span>
         );
@@ -597,6 +683,26 @@ function NavigationModePage() {
         </div>
       </SurfaceCard>
 
+      <div className="mb-3 d-flex justify-content-end">
+        <button type="button" className={`btn btn-outline-secondary ${showMap ? 'active' : ''}`} onClick={() => setShowMap((current) => !current)}>
+          <i className="ti ti-map-2 me-1" aria-hidden="true" />
+          Carte ({mapPointsQuery.data?.data.length ?? 0})
+        </button>
+      </div>
+
+      {showMap && (
+        <SurfaceCard className="mb-4">
+          <div className="card-body">
+            {mapPointsQuery.isLoading ? <LoadingSpinner size="lg" /> : (
+              <DatabaseMapView
+                points={mapPointsQuery.data?.data ?? []}
+                databaseId={databaseId}
+              />
+            )}
+          </div>
+        </SurfaceCard>
+      )}
+
       {/* Main Content Area: Facet Sidebar + Cards Grid */}
       <div className="row g-4">
         {/* Left Sidebar: Facets */}
@@ -618,33 +724,33 @@ function NavigationModePage() {
               )}
             </div>
             <div className="card-body p-3">
-              {filterableFields.length === 0 && (
+              {sidebarFacets.length === 0 && (
                 <div className="text-center text-muted py-3 small">Aucun filtre disponible</div>
               )}
-              {filterableFields.map((field) => {
-                const countsObj = facetCounts[field.name] || {};
+              {sidebarFacets.map((facet) => {
+                const countsObj = facetCounts[facet.key] || {};
                 const sortedValues = Object.entries(countsObj).sort((a, b) => b[1] - a[1]);
 
                 if (sortedValues.length === 0) return null;
-                const isCollapsed = collapsedFields[field.id] !== false;
+                const isCollapsed = collapsedFields[facet.key] !== false;
 
                 return (
-                  <div key={field.id} className="mb-3 border-bottom pb-2">
+                  <div key={facet.key} className="mb-3 border-bottom pb-2">
                     <div
                       className="d-flex align-items-center justify-content-between cursor-pointer py-1 select-none"
-                      onClick={() => toggleFieldCollapse(field.id)}
+                      onClick={() => toggleFieldCollapse(facet.key)}
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
-                          toggleFieldCollapse(field.id);
+                          toggleFieldCollapse(facet.key);
                         }
                       }}
                       style={{ outline: 'none' }}
                     >
                       <h4 className="fw-semibold text-uppercase text-muted mb-0 small tracking-wider">
-                        {field.name}
+                        {facet.label}
                       </h4>
                       <i
                         className={`ti ti-chevron-${isCollapsed ? 'right' : 'down'} text-muted fs-4`}
@@ -655,7 +761,7 @@ function NavigationModePage() {
                     {!isCollapsed && (
                       <div className="d-flex flex-column gap-1 mt-2">
                         {sortedValues.map(([val, count]) => {
-                          const isChecked = (activeFilters[field.name] || []).includes(val);
+                          const isChecked = (activeFilters[facet.key] || []).includes(val);
                           return (
                             <label
                               key={val}
@@ -666,14 +772,14 @@ function NavigationModePage() {
                                   type="checkbox"
                                   className="form-check-input m-0 cursor-pointer"
                                   checked={isChecked}
-                                  onChange={() => toggleFilterValue(field.name, val)}
+                                  onChange={() => toggleFilterValue(facet.key, val)}
                                 />
                                 <span
                                   className="text-body text-truncate"
                                   style={{ maxWidth: '140px' }}
                                   title={val === '--' ? 'Sans valeur' : val}
                                 >
-                                  {field.type === 'reference' ? (
+                                  {facet.field?.type === 'reference' ? (
                                     <ReferenceLabel
                                       targetRecordId={val}
                                       fallback={val}

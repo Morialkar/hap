@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CsvImportController;
 use App\Http\Controllers\DatabaseController;
+use App\Http\Controllers\DatabaseMapPointController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\TableController;
@@ -31,6 +32,7 @@ Route::prefix('v1')->group(function () {
         Route::post('uploads', [UploadController::class, 'store']);
 
         Route::apiResource('databases', DatabaseController::class);
+        Route::get('databases/{database}/map-points', [DatabaseMapPointController::class, 'index']);
         Route::get('templates', [TemplateController::class, 'index']);
         Route::post('databases/{database}/export-template', [TemplateController::class, 'export']);
         Route::post('workspaces/{workspace}/install-template', [TemplateController::class, 'install']);

@@ -53,4 +53,9 @@ class Record extends Model
     {
         return $this->hasMany(RecordLink::class, 'to_record');
     }
+
+    public function points(): HasMany
+    {
+        return $this->hasMany(RecordPoint::class, 'record_id');
+    }
 }
