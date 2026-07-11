@@ -173,4 +173,24 @@ describe('GpsMapPicker', () => {
       duration: 250,
     });
   });
+
+  it('renders a read-only map without coordinate editing handlers', async () => {
+    const onChange = vi.fn();
+
+    render(
+      <GpsMapPicker
+        coordinates={{ lat: 45.5017, lng: -73.5673 }}
+        height={140}
+        readOnly
+        onChange={onChange}
+      />
+    );
+
+    await waitFor(() => expect(maplibreMock.mapInstances).toHaveLength(1));
+
+    const options = maplibreMock.mapInstances[0].options as { interactive: boolean };
+    expect(options.interactive).toBe(false);
+    expect(maplibreMock.mapInstances[0].handlers.click).toBeUndefined();
+    expect(maplibreMock.markerInstances[0].handlers.dragend).toBeUndefined();
+  });
 });

@@ -8,7 +8,9 @@ interface Coordinates {
 
 interface GpsMapPickerProps {
   coordinates: Coordinates | null;
-  onChange: (coordinates: Coordinates) => void;
+  onChange?: (coordinates: Coordinates) => void;
+  height?: number;
+  readOnly?: boolean;
 }
 
 const DEFAULT_CENTER: Coordinates = {
@@ -39,7 +41,12 @@ const OPENSTREETMAP_STYLE = {
   ],
 };
 
-export function GpsMapPicker({ coordinates, onChange }: GpsMapPickerProps) {
+export function GpsMapPicker({
+  coordinates,
+  onChange,
+  height = 220,
+  readOnly = false,
+}: GpsMapPickerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<import('maplibre-gl').Map | null>(null);
   const markerRef = useRef<import('maplibre-gl').Marker | null>(null);
@@ -71,6 +78,7 @@ export function GpsMapPicker({ coordinates, onChange }: GpsMapPickerProps) {
           style: OPENSTREETMAP_STYLE as maplibregl.StyleSpecification,
           center: [center.lng, center.lat],
           zoom: latestCoordinatesRef.current ? 8 : 4,
+          interactive: !readOnly,
           attributionControl: {
             compact: true,
           },
@@ -78,29 +86,31 @@ export function GpsMapPicker({ coordinates, onChange }: GpsMapPickerProps) {
 
         const marker = new maplibregl.Marker({
           color: '#2f6f4e',
-          draggable: true,
+          draggable: !readOnly,
         })
           .setLngLat([center.lng, center.lat])
           .addTo(map);
 
-        marker.on('dragend', () => {
-          const next = marker.getLngLat();
-          onChangeRef.current({
-            lat: roundCoordinate(next.lat),
-            lng: roundCoordinate(next.lng),
+        if (!readOnly && onChangeRef.current) {
+          marker.on('dragend', () => {
+            const next = marker.getLngLat();
+            onChangeRef.current?.({
+              lat: roundCoordinate(next.lat),
+              lng: roundCoordinate(next.lng),
+            });
           });
-        });
 
-        map.on('click', (event) => {
-          const next = {
-            lat: roundCoordinate(event.lngLat.lat),
-            lng: roundCoordinate(event.lngLat.lng),
-          };
-          marker.setLngLat([next.lng, next.lat]);
-          onChangeRef.current(next);
-        });
+          map.on('click', (event) => {
+            const next = {
+              lat: roundCoordinate(event.lngLat.lat),
+              lng: roundCoordinate(event.lngLat.lng),
+            };
+            marker.setLngLat([next.lng, next.lat]);
+            onChangeRef.current?.(next);
+          });
 
-        map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+          map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+        }
 
         mapRef.current = map;
         markerRef.current = marker;
@@ -122,7 +132,7 @@ export function GpsMapPicker({ coordinates, onChange }: GpsMapPickerProps) {
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [readOnly]);
 
   useEffect(() => {
     if (
@@ -157,7 +167,7 @@ export function GpsMapPicker({ coordinates, onChange }: GpsMapPickerProps) {
     <div
       ref={containerRef}
       className="rounded border overflow-hidden"
-      style={{ height: 220 }}
+      style={{ height }}
       aria-label="OpenStreetMap position picker"
       data-testid="gps-map-picker"
     >

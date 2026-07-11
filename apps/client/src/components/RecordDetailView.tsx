@@ -2,7 +2,9 @@ import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/apiClient';
 import type { ApiRecord, ApiRecordData } from '../lib/apiTypes';
+import { parseGpsValue } from '../lib/fieldDisplay';
 import { type BuilderField } from '../lib/fieldTypes';
+import { GpsMapPicker } from './GpsMapPicker';
 import { LoadingSpinner } from './LoadingSpinner';
 
 interface RecordDetailViewProps {
@@ -110,6 +112,15 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
 
       case 'reference':
         return <ReferenceLabel targetRecordId={String(value)} />;
+
+      case 'gps': {
+        const coordinates = parseGpsValue(value);
+        return coordinates ? (
+          <GpsMapPicker coordinates={coordinates} height={220} readOnly />
+        ) : (
+          <span className="text-muted small">--</span>
+        );
+      }
 
       case 'image':
       case 'file': {

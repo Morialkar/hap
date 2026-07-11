@@ -2,8 +2,10 @@ import { createFileRoute, useParams, useSearch, useNavigate, Link } from '@tanst
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo, useEffect } from 'react';
 import { useI18n } from '../contexts/I18nContext';
+import { GpsMapPicker } from '../components/GpsMapPicker';
 import { apiClient } from '../lib/apiClient';
 import type { ApiRecord, ApiRecordData } from '../lib/apiTypes';
+import { parseGpsValue } from '../lib/fieldDisplay';
 import { type BuilderField } from '../lib/fieldTypes';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -322,6 +324,15 @@ function NavigationModePage() {
 
       case 'reference':
         return <ReferenceLabel targetRecordId={String(value)} />;
+
+      case 'gps': {
+        const coordinates = parseGpsValue(value);
+        return coordinates ? (
+          <GpsMapPicker coordinates={coordinates} height={160} readOnly />
+        ) : (
+          <span className="text-muted small">--</span>
+        );
+      }
 
       case 'image':
       case 'file': {
