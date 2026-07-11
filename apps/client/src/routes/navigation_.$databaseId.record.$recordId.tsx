@@ -63,7 +63,7 @@ export function SingleRecordPage() {
 
   // Resolve main title/label
   let recordTitle = '';
-  const titleField = fields.find((f) => f.type === 'title');
+  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     rData[titleField.name] !== undefined &&

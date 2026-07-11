@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useI18n } from '../contexts/I18nContext';
 import { FIELD_TYPES, FIELD_TYPE_ORDER } from '../lib/fieldTypes';
 import type { BuilderField, FieldOptionSchema, FieldValidationSchema } from '../lib/fieldTypes';
@@ -7,6 +7,7 @@ interface FieldOptionPanelProps {
   field: BuilderField;
   availableTables?: { id: string; name: string }[];
   onChange: (field: BuilderField) => void;
+  fields?: BuilderField[];
 }
 
 type OptionValue = string | number | boolean | string[] | undefined;
@@ -44,11 +45,15 @@ function InputControl({
   value,
   onChange,
   tables,
+  fields,
+  currentField,
 }: {
   schema: FieldOptionSchema;
   value: OptionValue;
   onChange: (value: unknown) => void;
   tables?: { id: string; name: string }[];
+  fields?: BuilderField[];
+  currentField?: BuilderField;
 }) {
   const { t } = useI18n();
 
@@ -156,13 +161,36 @@ function InputControl({
       );
 
     case 'string':
-    default:
+    default: {
+      const inputRef = useRef<HTMLInputElement>(null);
+
+      const insertTag = (fieldName: string) => {
+        const input = inputRef.current;
+        if (!input) return;
+        const start = input.selectionStart ?? 0;
+        const end = input.selectionEnd ?? 0;
+        const tag = `\${${fieldName}}`;
+        const text = String(value === undefined ? '' : value);
+        const newValue = text.slice(0, start) + tag + text.slice(end);
+        onChange(newValue);
+
+        setTimeout(() => {
+          input.focus();
+          input.setSelectionRange(start + tag.length, start + tag.length);
+        }, 0);
+      };
+
+      const otherFields = (fields ?? []).filter(
+        (f) => f.id !== currentField?.id && f.type !== 'compound'
+      );
+
       return (
         <>
           <label htmlFor={`option-${schema.key}`} className="form-label">
             {t(schema.label)}
           </label>
           <input
+            ref={inputRef}
             id={`option-${schema.key}`}
             type="text"
             className="form-control"
@@ -170,8 +198,32 @@ function InputControl({
             onChange={(e) => onChange(parseInputValue('string', e.target.value))}
             placeholder={schema.placeholder}
           />
+          {schema.key === 'template' && otherFields.length > 0 && (
+            <div className="mt-2">
+              <span className="text-muted small d-block mb-1">
+                Champs disponibles (cliquer ou glisser) :
+              </span>
+              <div className="d-flex flex-wrap gap-1">
+                {otherFields.map((f) => (
+                  <span
+                    key={f.id}
+                    className="badge text-bg-light border select-none hap-field-badge"
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData('text/plain', `\${${f.name}}`);
+                    }}
+                    onClick={() => insertTag(f.name)}
+                    style={{ cursor: 'grab' }}
+                  >
+                    {f.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </>
       );
+    }
   }
 }
 
@@ -182,6 +234,8 @@ function OptionGroup({
   tables,
   title,
   emptyMessage,
+  fields,
+  currentField,
 }: {
   schemas: (FieldOptionSchema | FieldValidationSchema)[];
   values: Record<string, unknown>;
@@ -189,6 +243,8 @@ function OptionGroup({
   tables?: { id: string; name: string }[];
   title: string;
   emptyMessage: string;
+  fields?: BuilderField[];
+  currentField?: BuilderField;
 }) {
   return (
     <>
@@ -200,10 +256,12 @@ function OptionGroup({
           {schemas.map((schema) => (
             <InputControl
               key={schema.key}
-              schema={schema}
+              schema={schema as FieldOptionSchema}
               value={getOptionValue(values, schema.key)}
               onChange={(newValue) => onChange({ [schema.key]: newValue })}
               tables={tables}
+              fields={fields}
+              currentField={currentField}
             />
           ))}
         </div>
@@ -212,7 +270,12 @@ function OptionGroup({
   );
 }
 
-export function FieldOptionPanel({ field, availableTables, onChange }: FieldOptionPanelProps) {
+export function FieldOptionPanel({
+  field,
+  availableTables,
+  onChange,
+  fields,
+}: FieldOptionPanelProps) {
   const { t } = useI18n();
 
   const definition = useMemo(() => FIELD_TYPES[field.type], [field.type]);
@@ -293,6 +356,8 @@ export function FieldOptionPanel({ field, availableTables, onChange }: FieldOpti
           onChange={updateOptions}
           tables={availableTables}
           emptyMessage={t('builder.options.noOptions')}
+          fields={fields}
+          currentField={field}
         />
 
         <OptionGroup
@@ -302,6 +367,8 @@ export function FieldOptionPanel({ field, availableTables, onChange }: FieldOpti
           onChange={updateValidation}
           tables={availableTables}
           emptyMessage={t('builder.validation.noRules')}
+          fields={fields}
+          currentField={field}
         />
       </div>
     </div>

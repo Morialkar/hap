@@ -468,6 +468,7 @@ function StructureBuilder() {
                   field={selectedField}
                   availableTables={availableTables}
                   onChange={handleFieldChange}
+                  fields={fields}
                 />
               ) : (
                 <SurfaceCard className="h-100">

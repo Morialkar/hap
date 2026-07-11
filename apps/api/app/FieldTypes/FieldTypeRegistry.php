@@ -52,5 +52,6 @@ class FieldTypeRegistry
         $this->register('url', new UrlType);
         $this->register('email', new EmailType);
         $this->register('gps', new GpsType);
+        $this->register('compound', new CompoundType);
     }
 }

@@ -37,6 +37,7 @@ interface View {
   config: {
     columnCount: number;
     columns: string[][];
+    hiddenLabels?: Record<string, boolean>;
   } | null;
   is_default?: boolean;
   is_single_default?: boolean;
@@ -70,6 +71,8 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   const [layoutItems, setLayoutItems] = useState<Record<string, string[]>>({
     unassigned: [],
   });
+
+  const [hiddenLabels, setHiddenLabels] = useState<Record<string, boolean>>({});
 
   // Dragging states
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -105,6 +108,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
         unassigned: [],
         'column-0': fields.map((f) => f.id),
       });
+      setHiddenLabels({});
       return;
     }
 
@@ -138,12 +142,14 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
       newItems.unassigned = fields.map((f) => f.id).filter((id) => !placedIds.has(id));
 
       setLayoutItems(newItems);
+      setHiddenLabels(config.hiddenLabels ?? {});
     } else {
       setColumnCount(1);
       setLayoutItems({
         unassigned: [],
         'column-0': fields.map((f) => f.id),
       });
+      setHiddenLabels({});
     }
   }, [selectedView, fields]);
 
@@ -201,7 +207,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   });
 
   const saveLayoutMutation = useMutation({
-    mutationFn: (config: { columnCount: number; columns: string[][] }) => {
+    mutationFn: (config: { columnCount: number; columns: string[][]; hiddenLabels?: Record<string, boolean> }) => {
       if (!selectedViewId) return Promise.reject(new Error('No view selected'));
       return apiClient.put(`/views/${selectedViewId}`, {
         config,
@@ -346,6 +352,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
     saveLayoutMutation.mutate({
       columnCount,
       columns: colsArray,
+      hiddenLabels,
     });
   };
 
@@ -595,6 +602,13 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                                         <LayoutFieldItem
                                           key={id}
                                           field={field}
+                                          hideLabel={hiddenLabels[id] === true}
+                                          onToggleLabel={() => {
+                                            setHiddenLabels((prev) => ({
+                                              ...prev,
+                                              [id]: !prev[id],
+                                            }));
+                                          }}
                                           onRemove={() => {
                                             setLayoutItems((prev) => {
                                               const activeContainer = `column-${colIdx}`;
@@ -645,7 +659,17 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   );
 }
 
-function LayoutFieldItem({ field, onRemove }: { field: BuilderField; onRemove?: () => void }) {
+function LayoutFieldItem({
+  field,
+  onRemove,
+  hideLabel,
+  onToggleLabel,
+}: {
+  field: BuilderField;
+  onRemove?: () => void;
+  hideLabel?: boolean;
+  onToggleLabel?: () => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id,
   });
@@ -674,6 +698,26 @@ function LayoutFieldItem({ field, onRemove }: { field: BuilderField; onRemove?: 
           <span className="text-truncate fw-medium">{field.name}</span>
         </div>
         <div className="d-flex align-items-center gap-2">
+          {onToggleLabel && (
+            <button
+              type="button"
+              className="btn btn-sm btn-link p-0 border-0 me-2"
+              onPointerDown={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onToggleLabel();
+              }}
+              title={hideLabel ? 'Afficher le libellé' : 'Masquer le libellé'}
+              style={{ cursor: 'pointer' }}
+            >
+              <i
+                className={`ti ti-tag${hideLabel ? '-off text-danger' : ' text-success'} fs-4`}
+                aria-hidden="true"
+              />
+            </button>
+          )}
           <span className="badge text-bg-light border text-muted small">{field.type}</span>
           {onRemove && (
             <button

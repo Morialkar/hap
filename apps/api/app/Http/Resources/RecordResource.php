@@ -14,10 +14,17 @@ class RecordResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $data = $this->data ?? [];
+        $table = $this->table;
+        if ($table) {
+            $validationService = app(\App\Services\RecordValidationService::class);
+            $data = $validationService->computeCompoundFields($table, $data);
+        }
+
         return [
             'id' => $this->id,
             'table_id' => $this->table_id,
-            'data' => $this->data,
+            'data' => $data,
             'version' => $this->version,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

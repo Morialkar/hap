@@ -51,6 +51,15 @@
   padding: 0.875rem;
 }
 
+.hap-referencing-record-title {
+  min-width: 0;
+}
+
+.hap-referencing-record-table {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .hap-empty-state {
   margin-inline: auto;
   max-width: 28rem;

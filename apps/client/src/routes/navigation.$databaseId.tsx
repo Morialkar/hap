@@ -51,6 +51,7 @@ interface ViewSchema {
   config: {
     columnCount: number;
     columns: string[][];
+    hiddenLabels?: Record<string, boolean>;
   } | null;
   is_default?: boolean;
 }
@@ -255,7 +256,7 @@ function NavigationModePage() {
     return activeView.config.columns;
   }, [activeView, fields]);
 
-  const titleField = useMemo(() => fields.find((f) => f.type === 'title'), [fields]);
+  const titleField = useMemo(() => fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title'), [fields]);
 
   const rawRecords = useMemo(() => recordsQuery.data?.data || [], [recordsQuery.data]);
 
@@ -739,11 +740,15 @@ function NavigationModePage() {
                                   const fieldDef = fieldsByIdMap.get(cleanId);
                                   if (!fieldDef || fieldDef.type === 'title') return null;
 
+                                  const hideLabel = activeView?.config?.hiddenLabels?.[cleanId] === true;
+
                                   return (
                                     <div key={cleanId} className="hap-fiche-field">
-                                      <div className="small text-muted fw-bold mb-1 text-uppercase hap-fiche-field-header py-1">
-                                        {fieldDef.name}
-                                      </div>
+                                      {!hideLabel && (
+                                        <div className="small text-muted fw-bold mb-1 text-uppercase hap-fiche-field-header py-1">
+                                          {fieldDef.name}
+                                        </div>
+                                      )}
                                       <div className="lh-sm mt-1">
                                         {renderFieldValue(fieldDef.name, rec.data || {})}
                                       </div>
@@ -863,7 +868,7 @@ function ReferenceLabel({
 
   // Determine the label to display
   let labelText = '';
-  const titleField = fields.find((f) => f.type === 'title');
+  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     rData[titleField.name] !== undefined &&

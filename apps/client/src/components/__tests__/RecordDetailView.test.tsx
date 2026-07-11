@@ -131,7 +131,8 @@ describe('RecordDetailView', () => {
       expect(screen.getByText('Fiches associées (1)')).toBeInTheDocument();
     });
     expect(screen.getByText('Histoire du Canada')).toBeInTheDocument();
-    expect(screen.getByText('Ouvrages')).toBeInTheDocument();
+    expect(screen.getByText('Ouvrages')).toHaveClass('hap-referencing-record-table');
     expect(screen.getByText('auteur')).toBeInTheDocument();
+    expect(screen.getByText('Histoire du Canada').closest('.hap-referencing-record-title')).not.toBeNull();
   });
 });

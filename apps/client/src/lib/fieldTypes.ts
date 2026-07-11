@@ -11,7 +11,8 @@ export type FieldType =
   | 'file'
   | 'url'
   | 'email'
-  | 'gps';
+  | 'gps'
+  | 'compound';
 
 export interface FieldOptionSchema {
   key: string;
@@ -455,6 +456,27 @@ export const FIELD_TYPES: Record<FieldType, FieldTypeDefinition> = {
       },
     ],
   },
+  compound: {
+    type: 'compound',
+    icon: 'binary',
+    labelKey: 'fieldType.compound.label',
+    descriptionKey: 'fieldType.compound.description',
+    options: [
+      {
+        key: 'template',
+        type: 'string',
+        label: 'fieldType.compound.options.template',
+        required: true,
+        placeholder: '${Prénom} ${Nom}',
+      },
+      {
+        key: 'is_title',
+        type: 'boolean',
+        label: 'fieldType.compound.options.isTitle',
+      },
+    ],
+    validation: [],
+  },
 };
 
 export interface BuilderField {
@@ -483,4 +505,5 @@ export const FIELD_TYPE_ORDER: FieldType[] = [
   'url',
   'email',
   'gps',
+  'compound',
 ];

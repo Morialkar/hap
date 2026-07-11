@@ -23,7 +23,7 @@ class UpdateFieldRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['sometimes', 'string', 'in:text,long_text,number,date,boolean,select,reference,image,file,url,email,title,gps'],
+            'type' => ['sometimes', 'string', 'in:text,long_text,number,date,boolean,select,reference,image,file,url,email,title,gps,compound'],
             'name' => ['sometimes', 'string', 'max:255'],
             'position' => ['sometimes', 'integer', 'min:0'],
             'options' => ['sometimes', 'array'],

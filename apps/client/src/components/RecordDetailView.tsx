@@ -21,6 +21,7 @@ interface ViewSchema {
   config: {
     columnCount: number;
     columns: string[][];
+    hiddenLabels?: Record<string, boolean>;
   } | null;
   is_default?: boolean;
   is_single_default?: boolean;
@@ -222,12 +223,15 @@ export function RecordDetailView({ tableId, recordId, databaseId: propsDatabaseI
                 const cleanId = fId.startsWith('draft-') ? fId.substring(6) : fId;
                 const fieldDef = fieldsByIdMap.get(cleanId);
                 if (!fieldDef) return null;
+                const hideLabel = activeView?.config?.hiddenLabels?.[cleanId] === true;
 
                 return (
                   <div key={cleanId} className="hap-detail-field">
-                    <div className="small text-muted fw-bold mb-1 text-uppercase">
-                      {fieldDef.name}
-                    </div>
+                    {!hideLabel && (
+                      <div className="small text-muted fw-bold mb-1 text-uppercase">
+                        {fieldDef.name}
+                      </div>
+                    )}
                     <div className="lh-sm">{renderFieldValue(fieldDef.name)}</div>
                   </div>
                 );
@@ -334,7 +338,7 @@ function ReferenceLabel({
 
   // Determine the label to display
   let labelText = '';
-  const titleField = fields.find((f) => f.type === 'title');
+  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     rData[titleField.name] !== undefined &&
@@ -432,7 +436,7 @@ function ReferencingRecordRow({
 
   // Determine the label to display
   let labelText = '';
-  const titleField = fields.find((f) => f.type === 'title');
+  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     recordData[titleField.name] !== undefined &&
@@ -463,14 +467,14 @@ function ReferencingRecordRow({
   }
 
   return (
-    <div className="d-flex align-items-center justify-content-between p-2 border-bottom">
-      <div>
+    <div className="hap-referencing-record d-flex align-items-center justify-content-between p-2 border-bottom gap-3">
+      <div className="hap-referencing-record-title flex-grow-1">
         {databaseId ? (
           window.location.pathname.startsWith('/navigation') ? (
             <Link
               to="/navigation/$databaseId/record/$recordId"
               params={{ databaseId, recordId }}
-              className="fw-bold text-primary text-decoration-none"
+              className="fw-bold text-primary text-decoration-none text-wrap text-break"
             >
               {labelText}
             </Link>
@@ -479,20 +483,20 @@ function ReferencingRecordRow({
               to="/tables/$databaseId/$tableId"
               params={{ databaseId, tableId }}
               search={{ recordId }}
-              className="fw-bold text-primary text-decoration-none"
+              className="fw-bold text-primary text-decoration-none text-wrap text-break"
             >
               {labelText}
             </Link>
           )
         ) : (
-          <span className="fw-bold text-primary">{labelText}</span>
+          <span className="fw-bold text-primary text-wrap text-break">{labelText}</span>
         )}
         <div className="text-muted small">
           Champ : <span className="font-monospace">{fieldName}</span>
         </div>
       </div>
       {tableName && (
-        <span className="badge text-bg-secondary">{tableName}</span>
+        <span className="hap-referencing-record-table badge text-bg-secondary">{tableName}</span>
       )}
     </div>
   );
