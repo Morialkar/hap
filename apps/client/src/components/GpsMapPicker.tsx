@@ -77,7 +77,7 @@ export function GpsMapPicker({
           container: containerRef.current,
           style: OPENSTREETMAP_STYLE as maplibregl.StyleSpecification,
           center: [center.lng, center.lat],
-          zoom: latestCoordinatesRef.current ? 8 : 4,
+          zoom: latestCoordinatesRef.current ? 15 : 4,
           interactive: !readOnly,
           attributionControl: {
             compact: true,
@@ -196,7 +196,7 @@ function syncMarkerToCoordinates(
   marker.setLngLat([coordinates.lng, coordinates.lat]);
   map.easeTo({
     center: [coordinates.lng, coordinates.lat],
-    zoom: Math.max(map.getZoom(), 8),
+    zoom: Math.max(map.getZoom(), 15),
     duration,
   });
 }

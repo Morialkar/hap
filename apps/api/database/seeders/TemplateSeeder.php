@@ -34,7 +34,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'authors',
                     'name' => 'Auteurs',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                         ['key' => 'prenom', 'name' => 'Prénom', 'type' => 'text', 'position' => 1, 'options' => ['max_length' => 255]],
                         ['key' => 'naissance', 'name' => 'Naissance', 'type' => 'date', 'position' => 2, 'options' => ['precision' => 'year']],
                         ['key' => 'deces', 'name' => 'Décès', 'type' => 'date', 'position' => 3, 'options' => ['precision' => 'year']],
@@ -47,7 +47,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'publishers',
                     'name' => 'Éditeurs',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                     ],
                     'views' => [],
                     'reports' => [],
@@ -56,7 +56,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'printers',
                     'name' => 'Imprimeurs',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                     ],
                     'views' => [],
                     'reports' => [],
@@ -65,7 +65,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'locations',
                     'name' => 'Localisations',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Nom de l\'établissement', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'nom', 'name' => 'Nom de l\'établissement', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                     ],
                     'views' => [],
                     'reports' => [],
@@ -74,7 +74,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'genres',
                     'name' => 'Genres',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                     ],
                     'views' => [],
                     'reports' => [],
@@ -83,7 +83,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'categories',
                     'name' => 'Catégories',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                     ],
                     'views' => [],
                     'reports' => [],
@@ -92,7 +92,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'frequencies',
                     'name' => 'Fréquences',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'nom', 'name' => 'Nom', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                     ],
                     'views' => [],
                     'reports' => [],
@@ -101,7 +101,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'lengths',
                     'name' => 'Longueurs',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Type d\'unité', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'nom', 'name' => 'Type d\'unité', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                     ],
                     'views' => [],
                     'reports' => [],
@@ -111,11 +111,11 @@ class TemplateSeeder extends Seeder
                     'name' => 'Périodiques',
                     'is_front_facing' => true,
                     'fields' => [
-                        ['key' => 'titre', 'name' => 'Titre', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'titre', 'name' => 'Titre', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                         ['key' => 'proprietaire', 'name' => 'Propriétaire', 'type' => 'text', 'position' => 1, 'options' => ['max_length' => 255]],
                         ['key' => 'debut', 'name' => 'Début de parution', 'type' => 'date', 'position' => 2, 'options' => ['precision' => 'year']],
                         ['key' => 'fin', 'name' => 'Fin de parution', 'type' => 'date', 'position' => 3, 'options' => ['precision' => 'year']],
-                        ['key' => 'description_courte', 'name' => 'Description courte', 'type' => 'text', 'position' => 4, 'options' => ['max_length' => 140]],
+                        ['key' => 'description_courte', 'name' => 'Description courte', 'type' => 'text', 'position' => 4, 'options' => ['max_length' => 140], 'is_filterable' => false],
                         ['key' => 'description', 'name' => 'Description', 'type' => 'long_text', 'position' => 5],
                         ['key' => 'images', 'name' => 'Images', 'type' => 'image', 'position' => 6],
                         ['key' => 'notes', 'name' => 'Notes', 'type' => 'long_text', 'position' => 7],
@@ -131,9 +131,9 @@ class TemplateSeeder extends Seeder
                     'name' => 'Ouvrages',
                     'is_front_facing' => true,
                     'fields' => [
-                        ['key' => 'titre', 'name' => 'Titre', 'type' => 'text', 'position' => 0],
+                        ['key' => 'titre', 'name' => 'Titre', 'type' => 'title', 'position' => 0, 'is_filterable' => false],
                         ['key' => 'description', 'name' => 'Description', 'type' => 'long_text', 'position' => 1],
-                        ['key' => 'description_courte', 'name' => 'Description courte', 'type' => 'text', 'position' => 2, 'options' => ['max_length' => 140]],
+                        ['key' => 'description_courte', 'name' => 'Description courte', 'type' => 'text', 'position' => 2, 'options' => ['max_length' => 140], 'is_filterable' => false],
                         ['key' => 'images', 'name' => 'Images', 'type' => 'image', 'position' => 3],
                         ['key' => 'annee_publication', 'name' => 'Année de publication', 'type' => 'number', 'position' => 4, 'options' => ['decimal' => false]],
                         ['key' => 'mois_publication', 'name' => 'Mois de publication', 'type' => 'number', 'position' => 5, 'options' => ['decimal' => false]],
@@ -154,7 +154,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'issues',
                     'name' => 'Numéros',
                     'fields' => [
-                        ['key' => 'code', 'name' => 'Numéro / Code', 'type' => 'text', 'position' => 0],
+                        ['key' => 'code', 'name' => 'Numéro / Code', 'type' => 'title', 'position' => 0, 'is_filterable' => false],
                         ['key' => 'date', 'name' => 'Date', 'type' => 'date', 'position' => 1, 'options' => ['precision' => 'full']],
                         ['key' => 'publicite', 'name' => 'Publicité', 'type' => 'boolean', 'position' => 2],
                         ['key' => 'localisation', 'name' => 'Localisation physique', 'type' => 'long_text', 'position' => 3],
@@ -167,9 +167,9 @@ class TemplateSeeder extends Seeder
                     'key' => 'articles',
                     'name' => 'Articles',
                     'fields' => [
-                        ['key' => 'titre', 'name' => 'Titre', 'type' => 'text', 'position' => 0],
+                        ['key' => 'titre', 'name' => 'Titre', 'type' => 'title', 'position' => 0, 'is_filterable' => false],
                         ['key' => 'description', 'name' => 'Description', 'type' => 'long_text', 'position' => 1],
-                        ['key' => 'description_courte', 'name' => 'Description courte', 'type' => 'text', 'position' => 2, 'options' => ['max_length' => 140]],
+                        ['key' => 'description_courte', 'name' => 'Description courte', 'type' => 'text', 'position' => 2, 'options' => ['max_length' => 140], 'is_filterable' => false],
                         ['key' => 'quantite_longueur', 'name' => 'Quantité longueur', 'type' => 'number', 'position' => 3],
                         ['key' => 'de', 'name' => 'De la page', 'type' => 'number', 'position' => 4],
                         ['key' => 'a', 'name' => 'À la page', 'type' => 'number', 'position' => 5],
@@ -186,7 +186,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'illustrations',
                     'name' => 'Illustrations',
                     'fields' => [
-                        ['key' => 'auteur', 'name' => 'Auteur', 'type' => 'text', 'position' => 0],
+                        ['key' => 'auteur', 'name' => 'Auteur', 'type' => 'title', 'position' => 0, 'is_filterable' => false],
                         ['key' => 'medium', 'name' => 'Médium', 'type' => 'text', 'position' => 1],
                         ['key' => 'description', 'name' => 'Description', 'type' => 'long_text', 'position' => 2],
                         ['key' => 'images', 'name' => 'Images', 'type' => 'image', 'position' => 3],
@@ -290,7 +290,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'categories',
                     'name' => 'Catégories',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Nom de la catégorie', 'type' => 'text', 'position' => 0, 'options' => ['max_length' => 255]],
+                        ['key' => 'nom', 'name' => 'Nom de la catégorie', 'type' => 'title', 'position' => 0, 'options' => ['max_length' => 255], 'is_filterable' => false],
                     ],
                     'views' => [],
                     'reports' => [],
@@ -300,7 +300,7 @@ class TemplateSeeder extends Seeder
                     'name' => 'Recettes',
                     'is_front_facing' => true,
                     'fields' => [
-                        ['key' => 'titre', 'name' => 'Titre de la recette', 'type' => 'text', 'position' => 0],
+                        ['key' => 'titre', 'name' => 'Titre de la recette', 'type' => 'title', 'position' => 0, 'is_filterable' => false],
                         ['key' => 'instructions', 'name' => 'Instructions', 'type' => 'long_text', 'position' => 1],
                         ['key' => 'prep_time', 'name' => 'Temps de préparation (min)', 'type' => 'number', 'position' => 2, 'options' => ['decimal' => false]],
                         ['key' => 'cook_time', 'name' => 'Temps de cuisson (min)', 'type' => 'number', 'position' => 3, 'options' => ['decimal' => false]],
@@ -316,7 +316,7 @@ class TemplateSeeder extends Seeder
                     'key' => 'ingredients',
                     'name' => 'Ingrédients',
                     'fields' => [
-                        ['key' => 'nom', 'name' => 'Nom de l\'ingrédient', 'type' => 'text', 'position' => 0],
+                        ['key' => 'nom', 'name' => 'Nom de l\'ingrédient', 'type' => 'title', 'position' => 0, 'is_filterable' => false],
                         ['key' => 'quantite', 'name' => 'Quantité', 'type' => 'text', 'position' => 1],
                         ['key' => 'recette', 'name' => 'Recette associée', 'type' => 'reference', 'position' => 2, 'options' => ['target_table' => 'recipes', 'multi' => false]],
                     ],

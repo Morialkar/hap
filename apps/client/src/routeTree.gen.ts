@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as NavigationDatabaseIdRouteImport } from './routes/navigation.$databaseId'
 import { Route as TablesDatabaseIdTableIdRouteImport } from './routes/tables.$databaseId.$tableId'
 import { Route as BuilderDatabaseIdTableIdRouteImport } from './routes/builder.$databaseId.$tableId'
+import { Route as NavigationDatabaseIdRecordRecordIdRouteImport } from './routes/navigation_.$databaseId.record.$recordId'
 
 const WorkspacesRoute = WorkspacesRouteImport.update({
   id: '/workspaces',
@@ -59,6 +60,12 @@ const BuilderDatabaseIdTableIdRoute =
     path: '/builder/$databaseId/$tableId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const NavigationDatabaseIdRecordRecordIdRoute =
+  NavigationDatabaseIdRecordRecordIdRouteImport.update({
+    id: '/navigation_/$databaseId/record/$recordId',
+    path: '/navigation/$databaseId/record/$recordId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -69,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
   '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
+  '/navigation/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -79,6 +87,7 @@ export interface FileRoutesByTo {
   '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
   '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
+  '/navigation/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -90,6 +99,7 @@ export interface FileRoutesById {
   '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
   '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
+  '/navigation_/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -102,6 +112,7 @@ export interface FileRouteTypes {
     | '/navigation/$databaseId'
     | '/builder/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
+    | '/navigation/$databaseId/record/$recordId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -112,6 +123,7 @@ export interface FileRouteTypes {
     | '/navigation/$databaseId'
     | '/builder/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
+    | '/navigation/$databaseId/record/$recordId'
   id:
     | '__root__'
     | '/'
@@ -122,6 +134,7 @@ export interface FileRouteTypes {
     | '/navigation/$databaseId'
     | '/builder/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
+    | '/navigation_/$databaseId/record/$recordId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -133,6 +146,7 @@ export interface RootRouteChildren {
   NavigationDatabaseIdRoute: typeof NavigationDatabaseIdRoute
   BuilderDatabaseIdTableIdRoute: typeof BuilderDatabaseIdTableIdRoute
   TablesDatabaseIdTableIdRoute: typeof TablesDatabaseIdTableIdRoute
+  NavigationDatabaseIdRecordRecordIdRoute: typeof NavigationDatabaseIdRecordRecordIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -193,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BuilderDatabaseIdTableIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/navigation_/$databaseId/record/$recordId': {
+      id: '/navigation_/$databaseId/record/$recordId'
+      path: '/navigation/$databaseId/record/$recordId'
+      fullPath: '/navigation/$databaseId/record/$recordId'
+      preLoaderRoute: typeof NavigationDatabaseIdRecordRecordIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -205,6 +226,8 @@ const rootRouteChildren: RootRouteChildren = {
   NavigationDatabaseIdRoute: NavigationDatabaseIdRoute,
   BuilderDatabaseIdTableIdRoute: BuilderDatabaseIdTableIdRoute,
   TablesDatabaseIdTableIdRoute: TablesDatabaseIdTableIdRoute,
+  NavigationDatabaseIdRecordRecordIdRoute:
+    NavigationDatabaseIdRecordRecordIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

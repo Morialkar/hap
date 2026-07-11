@@ -173,8 +173,19 @@ if (shouldImportEusebe) {
     throw new Error(`Eusèbe dump not found: ${eusebeDumpPath}`);
   }
 
-  console.log(`importing Eusèbe dump from ${eusebeDumpPath}`);
-  await dockerExec(["php", "artisan", "import:eusebe", eusebeDumpPath]);
+  const tempDumpDest = path.join(root, "apps/api/storage/app/eusebe_dump.sql");
+  console.log(`copying Eusèbe dump to temporary location: ${tempDumpDest}`);
+  fs.copyFileSync(eusebeDumpPath, tempDumpDest);
+
+  try {
+    console.log("importing Eusèbe dump inside Docker container...");
+    await dockerExec(["php", "artisan", "import:eusebe", "storage/app/eusebe_dump.sql"]);
+  } finally {
+    if (fs.existsSync(tempDumpDest)) {
+      console.log("removing temporary Eusèbe dump file");
+      fs.unlinkSync(tempDumpDest);
+    }
+  }
 }
 
 console.log("");

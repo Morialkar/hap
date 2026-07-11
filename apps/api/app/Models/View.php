@@ -15,11 +15,12 @@ class View extends Model
 
     public $incrementing = false;
 
-    protected $fillable = ['name', 'type', 'config', 'table_id', 'is_default'];
+    protected $fillable = ['name', 'type', 'config', 'table_id', 'is_default', 'is_single_default'];
 
     protected $casts = [
         'config' => 'array',
         'is_default' => 'boolean',
+        'is_single_default' => 'boolean',
     ];
 
     protected static function boot()

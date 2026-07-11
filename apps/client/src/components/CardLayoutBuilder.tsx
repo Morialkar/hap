@@ -39,6 +39,7 @@ interface View {
     columns: string[][];
   } | null;
   is_default?: boolean;
+  is_single_default?: boolean;
 }
 
 interface DroppableColumnProps {
@@ -213,8 +214,8 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   });
 
   const toggleDefaultMutation = useMutation({
-    mutationFn: (isDefault: boolean) =>
-      apiClient.put<View>(`/views/${selectedViewId}`, { is_default: isDefault }),
+    mutationFn: (payload: { is_default?: boolean; is_single_default?: boolean }) =>
+      apiClient.put<View>(`/views/${selectedViewId}`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['views', tableId] });
       showToast(t('layout.defaultSetSuccess'));
@@ -467,22 +468,44 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                 </div>
               </div>
               <div className="col d-flex justify-content-end align-items-center gap-3">
-                <div className="form-check form-switch mb-0" title={t('layout.isDefault')}>
-                  <input
-                    className="form-check-input cursor-pointer"
-                    type="checkbox"
-                    role="switch"
-                    id="isDefaultViewSwitch"
-                    checked={selectedView?.is_default ?? false}
-                    onChange={(e) => toggleDefaultMutation.mutate(e.target.checked)}
-                    disabled={toggleDefaultMutation.isPending}
-                  />
-                  <label
-                    className="form-check-label text-muted small cursor-pointer"
-                    htmlFor="isDefaultViewSwitch"
-                  >
-                    {t('layout.isDefault')}
-                  </label>
+                <div className="d-flex align-items-center border rounded px-3 py-1 bg-light gap-3">
+                  <span className="small fw-bold text-muted text-uppercase me-1">Defaults</span>
+                  
+                  <div className="form-check form-switch mb-0" title="Front default view">
+                    <input
+                      className="form-check-input cursor-pointer"
+                      type="checkbox"
+                      role="switch"
+                      id="isDefaultViewSwitch"
+                      checked={selectedView?.is_default ?? false}
+                      onChange={(e) => toggleDefaultMutation.mutate({ is_default: e.target.checked })}
+                      disabled={toggleDefaultMutation.isPending}
+                    />
+                    <label
+                      className="form-check-label text-muted small cursor-pointer"
+                      htmlFor="isDefaultViewSwitch"
+                    >
+                      Front
+                    </label>
+                  </div>
+
+                  <div className="form-check form-switch mb-0" title="Single default view">
+                    <input
+                      className="form-check-input cursor-pointer"
+                      type="checkbox"
+                      role="switch"
+                      id="isSingleDefaultViewSwitch"
+                      checked={selectedView?.is_single_default ?? false}
+                      onChange={(e) => toggleDefaultMutation.mutate({ is_single_default: e.target.checked })}
+                      disabled={toggleDefaultMutation.isPending}
+                    />
+                    <label
+                      className="form-check-label text-muted small cursor-pointer"
+                      htmlFor="isSingleDefaultViewSwitch"
+                    >
+                      Single
+                    </label>
+                  </div>
                 </div>
                 <button
                   type="button"

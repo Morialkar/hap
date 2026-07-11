@@ -6,22 +6,27 @@ import { parseGpsValue } from '../lib/fieldDisplay';
 import { type BuilderField } from '../lib/fieldTypes';
 import { GpsMapPicker } from './GpsMapPicker';
 import { LoadingSpinner } from './LoadingSpinner';
+import { Link } from '@tanstack/react-router';
 
 interface RecordDetailViewProps {
   tableId: string;
   recordId: string;
+  databaseId: string;
 }
 
 interface ViewSchema {
   id: string;
   name: string;
+  type?: string;
   config: {
     columnCount: number;
     columns: string[][];
   } | null;
+  is_default?: boolean;
+  is_single_default?: boolean;
 }
 
-export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
+export function RecordDetailView({ tableId, recordId, databaseId: propsDatabaseId }: RecordDetailViewProps) {
   const [activeLightboxHash, setActiveLightboxHash] = useState<string | null>(null);
 
   // Queries
@@ -48,7 +53,34 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
     enabled: !!recordId,
   });
 
-  const activeView = viewsQuery.data?.data?.[0] || null;
+  const databaseId = propsDatabaseId;
+
+  const tablesQuery = useQuery<{ id: string; name: string }[], Error>({
+    queryKey: ['tables', databaseId],
+    queryFn: () => apiClient.get(`/tables?database_id=${databaseId}`),
+    enabled: !!databaseId,
+  });
+
+  const tablesMap = useMemo(() => {
+    return new Map((tablesQuery.data || []).map((t) => [t.id, t.name]));
+  }, [tablesQuery.data]);
+
+  const referencingQuery = useQuery<{ data: ReferencingRecordItem[] }, Error>({
+    queryKey: ['records', recordId, 'referencing'],
+    queryFn: () => apiClient.get(`/records/${recordId}/referencing-records`),
+    enabled: !!recordId,
+  });
+
+  const referencingRecords = referencingQuery.data?.data || [];
+
+  const activeView = useMemo(() => {
+    const list = viewsQuery.data?.data || [];
+    const singleDefault = list.find((v) => v.is_single_default);
+    if (singleDefault) return singleDefault;
+    const cardView = list.find((v) => v.type === 'card');
+    if (cardView) return cardView;
+    return list[0] || null;
+  }, [viewsQuery.data]);
   const fields = useMemo(() => fieldsQuery.data || [], [fieldsQuery.data]);
   const recordData = recordQuery.data?.data || {};
 
@@ -111,7 +143,7 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
         return <span className="badge text-bg-secondary px-2 py-1">{String(value)}</span>;
 
       case 'reference':
-        return <ReferenceLabel targetRecordId={String(value)} />;
+        return <ReferenceLabel targetRecordId={String(value)} databaseId={databaseId} />;
 
       case 'gps': {
         const coordinates = parseGpsValue(value);
@@ -205,6 +237,27 @@ export function RecordDetailView({ tableId, recordId }: RecordDetailViewProps) {
         ))}
       </div>
 
+      {referencingRecords.length > 0 && (
+        <div className="mt-4 border-top pt-3" data-testid="referencing-section">
+          <h4 className="h6 text-muted fw-bold text-uppercase mb-3">
+            Fiches associées ({referencingRecords.length})
+          </h4>
+          <div className="border rounded bg-white overflow-hidden">
+            {referencingRecords.map((item) => (
+              <ReferencingRecordRow
+                key={`${item.record_id}-${item.field_id}`}
+                recordId={item.record_id}
+                tableId={item.table_id}
+                fieldName={item.field_name}
+                recordData={item.record_data}
+                databaseId={databaseId}
+                tableName={tablesMap.get(item.table_id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Lightbox Modal overlay */}
       {activeLightboxHash && (
         <div
@@ -243,10 +296,12 @@ function ReferenceLabel({
   targetRecordId,
   fallback,
   className = 'fw-medium text-primary',
+  databaseId,
 }: {
   targetRecordId: string;
   fallback?: string;
   className?: string;
+  databaseId: string;
 }) {
   const recordQuery = useQuery<ApiRecord, Error>({
     queryKey: ['records', targetRecordId],
@@ -277,7 +332,8 @@ function ReferenceLabel({
   const rData = recordQuery.data.data || {};
   const fields = fieldsQuery.data || [];
 
-  // Find the field of type 'title'
+  // Determine the label to display
+  let labelText = '';
   const titleField = fields.find((f) => f.type === 'title');
   if (
     titleField &&
@@ -285,30 +341,159 @@ function ReferenceLabel({
     rData[titleField.name] !== null &&
     rData[titleField.name] !== ''
   ) {
-    return <span className={className}>{String(rData[titleField.name])}</span>;
+    labelText = String(rData[titleField.name]);
+  } else {
+    const sortedFields = [...fields].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+    const firstField = sortedFields[0];
+    if (
+      firstField &&
+      rData[firstField.name] !== undefined &&
+      rData[firstField.name] !== null &&
+      rData[firstField.name] !== ''
+    ) {
+      labelText = String(rData[firstField.name]);
+    } else {
+      labelText = String(
+        rData.name ||
+        rData.title ||
+        rData.nom ||
+        rData.titre ||
+        Object.values(rData)[0] ||
+        fallback ||
+        targetRecordId
+      );
+    }
   }
 
-  // Find the first field (by position or just first in list)
-  const sortedFields = [...fields].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
-  const firstField = sortedFields[0];
+
+
+  if (databaseId && targetTableId) {
+    const isFront = window.location.pathname.startsWith('/navigation');
+    if (isFront) {
+      return (
+        <Link
+          to="/navigation/$databaseId/record/$recordId"
+          params={{ databaseId, recordId: targetRecordId }}
+          className={`${className} text-decoration-none`}
+        >
+          {labelText}
+        </Link>
+      );
+    }
+    return (
+      <Link
+        to="/tables/$databaseId/$tableId"
+        params={{ databaseId, tableId: targetTableId }}
+        search={{ recordId: targetRecordId }}
+        className={`${className} text-decoration-none`}
+      >
+        {labelText}
+      </Link>
+    );
+  }
+
+  return <span className={className}>{labelText}</span>;
+}
+
+interface ReferencingRecordItem {
+  record_id: string;
+  table_id: string;
+  field_id: string;
+  field_name: string;
+  record_data: ApiRecordData;
+}
+
+function ReferencingRecordRow({
+  recordId,
+  tableId,
+  fieldName,
+  recordData,
+  databaseId,
+  tableName,
+}: {
+  recordId: string;
+  tableId: string;
+  fieldName: string;
+  recordData: ApiRecordData;
+  databaseId?: string;
+  tableName?: string;
+}) {
+  const fieldsQuery = useQuery<BuilderField[], Error>({
+    queryKey: ['fields', tableId],
+    queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
+    enabled: !!tableId,
+  });
+
+  if (fieldsQuery.isLoading) {
+    return <LoadingSpinner size="sm" />;
+  }
+
+  const fields = fieldsQuery.data || [];
+
+  // Determine the label to display
+  let labelText = '';
+  const titleField = fields.find((f) => f.type === 'title');
   if (
-    firstField &&
-    rData[firstField.name] !== undefined &&
-    rData[firstField.name] !== null &&
-    rData[firstField.name] !== ''
+    titleField &&
+    recordData[titleField.name] !== undefined &&
+    recordData[titleField.name] !== null &&
+    recordData[titleField.name] !== ''
   ) {
-    return <span className={className}>{String(rData[firstField.name])}</span>;
+    labelText = String(recordData[titleField.name]);
+  } else {
+    const sortedFields = [...fields].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+    const firstField = sortedFields[0];
+    if (
+      firstField &&
+      recordData[firstField.name] !== undefined &&
+      recordData[firstField.name] !== null &&
+      recordData[firstField.name] !== ''
+    ) {
+      labelText = String(recordData[firstField.name]);
+    } else {
+      labelText = String(
+        recordData.name ||
+        recordData.title ||
+        recordData.nom ||
+        recordData.titre ||
+        Object.values(recordData)[0] ||
+        recordId
+      );
+    }
   }
 
-  // Fallback if no fields exist or values are empty
-  const defaultLabel =
-    rData.name ||
-    rData.title ||
-    rData.nom ||
-    rData.titre ||
-    Object.values(rData)[0] ||
-    fallback ||
-    targetRecordId;
-
-  return <span className={className}>{String(defaultLabel)}</span>;
+  return (
+    <div className="d-flex align-items-center justify-content-between p-2 border-bottom">
+      <div>
+        {databaseId ? (
+          window.location.pathname.startsWith('/navigation') ? (
+            <Link
+              to="/navigation/$databaseId/record/$recordId"
+              params={{ databaseId, recordId }}
+              className="fw-bold text-primary text-decoration-none"
+            >
+              {labelText}
+            </Link>
+          ) : (
+            <Link
+              to="/tables/$databaseId/$tableId"
+              params={{ databaseId, tableId }}
+              search={{ recordId }}
+              className="fw-bold text-primary text-decoration-none"
+            >
+              {labelText}
+            </Link>
+          )
+        ) : (
+          <span className="fw-bold text-primary">{labelText}</span>
+        )}
+        <div className="text-muted small">
+          Champ : <span className="font-monospace">{fieldName}</span>
+        </div>
+      </div>
+      {tableName && (
+        <span className="badge text-bg-secondary">{tableName}</span>
+      )}
+    </div>
+  );
 }

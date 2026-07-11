@@ -267,7 +267,7 @@ export function FieldOptionPanel({ field, availableTables, onChange }: FieldOpti
           </select>
         </div>
 
-        {field.type !== 'image' && field.type !== 'file' && field.type !== 'long_text' && (
+        {field.type !== 'image' && field.type !== 'file' && field.type !== 'long_text' && field.type !== 'title' && (
           <div className="form-check form-switch mb-3">
             <input
               id="field-is-filterable"

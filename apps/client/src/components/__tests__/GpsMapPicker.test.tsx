@@ -169,7 +169,7 @@ describe('GpsMapPicker', () => {
     });
     expect(maplibreMock.mapInstances[0].easeTo).toHaveBeenCalledWith({
       center: [-71.208, 46.8139],
-      zoom: 8,
+      zoom: 15,
       duration: 250,
     });
   });
