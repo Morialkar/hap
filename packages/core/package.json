@@ -5,5 +5,7 @@
   "description": "HAP shared core: schema engine, validation, query model, platform interfaces",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "scripts": {}
+  "scripts": {
+    "build:gazetteer": "node scripts/build-gazetteer.mjs"
+  }
 }

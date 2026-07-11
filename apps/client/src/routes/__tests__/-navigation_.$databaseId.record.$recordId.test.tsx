@@ -11,7 +11,11 @@ vi.mock('@tanstack/react-router', () => ({
   }),
   useParams: () => ({ databaseId: 'db-1' }),
   useNavigate: () => vi.fn(),
-  Link: ({ children, to }: any) => <a href={to}>{children}</a>,
+  Link: ({ children, to, ...props }: any) => {
+    delete props.params;
+    delete props.search;
+    return <a href={to} {...props}>{children}</a>;
+  },
 }));
 
 const queryClient = new QueryClient({
@@ -94,5 +98,10 @@ describe('SingleRecordPage Route', () => {
 
     // Verify the back button exists
     expect(screen.getByRole('button', { name: /Back|Retour/i })).toBeInTheDocument();
+
+    expect(screen.getByTestId('single-record-edit')).toHaveAttribute(
+      'href',
+      '/tables/$databaseId/$tableId'
+    );
   });
 });

@@ -447,7 +447,13 @@ export const FIELD_TYPES: Record<FieldType, FieldTypeDefinition> = {
     icon: 'map-pin',
     labelKey: 'fieldType.gps.label',
     descriptionKey: 'fieldType.gps.description',
-    options: [],
+    options: [
+      {
+        key: 'show_locality',
+        type: 'boolean',
+        label: 'fieldType.gps.options.showLocality',
+      },
+    ],
     validation: [
       {
         key: 'required',

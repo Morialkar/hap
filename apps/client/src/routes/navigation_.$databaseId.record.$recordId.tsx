@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/apiClient';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -103,7 +103,7 @@ export function SingleRecordPage() {
 
   return (
     <div className="container py-4" data-testid="single-record-page">
-      <div className="mb-3">
+      <div className="mb-3 d-flex justify-content-between align-items-center gap-3">
         <button
           type="button"
           className="btn btn-outline-secondary d-inline-flex align-items-center gap-1"
@@ -112,6 +112,18 @@ export function SingleRecordPage() {
           <i className="ti ti-arrow-left" aria-hidden="true" />
           {t('common.back') || 'Retour'}
         </button>
+        {tableId && (
+          <Link
+            to="/tables/$databaseId/$tableId"
+            params={{ databaseId, tableId }}
+            search={{ action: 'edit', recordId, returnTo: 'single-record' }}
+            className="btn btn-primary d-inline-flex align-items-center gap-1 flex-shrink-0"
+            data-testid="single-record-edit"
+          >
+            <i className="ti ti-edit" aria-hidden="true" />
+            Éditer la fiche
+          </Link>
+        )}
       </div>
 
       <div className="card shadow-sm border-0">

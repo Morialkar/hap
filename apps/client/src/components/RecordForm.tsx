@@ -74,6 +74,7 @@ export function RecordForm({
   const [uploadsState, setUploadsState] = useState<
     Record<string, { hash: string; name: string; isUploading: boolean }[]>
   >({});
+  const [photoGps, setPhotoGps] = useState<{ lat: number; lng: number } | null>(null);
 
   // Fetch record data if we are editing or duplicating
   const isEditing = !!recordId && !isDuplicate;
@@ -198,7 +199,8 @@ export function RecordForm({
           throw new Error('Upload failed');
         }
 
-        const data = (await res.json()) as { hash: string };
+        const data = (await res.json()) as { hash: string; gps?: { lat: number; lng: number } };
+        if (data.gps) setPhotoGps(data.gps);
 
         // Update uploadsState and form value with the returned hash
         setUploadsState((prev) => {
@@ -370,6 +372,7 @@ export function RecordForm({
                               value={value}
                               onChange={(val) => fieldApi.handleChange(val)}
                               testId={`field-input-${field.name}`}
+                              photoGps={photoGps}
                             />
                           );
 
@@ -583,9 +586,10 @@ interface GpsFieldEditorProps {
   value: ApiValue | undefined;
   onChange: (val: ApiValue) => void;
   testId: string;
+  photoGps: { lat: number; lng: number } | null;
 }
 
-function GpsFieldEditor({ value, onChange, testId }: GpsFieldEditorProps) {
+function GpsFieldEditor({ value, onChange, testId, photoGps }: GpsFieldEditorProps) {
   const coordinates =
     value && typeof value === 'object' && !Array.isArray(value)
       ? (value as Record<string, ApiValue>)
@@ -621,6 +625,12 @@ function GpsFieldEditor({ value, onChange, testId }: GpsFieldEditorProps) {
 
   return (
     <div className="vstack gap-2" data-testid={testId}>
+      {photoGps && (
+        <button type="button" className="btn btn-outline-secondary btn-sm align-self-start" onClick={() => onChange({ lat: String(photoGps.lat), lng: String(photoGps.lng) })}>
+          <i className="ti ti-photo me-1" aria-hidden="true" />
+          Utiliser la position de la photo
+        </button>
+      )}
       <GpsMapPicker
         coordinates={numericCoordinates}
         onChange={(nextCoordinates) => {

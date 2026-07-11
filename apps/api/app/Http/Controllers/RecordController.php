@@ -10,6 +10,7 @@ use App\Models\RecordActivityLog;
 use App\Models\Table;
 use App\Services\RecordActivityService;
 use App\Services\RecordLinkService;
+use App\Services\RecordPointService;
 use App\Services\RecordQueryService;
 use App\Services\RecordValidationService;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +20,7 @@ class RecordController extends Controller
 {
     public function __construct(
         private RecordLinkService $recordLinkService,
+        private RecordPointService $recordPointService,
         private RecordQueryService $recordQueryService,
         private RecordActivityService $recordActivityService,
         private RecordValidationService $recordValidationService
@@ -75,6 +77,7 @@ class RecordController extends Controller
 
         // Sync record links for reference fields
         $this->recordLinkService->syncLinks($record);
+        $this->recordPointService->syncPoints($record);
 
         // Log activity
         $this->recordActivityService->logCreate($record, $request->user());
@@ -121,6 +124,7 @@ class RecordController extends Controller
 
         // Sync record links for reference fields
         $this->recordLinkService->syncLinks($record);
+        $this->recordPointService->syncPoints($record);
 
         // Log activity with diff
         $this->recordActivityService->logUpdate($record, $request->user(), $oldData, $newData);
@@ -140,6 +144,7 @@ class RecordController extends Controller
             ], 409);
         }
 
+        $this->recordPointService->deletePoints($record);
         $record->delete();
 
         // Log activity
@@ -203,6 +208,7 @@ class RecordController extends Controller
 
         // Sync record links for reference fields
         $this->recordLinkService->syncLinks($record);
+        $this->recordPointService->syncPoints($record);
 
         // Log restore activity
         $this->recordActivityService->logUpdate($record, $request->user(), $oldData, $newData);
@@ -239,6 +245,7 @@ class RecordController extends Controller
 
         // Sync record links for reference fields
         $this->recordLinkService->syncLinks($recordWithTrashed);
+        $this->recordPointService->syncPoints($recordWithTrashed);
 
         // Log restore activity
         $this->recordActivityService->logRestore($recordWithTrashed, $request->user());

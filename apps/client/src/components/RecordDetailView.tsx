@@ -5,6 +5,7 @@ import type { ApiRecord, ApiRecordData } from '../lib/apiTypes';
 import { parseGpsValue } from '../lib/fieldDisplay';
 import { type BuilderField } from '../lib/fieldTypes';
 import { GpsMapPicker } from './GpsMapPicker';
+import { GpsLocalityLabel } from './GpsLocalityLabel';
 import { LoadingSpinner } from './LoadingSpinner';
 import { Link } from '@tanstack/react-router';
 
@@ -149,7 +150,10 @@ export function RecordDetailView({ tableId, recordId, databaseId: propsDatabaseI
       case 'gps': {
         const coordinates = parseGpsValue(value);
         return coordinates ? (
-          <GpsMapPicker coordinates={coordinates} height={220} readOnly />
+          <>
+            <GpsMapPicker coordinates={coordinates} height={220} readOnly />
+            {field.options?.show_locality === true && <GpsLocalityLabel coordinates={coordinates} />}
+          </>
         ) : (
           <span className="text-muted small">--</span>
         );
