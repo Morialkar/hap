@@ -82,6 +82,7 @@ class RecordValidationService
             $template = $field->options['template'] ?? '';
             $computedValue = preg_replace_callback('/\$\{([^}]+)\}/', function ($matches) use ($normalized) {
                 $refFieldName = $matches[1];
+
                 return $normalized[$refFieldName] ?? '';
             }, $template);
 
@@ -106,6 +107,7 @@ class RecordValidationService
             $template = $field->options['template'] ?? '';
             $computedValue = preg_replace_callback('/\$\{([^}]+)\}/', function ($matches) use ($data) {
                 $refFieldName = $matches[1];
+
                 return $data[$refFieldName] ?? '';
             }, $template);
 
