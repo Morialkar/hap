@@ -361,7 +361,18 @@ function Workspaces() {
             return (
               <SurfaceCard key={database.id}>
                 <div className="card-header d-flex justify-content-between align-items-center">
-                  <h2 className="h4 mb-0">{database.name}</h2>
+                  <div className="d-flex align-items-center gap-2">
+                    <h2 className="h4 mb-0">{database.name}</h2>
+                    <Link
+                      to="/shares/$databaseId"
+                      params={{ databaseId: database.id }}
+                      className="btn btn-sm btn-ghost-secondary px-2 py-0 border-0"
+                      title="Gérer les liens de partage"
+                    >
+                      <i className="ti ti-share me-1" />
+                      Partages
+                    </Link>
+                  </div>
                   <span className="text-muted small">
                     {tables.length} {t('workspaces.tables.count')}
                   </span>
@@ -420,6 +431,14 @@ function Workspaces() {
                               className="btn btn-sm btn-outline-secondary"
                             >
                               {t('workspaces.builder.action')}
+                            </Link>
+                            <Link
+                              to="/reports/$databaseId/$tableId"
+                              params={{ databaseId: database.id, tableId: table.id }}
+                              className="btn btn-sm btn-outline-secondary ms-2"
+                            >
+                              <i className="ti ti-chart-bar me-1" aria-hidden="true" />
+                              {t('workspaces.reports.action')}
                             </Link>
                           </div>
                         </div>

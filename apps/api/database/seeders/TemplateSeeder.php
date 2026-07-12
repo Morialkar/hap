@@ -148,7 +148,31 @@ class TemplateSeeder extends Seeder
                         ['key' => 'localisation', 'name' => 'Localisation', 'type' => 'reference', 'position' => 14, 'options' => ['target_table' => 'locations', 'multi' => false]],
                     ],
                     'views' => [],
-                    'reports' => [],
+                    'reports' => [
+                        [
+                            'key' => 'annexe-b',
+                            'name' => 'Annexe B',
+                            'query' => [
+                                'select' => ['annee_publication', 'auteur.nom', 'auteur.prenom', 'titre', 'nombre_pages', 'imprimeur.nom', 'editeur.nom'],
+                                'group_by' => 'annee_publication',
+                                'sort' => [
+                                    ['field' => 'annee_publication', 'direction' => 'asc'],
+                                    ['field' => 'titre', 'direction' => 'asc'],
+                                ],
+                            ],
+                            'layout' => [
+                                'fields' => [
+                                    ['name' => 'annee_publication', 'visible' => true, 'order' => 1],
+                                    ['name' => 'auteur.nom', 'visible' => true, 'order' => 2],
+                                    ['name' => 'auteur.prenom', 'visible' => true, 'order' => 3],
+                                    ['name' => 'titre', 'visible' => true, 'order' => 4],
+                                    ['name' => 'nombre_pages', 'visible' => true, 'order' => 5],
+                                    ['name' => 'imprimeur.nom', 'visible' => true, 'order' => 6],
+                                    ['name' => 'editeur.nom', 'visible' => true, 'order' => 7],
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 [
                     'key' => 'issues',

@@ -2,6 +2,7 @@
 
 use App\Models\Database;
 use App\Models\Field;
+use App\Models\Record;
 use App\Models\Table;
 use App\Models\User;
 use App\Models\Workspace;
@@ -68,7 +69,7 @@ test('user can create compound field and save record which resolves it', functio
         ]);
 
     $recordResponse->assertStatus(201);
-    
+
     // Check that Nom Complet resolved to "Jean-Baptiste Badeaux"
     $recordData = $recordResponse->json('data');
     expect($recordData['Nom Complet'])->toBe('Jean-Baptiste Badeaux');
@@ -116,7 +117,7 @@ test('pre-existing records have compound fields calculated dynamically on read',
     ]);
 
     // Create a record *before* the compound field exists
-    $record = \App\Models\Record::create([
+    $record = Record::create([
         'table_id' => $table->id,
         'data' => [
             'Prénom' => 'Jean-Baptiste',
@@ -141,8 +142,7 @@ test('pre-existing records have compound fields calculated dynamically on read',
         ->getJson("/api/v1/records/{$record->id}");
 
     $response->assertStatus(200);
-    
+
     // Verify it was calculated dynamically on the fly!
     expect($response->json('data.Nom Complet'))->toBe('Jean-Baptiste Badeaux');
 });
-

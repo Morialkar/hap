@@ -65,6 +65,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    if (window.location.pathname.startsWith('/public-shares/')) {
+      setIsLoading(false);
+      return;
+    }
+
     checkAuth();
   }, []);
 

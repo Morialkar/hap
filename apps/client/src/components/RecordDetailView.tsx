@@ -28,7 +28,11 @@ interface ViewSchema {
   is_single_default?: boolean;
 }
 
-export function RecordDetailView({ tableId, recordId, databaseId: propsDatabaseId }: RecordDetailViewProps) {
+export function RecordDetailView({
+  tableId,
+  recordId,
+  databaseId: propsDatabaseId,
+}: RecordDetailViewProps) {
   const [activeLightboxHash, setActiveLightboxHash] = useState<string | null>(null);
 
   // Queries
@@ -152,7 +156,9 @@ export function RecordDetailView({ tableId, recordId, databaseId: propsDatabaseI
         return coordinates ? (
           <>
             <GpsMapPicker coordinates={coordinates} height={220} readOnly />
-            {field.options?.show_locality === true && <GpsLocalityLabel coordinates={coordinates} />}
+            {field.options?.show_locality === true && (
+              <GpsLocalityLabel coordinates={coordinates} />
+            )}
           </>
         ) : (
           <span className="text-muted small">--</span>
@@ -341,8 +347,9 @@ function ReferenceLabel({
   const fields = fieldsQuery.data || [];
 
   // Determine the label to display
-  let labelText = '';
-  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
+  let labelText: string;
+  const titleField =
+    fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     rData[titleField.name] !== undefined &&
@@ -363,17 +370,15 @@ function ReferenceLabel({
     } else {
       labelText = String(
         rData.name ||
-        rData.title ||
-        rData.nom ||
-        rData.titre ||
-        Object.values(rData)[0] ||
-        fallback ||
-        targetRecordId
+          rData.title ||
+          rData.nom ||
+          rData.titre ||
+          Object.values(rData)[0] ||
+          fallback ||
+          targetRecordId
       );
     }
   }
-
-
 
   if (databaseId && targetTableId) {
     const isFront = window.location.pathname.startsWith('/navigation');
@@ -439,8 +444,9 @@ function ReferencingRecordRow({
   const fields = fieldsQuery.data || [];
 
   // Determine the label to display
-  let labelText = '';
-  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
+  let labelText: string;
+  const titleField =
+    fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     recordData[titleField.name] !== undefined &&
@@ -461,11 +467,11 @@ function ReferencingRecordRow({
     } else {
       labelText = String(
         recordData.name ||
-        recordData.title ||
-        recordData.nom ||
-        recordData.titre ||
-        Object.values(recordData)[0] ||
-        recordId
+          recordData.title ||
+          recordData.nom ||
+          recordData.titre ||
+          Object.values(recordData)[0] ||
+          recordId
       );
     }
   }

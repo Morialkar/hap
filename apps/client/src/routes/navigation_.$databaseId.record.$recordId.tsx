@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { apiClient } from '../lib/apiClient';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { RecordDetailView } from '../components/RecordDetailView';
 import { useI18n } from '../contexts/I18nContext';
 import { type BuilderField } from '../lib/fieldTypes';
 import type { ApiRecord } from '../lib/apiTypes';
+import { ShareModal } from '../components/ShareModal';
 
 export const Route = createFileRoute('/navigation_/$databaseId/record/$recordId')({
   component: SingleRecordPage,
@@ -15,6 +17,7 @@ export function SingleRecordPage() {
   const { databaseId, recordId } = Route.useParams();
   const { t } = useI18n();
   const navigate = useNavigate();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // 1. Fetch the record
   const recordQuery = useQuery<ApiRecord, Error>({
@@ -62,8 +65,9 @@ export function SingleRecordPage() {
   const tableName = tableQuery.data?.name || 'Fiche';
 
   // Resolve main title/label
-  let recordTitle = '';
-  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
+  let recordTitle: string;
+  const titleField =
+    fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     rData[titleField.name] !== undefined &&
@@ -83,12 +87,7 @@ export function SingleRecordPage() {
       recordTitle = String(rData[firstField.name]);
     } else {
       recordTitle = String(
-        rData.name ||
-        rData.title ||
-        rData.nom ||
-        rData.titre ||
-        Object.values(rData)[0] ||
-        recordId
+        rData.name || rData.title || rData.nom || rData.titre || Object.values(rData)[0] || recordId
       );
     }
   }
@@ -112,44 +111,59 @@ export function SingleRecordPage() {
           <i className="ti ti-arrow-left" aria-hidden="true" />
           {t('common.back') || 'Retour'}
         </button>
-        {tableId && (
-          <Link
-            to="/tables/$databaseId/$tableId"
-            params={{ databaseId, tableId }}
-            search={{ action: 'edit', recordId, returnTo: 'single-record' }}
-            className="btn btn-primary d-inline-flex align-items-center gap-1 flex-shrink-0"
-            data-testid="single-record-edit"
-          >
-            <i className="ti ti-edit" aria-hidden="true" />
-            Éditer la fiche
-          </Link>
-        )}
+        <div className="d-flex align-items-center gap-2">
+          {tableId && (
+            <button
+              type="button"
+              className="btn btn-outline-primary d-inline-flex align-items-center gap-1"
+              onClick={() => setIsShareModalOpen(true)}
+            >
+              <i className="ti ti-share" aria-hidden="true" />
+              Partager
+            </button>
+          )}
+          {tableId && (
+            <Link
+              to="/tables/$databaseId/$tableId"
+              params={{ databaseId, tableId }}
+              search={{ action: 'edit', recordId, returnTo: 'single-record' }}
+              className="btn btn-primary d-inline-flex align-items-center gap-1 flex-shrink-0"
+              data-testid="single-record-edit"
+            >
+              <i className="ti ti-edit" aria-hidden="true" />
+              Éditer la fiche
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="card shadow-sm border-0">
         <div className="card-header bg-white py-3 border-bottom-0">
           <div className="d-flex flex-column gap-1">
             <div>
-              <span className="badge text-bg-secondary px-2 py-1 text-uppercase">
-                {tableName}
-              </span>
+              <span className="badge text-bg-secondary px-2 py-1 text-uppercase">{tableName}</span>
             </div>
-            <h1 className="h2 fw-bold text-primary mb-0 mt-1">
-              {recordTitle}
-            </h1>
+            <h1 className="h2 fw-bold text-primary mb-0 mt-1">{recordTitle}</h1>
           </div>
         </div>
 
         <div className="card-body pt-0">
           {tableId && (
-            <RecordDetailView
-              databaseId={databaseId}
-              tableId={tableId}
-              recordId={recordId}
-            />
+            <RecordDetailView databaseId={databaseId} tableId={tableId} recordId={recordId} />
           )}
         </div>
       </div>
+
+      {tableId && (
+        <ShareModal
+          databaseId={databaseId}
+          targetType="record"
+          targetId={recordId}
+          targetName={recordTitle}
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

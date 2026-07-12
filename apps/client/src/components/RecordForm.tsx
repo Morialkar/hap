@@ -626,7 +626,11 @@ function GpsFieldEditor({ value, onChange, testId, photoGps }: GpsFieldEditorPro
   return (
     <div className="vstack gap-2" data-testid={testId}>
       {photoGps && (
-        <button type="button" className="btn btn-outline-secondary btn-sm align-self-start" onClick={() => onChange({ lat: String(photoGps.lat), lng: String(photoGps.lng) })}>
+        <button
+          type="button"
+          className="btn btn-outline-secondary btn-sm align-self-start"
+          onClick={() => onChange({ lat: String(photoGps.lat), lng: String(photoGps.lng) })}
+        >
           <i className="ti ti-photo me-1" aria-hidden="true" />
           Utiliser la position de la photo
         </button>

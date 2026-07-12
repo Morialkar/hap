@@ -14,8 +14,11 @@ import { Route as PingRouteImport } from './routes/ping'
 import { Route as NotFoundRouteImport } from './routes/not-found'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SharesDatabaseIdRouteImport } from './routes/shares.$databaseId'
+import { Route as PublicSharesTokenRouteImport } from './routes/public-shares.$token'
 import { Route as NavigationDatabaseIdRouteImport } from './routes/navigation.$databaseId'
 import { Route as TablesDatabaseIdTableIdRouteImport } from './routes/tables.$databaseId.$tableId'
+import { Route as ReportsDatabaseIdTableIdRouteImport } from './routes/reports.$databaseId.$tableId'
 import { Route as BuilderDatabaseIdTableIdRouteImport } from './routes/builder.$databaseId.$tableId'
 import { Route as NavigationDatabaseIdRecordRecordIdRouteImport } from './routes/navigation_.$databaseId.record.$recordId'
 
@@ -44,6 +47,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SharesDatabaseIdRoute = SharesDatabaseIdRouteImport.update({
+  id: '/shares/$databaseId',
+  path: '/shares/$databaseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicSharesTokenRoute = PublicSharesTokenRouteImport.update({
+  id: '/public-shares/$token',
+  path: '/public-shares/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NavigationDatabaseIdRoute = NavigationDatabaseIdRouteImport.update({
   id: '/navigation/$databaseId',
   path: '/navigation/$databaseId',
@@ -54,6 +67,12 @@ const TablesDatabaseIdTableIdRoute = TablesDatabaseIdTableIdRouteImport.update({
   path: '/tables/$databaseId/$tableId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportsDatabaseIdTableIdRoute =
+  ReportsDatabaseIdTableIdRouteImport.update({
+    id: '/reports/$databaseId/$tableId',
+    path: '/reports/$databaseId/$tableId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BuilderDatabaseIdTableIdRoute =
   BuilderDatabaseIdTableIdRouteImport.update({
     id: '/builder/$databaseId/$tableId',
@@ -74,7 +93,10 @@ export interface FileRoutesByFullPath {
   '/ping': typeof PingRoute
   '/workspaces': typeof WorkspacesRoute
   '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
+  '/public-shares/$token': typeof PublicSharesTokenRoute
+  '/shares/$databaseId': typeof SharesDatabaseIdRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
+  '/reports/$databaseId/$tableId': typeof ReportsDatabaseIdTableIdRoute
   '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
   '/navigation/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute
 }
@@ -85,7 +107,10 @@ export interface FileRoutesByTo {
   '/ping': typeof PingRoute
   '/workspaces': typeof WorkspacesRoute
   '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
+  '/public-shares/$token': typeof PublicSharesTokenRoute
+  '/shares/$databaseId': typeof SharesDatabaseIdRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
+  '/reports/$databaseId/$tableId': typeof ReportsDatabaseIdTableIdRoute
   '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
   '/navigation/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute
 }
@@ -97,7 +122,10 @@ export interface FileRoutesById {
   '/ping': typeof PingRoute
   '/workspaces': typeof WorkspacesRoute
   '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
+  '/public-shares/$token': typeof PublicSharesTokenRoute
+  '/shares/$databaseId': typeof SharesDatabaseIdRoute
   '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
+  '/reports/$databaseId/$tableId': typeof ReportsDatabaseIdTableIdRoute
   '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
   '/navigation_/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute
 }
@@ -110,7 +138,10 @@ export interface FileRouteTypes {
     | '/ping'
     | '/workspaces'
     | '/navigation/$databaseId'
+    | '/public-shares/$token'
+    | '/shares/$databaseId'
     | '/builder/$databaseId/$tableId'
+    | '/reports/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
     | '/navigation/$databaseId/record/$recordId'
   fileRoutesByTo: FileRoutesByTo
@@ -121,7 +152,10 @@ export interface FileRouteTypes {
     | '/ping'
     | '/workspaces'
     | '/navigation/$databaseId'
+    | '/public-shares/$token'
+    | '/shares/$databaseId'
     | '/builder/$databaseId/$tableId'
+    | '/reports/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
     | '/navigation/$databaseId/record/$recordId'
   id:
@@ -132,7 +166,10 @@ export interface FileRouteTypes {
     | '/ping'
     | '/workspaces'
     | '/navigation/$databaseId'
+    | '/public-shares/$token'
+    | '/shares/$databaseId'
     | '/builder/$databaseId/$tableId'
+    | '/reports/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
     | '/navigation_/$databaseId/record/$recordId'
   fileRoutesById: FileRoutesById
@@ -144,7 +181,10 @@ export interface RootRouteChildren {
   PingRoute: typeof PingRoute
   WorkspacesRoute: typeof WorkspacesRoute
   NavigationDatabaseIdRoute: typeof NavigationDatabaseIdRoute
+  PublicSharesTokenRoute: typeof PublicSharesTokenRoute
+  SharesDatabaseIdRoute: typeof SharesDatabaseIdRoute
   BuilderDatabaseIdTableIdRoute: typeof BuilderDatabaseIdTableIdRoute
+  ReportsDatabaseIdTableIdRoute: typeof ReportsDatabaseIdTableIdRoute
   TablesDatabaseIdTableIdRoute: typeof TablesDatabaseIdTableIdRoute
   NavigationDatabaseIdRecordRecordIdRoute: typeof NavigationDatabaseIdRecordRecordIdRoute
 }
@@ -186,6 +226,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shares/$databaseId': {
+      id: '/shares/$databaseId'
+      path: '/shares/$databaseId'
+      fullPath: '/shares/$databaseId'
+      preLoaderRoute: typeof SharesDatabaseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public-shares/$token': {
+      id: '/public-shares/$token'
+      path: '/public-shares/$token'
+      fullPath: '/public-shares/$token'
+      preLoaderRoute: typeof PublicSharesTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/navigation/$databaseId': {
       id: '/navigation/$databaseId'
       path: '/navigation/$databaseId'
@@ -198,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/tables/$databaseId/$tableId'
       fullPath: '/tables/$databaseId/$tableId'
       preLoaderRoute: typeof TablesDatabaseIdTableIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports/$databaseId/$tableId': {
+      id: '/reports/$databaseId/$tableId'
+      path: '/reports/$databaseId/$tableId'
+      fullPath: '/reports/$databaseId/$tableId'
+      preLoaderRoute: typeof ReportsDatabaseIdTableIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/builder/$databaseId/$tableId': {
@@ -224,7 +285,10 @@ const rootRouteChildren: RootRouteChildren = {
   PingRoute: PingRoute,
   WorkspacesRoute: WorkspacesRoute,
   NavigationDatabaseIdRoute: NavigationDatabaseIdRoute,
+  PublicSharesTokenRoute: PublicSharesTokenRoute,
+  SharesDatabaseIdRoute: SharesDatabaseIdRoute,
   BuilderDatabaseIdTableIdRoute: BuilderDatabaseIdTableIdRoute,
+  ReportsDatabaseIdTableIdRoute: ReportsDatabaseIdTableIdRoute,
   TablesDatabaseIdTableIdRoute: TablesDatabaseIdTableIdRoute,
   NavigationDatabaseIdRecordRecordIdRoute:
     NavigationDatabaseIdRecordRecordIdRoute,
