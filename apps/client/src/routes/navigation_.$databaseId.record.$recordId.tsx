@@ -62,8 +62,9 @@ export function SingleRecordPage() {
   const tableName = tableQuery.data?.name || 'Fiche';
 
   // Resolve main title/label
-  let recordTitle = '';
-  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
+  let recordTitle: string;
+  const titleField =
+    fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     rData[titleField.name] !== undefined &&
@@ -83,12 +84,7 @@ export function SingleRecordPage() {
       recordTitle = String(rData[firstField.name]);
     } else {
       recordTitle = String(
-        rData.name ||
-        rData.title ||
-        rData.nom ||
-        rData.titre ||
-        Object.values(rData)[0] ||
-        recordId
+        rData.name || rData.title || rData.nom || rData.titre || Object.values(rData)[0] || recordId
       );
     }
   }
@@ -130,23 +126,15 @@ export function SingleRecordPage() {
         <div className="card-header bg-white py-3 border-bottom-0">
           <div className="d-flex flex-column gap-1">
             <div>
-              <span className="badge text-bg-secondary px-2 py-1 text-uppercase">
-                {tableName}
-              </span>
+              <span className="badge text-bg-secondary px-2 py-1 text-uppercase">{tableName}</span>
             </div>
-            <h1 className="h2 fw-bold text-primary mb-0 mt-1">
-              {recordTitle}
-            </h1>
+            <h1 className="h2 fw-bold text-primary mb-0 mt-1">{recordTitle}</h1>
           </div>
         </div>
 
         <div className="card-body pt-0">
           {tableId && (
-            <RecordDetailView
-              databaseId={databaseId}
-              tableId={tableId}
-              recordId={recordId}
-            />
+            <RecordDetailView databaseId={databaseId} tableId={tableId} recordId={recordId} />
           )}
         </div>
       </div>

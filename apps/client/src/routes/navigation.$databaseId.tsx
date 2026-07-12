@@ -280,7 +280,11 @@ function NavigationModePage() {
     return activeView.config.columns;
   }, [activeView, fields]);
 
-  const titleField = useMemo(() => fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title'), [fields]);
+  const titleField = useMemo(
+    () =>
+      fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title'),
+    [fields]
+  );
 
   const rawRecords = useMemo(() => recordsQuery.data?.data || [], [recordsQuery.data]);
 
@@ -311,37 +315,59 @@ function NavigationModePage() {
     }
 
     setGpsLocalitiesReady(false);
-    void loadBundledGazetteerResolver().then((resolver) => {
-      if (cancelled) return;
+    void loadBundledGazetteerResolver()
+      .then((resolver) => {
+        if (cancelled) return;
 
-      const next: Record<string, Record<string, LocalitySnapshot>> = {};
-      rawRecords.forEach((record) => {
-        const localities: Record<string, LocalitySnapshot> = {};
-        gpsFilterableFields.forEach((field) => {
-          const coordinates = parseGpsValue(record.data?.[field.name]);
-          if (coordinates) localities[field.name] = resolver.resolve(coordinates);
+        const next: Record<string, Record<string, LocalitySnapshot>> = {};
+        rawRecords.forEach((record) => {
+          const localities: Record<string, LocalitySnapshot> = {};
+          gpsFilterableFields.forEach((field) => {
+            const coordinates = parseGpsValue(record.data?.[field.name]);
+            if (coordinates) localities[field.name] = resolver.resolve(coordinates);
+          });
+          if (Object.keys(localities).length > 0) next[record.id] = localities;
         });
-        if (Object.keys(localities).length > 0) next[record.id] = localities;
+        setGpsLocalities(next);
+        setGpsLocalitiesReady(true);
+      })
+      .catch(() => {
+        if (!cancelled) setGpsLocalitiesReady(true);
       });
-      setGpsLocalities(next);
-      setGpsLocalitiesReady(true);
-    }).catch(() => {
-      if (!cancelled) setGpsLocalitiesReady(true);
-    });
 
     return () => {
       cancelled = true;
     };
   }, [gpsFilterableFields, rawRecords]);
 
-  const sidebarFacets = useMemo<SidebarFacet[]>(() => [
-    ...filterableFields.map((field) => ({ key: field.name, label: field.name, field })),
-    ...(gpsLocalitiesReady ? gpsFilterableFields.flatMap((field) => [
-      { key: `${field.name}.__locality.country`, label: `${field.name} — Pays`, gpsFieldName: field.name, dimension: 'country' as const },
-      { key: `${field.name}.__locality.region`, label: `${field.name} — Région`, gpsFieldName: field.name, dimension: 'region' as const },
-      { key: `${field.name}.__locality.city`, label: `${field.name} — Ville`, gpsFieldName: field.name, dimension: 'city' as const },
-    ]) : []),
-  ], [filterableFields, gpsFilterableFields, gpsLocalitiesReady]);
+  const sidebarFacets = useMemo<SidebarFacet[]>(
+    () => [
+      ...filterableFields.map((field) => ({ key: field.name, label: field.name, field })),
+      ...(gpsLocalitiesReady
+        ? gpsFilterableFields.flatMap((field) => [
+            {
+              key: `${field.name}.__locality.country`,
+              label: `${field.name} — Pays`,
+              gpsFieldName: field.name,
+              dimension: 'country' as const,
+            },
+            {
+              key: `${field.name}.__locality.region`,
+              label: `${field.name} — Région`,
+              gpsFieldName: field.name,
+              dimension: 'region' as const,
+            },
+            {
+              key: `${field.name}.__locality.city`,
+              label: `${field.name} — Ville`,
+              gpsFieldName: field.name,
+              dimension: 'city' as const,
+            },
+          ])
+        : []),
+    ],
+    [filterableFields, gpsFilterableFields, gpsLocalitiesReady]
+  );
 
   const facetsByKey = useMemo(
     () => new Map(sidebarFacets.map((facet) => [facet.key, facet])),
@@ -415,7 +441,9 @@ function NavigationModePage() {
         return coordinates ? (
           <>
             <GpsMapPicker coordinates={coordinates} height={160} readOnly />
-            {field.options?.show_locality === true && <GpsLocalityLabel coordinates={coordinates} />}
+            {field.options?.show_locality === true && (
+              <GpsLocalityLabel coordinates={coordinates} />
+            )}
           </>
         ) : (
           <span className="text-muted small">--</span>
@@ -684,7 +712,11 @@ function NavigationModePage() {
       </SurfaceCard>
 
       <div className="mb-3 d-flex justify-content-end">
-        <button type="button" className={`btn btn-outline-secondary ${showMap ? 'active' : ''}`} onClick={() => setShowMap((current) => !current)}>
+        <button
+          type="button"
+          className={`btn btn-outline-secondary ${showMap ? 'active' : ''}`}
+          onClick={() => setShowMap((current) => !current)}
+        >
           <i className="ti ti-map-2 me-1" aria-hidden="true" />
           Carte ({mapPointsQuery.data?.data.length ?? 0})
         </button>
@@ -693,11 +725,10 @@ function NavigationModePage() {
       {showMap && (
         <SurfaceCard className="mb-4">
           <div className="card-body">
-            {mapPointsQuery.isLoading ? <LoadingSpinner size="lg" /> : (
-              <DatabaseMapView
-                points={mapPointsQuery.data?.data ?? []}
-                databaseId={databaseId}
-              />
+            {mapPointsQuery.isLoading ? (
+              <LoadingSpinner size="lg" />
+            ) : (
+              <DatabaseMapView points={mapPointsQuery.data?.data ?? []} databaseId={databaseId} />
             )}
           </div>
         </SurfaceCard>
@@ -846,7 +877,8 @@ function NavigationModePage() {
                                   const fieldDef = fieldsByIdMap.get(cleanId);
                                   if (!fieldDef || fieldDef.type === 'title') return null;
 
-                                  const hideLabel = activeView?.config?.hiddenLabels?.[cleanId] === true;
+                                  const hideLabel =
+                                    activeView?.config?.hiddenLabels?.[cleanId] === true;
 
                                   return (
                                     <div key={cleanId} className="hap-fiche-field">
@@ -973,8 +1005,9 @@ function ReferenceLabel({
   const fields = fieldsQuery.data || [];
 
   // Determine the label to display
-  let labelText = '';
-  const titleField = fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
+  let labelText: string;
+  const titleField =
+    fields.find((f) => f.options?.is_title === true) ?? fields.find((f) => f.type === 'title');
   if (
     titleField &&
     rData[titleField.name] !== undefined &&
@@ -995,17 +1028,15 @@ function ReferenceLabel({
     } else {
       labelText = String(
         rData.name ||
-        rData.title ||
-        rData.nom ||
-        rData.titre ||
-        Object.values(rData)[0] ||
-        fallback ||
-        targetRecordId
+          rData.title ||
+          rData.nom ||
+          rData.titre ||
+          Object.values(rData)[0] ||
+          fallback ||
+          targetRecordId
       );
     }
   }
-
-
 
   if (databaseId && targetTableId) {
     return (

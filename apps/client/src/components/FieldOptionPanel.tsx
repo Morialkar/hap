@@ -330,24 +330,27 @@ export function FieldOptionPanel({
           </select>
         </div>
 
-        {field.type !== 'image' && field.type !== 'file' && field.type !== 'long_text' && field.type !== 'title' && (
-          <div className="form-check form-switch mb-3">
-            <input
-              id="field-is-filterable"
-              className="form-check-input cursor-pointer"
-              type="checkbox"
-              role="switch"
-              checked={field.is_filterable !== false}
-              onChange={(e) => updateField({ is_filterable: e.target.checked })}
-            />
-            <label
-              className="form-check-label cursor-pointer text-muted small"
-              htmlFor="field-is-filterable"
-            >
-              {t('fieldType.isFilterable')}
-            </label>
-          </div>
-        )}
+        {field.type !== 'image' &&
+          field.type !== 'file' &&
+          field.type !== 'long_text' &&
+          field.type !== 'title' && (
+            <div className="form-check form-switch mb-3">
+              <input
+                id="field-is-filterable"
+                className="form-check-input cursor-pointer"
+                type="checkbox"
+                role="switch"
+                checked={field.is_filterable !== false}
+                onChange={(e) => updateField({ is_filterable: e.target.checked })}
+              />
+              <label
+                className="form-check-label cursor-pointer text-muted small"
+                htmlFor="field-is-filterable"
+              >
+                {t('fieldType.isFilterable')}
+              </label>
+            </div>
+          )}
 
         <OptionGroup
           title={t('builder.options.title')}
