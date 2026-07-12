@@ -259,9 +259,11 @@ const resources = {
       'fieldType.gps.description': 'Coordonnées latitude et longitude.',
       'fieldType.gps.options.showLocality': 'Afficher la ville, la région et le pays',
       'fieldType.compound.label': 'Champ composé',
-      'fieldType.compound.description': 'Champ assemblant les valeurs de plusieurs champs existants pour affichage.',
+      'fieldType.compound.description':
+        'Champ assemblant les valeurs de plusieurs champs existants pour affichage.',
       'fieldType.compound.options.template': 'Gabarit de formatage (ex: ${Prénom} ${Nom})',
-      'fieldType.compound.options.isTitle': 'Utiliser comme titre de la fiche (remplace le type Titre)',
+      'fieldType.compound.options.isTitle':
+        'Utiliser comme titre de la fiche (remplace le type Titre)',
       'fieldType.validation.required': 'Obligatoire',
       'fieldType.validation.minLength': 'Longueur minimale',
       'fieldType.validation.maxLength': 'Longueur maximale',
@@ -527,8 +529,10 @@ const resources = {
       'fieldType.gps.description': 'Latitude and longitude coordinates.',
       'fieldType.gps.options.showLocality': 'Show city, region, and country',
       'fieldType.compound.label': 'Compound field',
-      'fieldType.compound.description': 'Field assembling the values of multiple existing fields for display.',
-      'fieldType.compound.options.template': 'Formatting template (e.g., ${First Name} ${Last Name})',
+      'fieldType.compound.description':
+        'Field assembling the values of multiple existing fields for display.',
+      'fieldType.compound.options.template':
+        'Formatting template (e.g., ${First Name} ${Last Name})',
       'fieldType.compound.options.isTitle': 'Use as record title (replaces Title type)',
       'fieldType.validation.required': 'Required',
       'fieldType.validation.minLength': 'Minimum length',

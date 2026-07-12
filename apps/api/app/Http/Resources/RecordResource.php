@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\RecordValidationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +18,7 @@ class RecordResource extends JsonResource
         $data = $this->data ?? [];
         $table = $this->table;
         if ($table) {
-            $validationService = app(\App\Services\RecordValidationService::class);
+            $validationService = app(RecordValidationService::class);
             $data = $validationService->computeCompoundFields($table, $data);
         }
 

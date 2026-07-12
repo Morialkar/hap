@@ -7,8 +7,12 @@ import { render } from '../../test/render';
 import { type BuilderField } from '../../lib/fieldTypes';
 
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to, params, search, ...props }: any) => {
-    return <a href={to} {...props}>{children}</a>;
+  Link: ({ children, to, params: _params, search: _search, ...props }: any) => {
+    return (
+      <a href={to} {...props}>
+        {children}
+      </a>
+    );
   },
 }));
 
@@ -133,6 +137,8 @@ describe('RecordDetailView', () => {
     expect(screen.getByText('Histoire du Canada')).toBeInTheDocument();
     expect(screen.getByText('Ouvrages')).toHaveClass('hap-referencing-record-table');
     expect(screen.getByText('auteur')).toBeInTheDocument();
-    expect(screen.getByText('Histoire du Canada').closest('.hap-referencing-record-title')).not.toBeNull();
+    expect(
+      screen.getByText('Histoire du Canada').closest('.hap-referencing-record-title')
+    ).not.toBeNull();
   });
 });

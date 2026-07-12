@@ -202,12 +202,12 @@ class TemplateSeeder extends Seeder
                     'table' => 'authors',
                     'records' => [
                         [
-                            'id' => 'ref-author-badeaux',
-                            'nom' => 'Badeaux',
-                            'prenom' => 'Jean-Baptiste',
-                            'naissance' => '1741-00-00',
-                            'deces' => '1796-00-00',
-                            'lien' => 'https://www.biographi.ca/fr/bio/badeaux_jean_baptiste_4F.html',
+                            'id' => 'ref-author-exemple',
+                            'nom' => 'Exemple',
+                            'prenom' => 'Camille',
+                            'naissance' => '1900-00-00',
+                            'deces' => '1970-00-00',
+                            'lien' => 'https://example.org/demo/camille-exemple',
                         ],
                     ],
                 ],
@@ -215,8 +215,8 @@ class TemplateSeeder extends Seeder
                     'table' => 'publishers',
                     'records' => [
                         [
-                            'id' => 'ref-publisher-senecal',
-                            'nom' => 'Eusèbe Senécal, imprimeur-éditeur',
+                            'id' => 'ref-publisher-nuage',
+                            'nom' => 'Éditions du Nuage Bleu',
                         ],
                     ],
                 ],
@@ -224,8 +224,8 @@ class TemplateSeeder extends Seeder
                     'table' => 'printers',
                     'records' => [
                         [
-                            'id' => 'ref-printer-senecal',
-                            'nom' => 'Eusèbe Senécal, imprimeur',
+                            'id' => 'ref-printer-exemple',
+                            'nom' => 'Imprimerie Exemple',
                         ],
                     ],
                 ],
@@ -233,8 +233,8 @@ class TemplateSeeder extends Seeder
                     'table' => 'locations',
                     'records' => [
                         [
-                            'id' => 'ref-location-banq',
-                            'nom' => 'Bibliothèque et Archives nationales du Québec (BAnQ)',
+                            'id' => 'ref-location-fictive',
+                            'nom' => 'Centre des Archives Fictives',
                         ],
                     ],
                 ],
@@ -242,8 +242,8 @@ class TemplateSeeder extends Seeder
                     'table' => 'genres',
                     'records' => [
                         [
-                            'id' => 'ref-genre-histoire',
-                            'nom' => 'Histoire',
+                            'id' => 'ref-genre-recit',
+                            'nom' => 'Récit',
                         ],
                     ],
                 ],
@@ -251,8 +251,8 @@ class TemplateSeeder extends Seeder
                     'table' => 'categories',
                     'records' => [
                         [
-                            'id' => 'ref-cat-histoire',
-                            'nom' => 'Histoire',
+                            'id' => 'ref-cat-demo',
+                            'nom' => 'Démonstration',
                         ],
                     ],
                 ],
@@ -260,19 +260,19 @@ class TemplateSeeder extends Seeder
                     'table' => 'works',
                     'records' => [
                         [
-                            'titre' => 'Journal des opérations de l\'armée américaine lors de l\'invasion du Canada en 1775-1776',
-                            'description' => 'récits personnels, histoire, invasion américaine 1775-1776',
-                            'description_courte' => 'histoire, invasion américaine 1775-1776',
-                            'annee_publication' => 1871,
-                            'nombre_pages' => 43,
-                            'nombre_editions' => 2,
-                            'notes' => 'cote: 971. 024 B133j 1927 Collection nationale, Réserve',
-                            'auteur' => 'ref-author-badeaux',
-                            'type' => 'ref-genre-histoire',
-                            'categorie' => 'ref-cat-histoire',
-                            'editeur' => 'ref-publisher-senecal',
-                            'imprimeur' => 'ref-printer-senecal',
-                            'localisation' => 'ref-location-banq',
+                            'titre' => 'Le carnet imaginaire de Rivière-Claire',
+                            'description' => 'récit fictif sur les traditions et paysages de Rivière-Claire',
+                            'description_courte' => 'récit fictif de Rivière-Claire',
+                            'annee_publication' => 1912,
+                            'nombre_pages' => 128,
+                            'nombre_editions' => 1,
+                            'notes' => 'cote fictive: DEMO-1912-001, collection de démonstration',
+                            'auteur' => 'ref-author-exemple',
+                            'type' => 'ref-genre-recit',
+                            'categorie' => 'ref-cat-demo',
+                            'editeur' => 'ref-publisher-nuage',
+                            'imprimeur' => 'ref-printer-exemple',
+                            'localisation' => 'ref-location-fictive',
                         ],
                     ],
                 ],
@@ -373,7 +373,7 @@ class TemplateSeeder extends Seeder
         $t1->id = (string) Str::uuid();
         $t1->database_id = $systemDatabase->id;
         $t1->name = 'Catalogue Littéraire';
-        $t1->description = 'Modèle complet pour cataloguer des oeuvres littéraires, périodiques, auteurs, éditeurs, imprimeurs, localisations, etc. (Basé sur la base de données historique Éusèbe Sénécal).';
+        $t1->description = 'Modèle complet pour cataloguer des oeuvres littéraires, périodiques, auteurs, éditeurs, imprimeurs, localisations, etc.';
         $t1->format_version = 1;
         $t1->template_version = '1.0.0';
         $t1->schema = $literaryCatalogPayload;

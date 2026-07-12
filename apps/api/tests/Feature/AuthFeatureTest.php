@@ -43,6 +43,21 @@ test('login rejects invalid credentials', function () {
     $this->assertFalse(Auth::check());
 });
 
+test('login is rate limited after five failed attempts for the same email and IP', function () {
+    $credentials = [
+        'email' => 'throttle-test@example.com',
+        'password' => 'wrongpassword',
+    ];
+
+    foreach (range(1, 5) as $attempt) {
+        $this->postJson('/api/v1/login', $credentials)
+            ->assertStatus(422);
+    }
+
+    $this->postJson('/api/v1/login', $credentials)
+        ->assertStatus(429);
+});
+
 test('user can fetch authenticated user profile', function () {
     $user = User::factory()->create();
 

@@ -150,6 +150,8 @@ jobs:
 
       - name: Vitest
         run: cd apps/client && pnpm exec vitest run
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
   build:
     name: Build

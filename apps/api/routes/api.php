@@ -15,7 +15,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
-    Route::post('login', [AuthController::class, 'login'])->middleware(StartSession::class);
+    Route::post('login', [AuthController::class, 'login'])->middleware([StartSession::class, 'throttle:login']);
     Route::post('logout', [AuthController::class, 'logout'])->middleware(StartSession::class);
 
     Route::middleware([StartSession::class, 'auth:sanctum'])->group(function () {

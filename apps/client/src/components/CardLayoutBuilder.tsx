@@ -207,7 +207,11 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   });
 
   const saveLayoutMutation = useMutation({
-    mutationFn: (config: { columnCount: number; columns: string[][]; hiddenLabels?: Record<string, boolean> }) => {
+    mutationFn: (config: {
+      columnCount: number;
+      columns: string[][];
+      hiddenLabels?: Record<string, boolean>;
+    }) => {
       if (!selectedViewId) return Promise.reject(new Error('No view selected'));
       return apiClient.put(`/views/${selectedViewId}`, {
         config,
@@ -477,7 +481,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
               <div className="col d-flex justify-content-end align-items-center gap-3">
                 <div className="d-flex align-items-center border rounded px-3 py-1 bg-light gap-3">
                   <span className="small fw-bold text-muted text-uppercase me-1">Defaults</span>
-                  
+
                   <div className="form-check form-switch mb-0" title="Front default view">
                     <input
                       className="form-check-input cursor-pointer"
@@ -485,7 +489,9 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                       role="switch"
                       id="isDefaultViewSwitch"
                       checked={selectedView?.is_default ?? false}
-                      onChange={(e) => toggleDefaultMutation.mutate({ is_default: e.target.checked })}
+                      onChange={(e) =>
+                        toggleDefaultMutation.mutate({ is_default: e.target.checked })
+                      }
                       disabled={toggleDefaultMutation.isPending}
                     />
                     <label
@@ -503,7 +509,9 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
                       role="switch"
                       id="isSingleDefaultViewSwitch"
                       checked={selectedView?.is_single_default ?? false}
-                      onChange={(e) => toggleDefaultMutation.mutate({ is_single_default: e.target.checked })}
+                      onChange={(e) =>
+                        toggleDefaultMutation.mutate({ is_single_default: e.target.checked })
+                      }
                       disabled={toggleDefaultMutation.isPending}
                     />
                     <label

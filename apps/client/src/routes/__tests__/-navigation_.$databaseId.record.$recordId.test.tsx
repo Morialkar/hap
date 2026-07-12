@@ -14,7 +14,11 @@ vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, ...props }: any) => {
     delete props.params;
     delete props.search;
-    return <a href={to} {...props}>{children}</a>;
+    return (
+      <a href={to} {...props}>
+        {children}
+      </a>
+    );
   },
 }));
 
@@ -80,7 +84,6 @@ describe('SingleRecordPage Route', () => {
       }
       return Promise.reject(new Error(`Unexpected URL: ${url}`));
     });
-
 
     render(
       <QueryClientProvider client={queryClient}>
