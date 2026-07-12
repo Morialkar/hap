@@ -2,6 +2,7 @@
 
 use App\Models\Database;
 use App\Models\Field;
+use App\Models\Record;
 use App\Models\Table;
 use App\Models\User;
 use App\Models\Workspace;
@@ -62,16 +63,16 @@ test('user can create compound field and save record which resolves it', functio
         ->postJson('/api/v1/records', [
             'table_id' => $table->id,
             'data' => [
-                'Prénom' => 'Jean-Baptiste',
-                'Nom' => 'Badeaux',
+                'Prénom' => 'Camille',
+                'Nom' => 'Exemple',
             ],
         ]);
 
     $recordResponse->assertStatus(201);
-    
-    // Check that Nom Complet resolved to "Jean-Baptiste Badeaux"
+
+    // Check that Nom Complet resolved to "Camille Exemple"
     $recordData = $recordResponse->json('data');
-    expect($recordData['Nom Complet'])->toBe('Jean-Baptiste Badeaux');
+    expect($recordData['Nom Complet'])->toBe('Camille Exemple');
 
     // Update the record and check recalculation
     $recordId = $recordResponse->json('id');
@@ -79,13 +80,13 @@ test('user can create compound field and save record which resolves it', functio
         ->putJson("/api/v1/records/{$recordId}", [
             'version' => 1,
             'data' => [
-                'Prénom' => 'Jean',
-                'Nom' => 'Badeaux',
+                'Prénom' => 'Sacha',
+                'Nom' => 'Exemple',
             ],
         ]);
 
     $updateResponse->assertStatus(200);
-    expect($updateResponse->json('data.Nom Complet'))->toBe('Jean Badeaux');
+    expect($updateResponse->json('data.Nom Complet'))->toBe('Sacha Exemple');
 });
 
 test('pre-existing records have compound fields calculated dynamically on read', function () {
@@ -116,11 +117,11 @@ test('pre-existing records have compound fields calculated dynamically on read',
     ]);
 
     // Create a record *before* the compound field exists
-    $record = \App\Models\Record::create([
+    $record = Record::create([
         'table_id' => $table->id,
         'data' => [
-            'Prénom' => 'Jean-Baptiste',
-            'Nom' => 'Badeaux',
+            'Prénom' => 'Camille',
+            'Nom' => 'Exemple',
         ],
         'version' => 1,
     ]);
@@ -141,8 +142,7 @@ test('pre-existing records have compound fields calculated dynamically on read',
         ->getJson("/api/v1/records/{$record->id}");
 
     $response->assertStatus(200);
-    
-    // Verify it was calculated dynamically on the fly!
-    expect($response->json('data.Nom Complet'))->toBe('Jean-Baptiste Badeaux');
-});
 
+    // Verify it was calculated dynamically on the fly!
+    expect($response->json('data.Nom Complet'))->toBe('Camille Exemple');
+});
