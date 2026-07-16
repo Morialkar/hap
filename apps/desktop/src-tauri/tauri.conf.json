@@ -1,0 +1,41 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "HAP Tauri Spike",
+  "version": "0.1.0",
+  "identifier": "com.morialkar.hap.spike",
+  "build": {
+    "frontendDist": "../../client/dist",
+    "devUrl": "http://127.0.0.1:15174",
+    "beforeDevCommand": "VITE_DEV_PORT=15174 pnpm --dir ../client dev --host 127.0.0.1 --port 15174",
+    "beforeBuildCommand": "pnpm --dir ../client build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "HAP Tauri Spike",
+        "url": "tauri://localhost/tauri-spike",
+        "width": 800,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "android": {
+      "debugApplicationIdSuffix": ".debug"
+    }
+  }
+}

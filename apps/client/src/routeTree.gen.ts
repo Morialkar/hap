@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkspacesRouteImport } from './routes/workspaces'
+import { Route as TauriSpikeRouteImport } from './routes/tauri-spike'
 import { Route as PingRouteImport } from './routes/ping'
 import { Route as NotFoundRouteImport } from './routes/not-found'
 import { Route as LoginRouteImport } from './routes/login'
@@ -25,6 +26,11 @@ import { Route as NavigationDatabaseIdRecordRecordIdRouteImport } from './routes
 const WorkspacesRoute = WorkspacesRouteImport.update({
   id: '/workspaces',
   path: '/workspaces',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TauriSpikeRoute = TauriSpikeRouteImport.update({
+  id: '/tauri-spike',
+  path: '/tauri-spike',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PingRoute = PingRouteImport.update({
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/not-found': typeof NotFoundRoute
   '/ping': typeof PingRoute
+  '/tauri-spike': typeof TauriSpikeRoute
   '/workspaces': typeof WorkspacesRoute
   '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
   '/public-shares/$token': typeof PublicSharesTokenRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/not-found': typeof NotFoundRoute
   '/ping': typeof PingRoute
+  '/tauri-spike': typeof TauriSpikeRoute
   '/workspaces': typeof WorkspacesRoute
   '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
   '/public-shares/$token': typeof PublicSharesTokenRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/not-found': typeof NotFoundRoute
   '/ping': typeof PingRoute
+  '/tauri-spike': typeof TauriSpikeRoute
   '/workspaces': typeof WorkspacesRoute
   '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
   '/public-shares/$token': typeof PublicSharesTokenRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/not-found'
     | '/ping'
+    | '/tauri-spike'
     | '/workspaces'
     | '/navigation/$databaseId'
     | '/public-shares/$token'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/not-found'
     | '/ping'
+    | '/tauri-spike'
     | '/workspaces'
     | '/navigation/$databaseId'
     | '/public-shares/$token'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/not-found'
     | '/ping'
+    | '/tauri-spike'
     | '/workspaces'
     | '/navigation/$databaseId'
     | '/public-shares/$token'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   NotFoundRoute: typeof NotFoundRoute
   PingRoute: typeof PingRoute
+  TauriSpikeRoute: typeof TauriSpikeRoute
   WorkspacesRoute: typeof WorkspacesRoute
   NavigationDatabaseIdRoute: typeof NavigationDatabaseIdRoute
   PublicSharesTokenRoute: typeof PublicSharesTokenRoute
@@ -196,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: '/workspaces'
       fullPath: '/workspaces'
       preLoaderRoute: typeof WorkspacesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tauri-spike': {
+      id: '/tauri-spike'
+      path: '/tauri-spike'
+      fullPath: '/tauri-spike'
+      preLoaderRoute: typeof TauriSpikeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ping': {
@@ -283,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   NotFoundRoute: NotFoundRoute,
   PingRoute: PingRoute,
+  TauriSpikeRoute: TauriSpikeRoute,
   WorkspacesRoute: WorkspacesRoute,
   NavigationDatabaseIdRoute: NavigationDatabaseIdRoute,
   PublicSharesTokenRoute: PublicSharesTokenRoute,

@@ -22,7 +22,8 @@ function RootLayout() {
 
   const isLoginPage = location.pathname === '/login';
   const isPublicSharePage = location.pathname.startsWith('/public-shares/');
-  const isBarePage = isLoginPage || isPublicSharePage;
+  const isTauriSpikePage = location.pathname === '/tauri-spike';
+  const isBarePage = isLoginPage || isPublicSharePage || isTauriSpikePage;
 
   interface Database {
     id: string;
