@@ -109,6 +109,7 @@ function StructureBuilder() {
   // Snapshot of what the server holds, keyed by draft field id. Compared against the
   // live draft to know whether leaving the page would discard work.
   const [savedSnapshot, setSavedSnapshot] = useState<Record<string, string>>({});
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<{
     fieldId: string;
     action: 'delete' | 'type-change';
@@ -168,14 +169,27 @@ function StructureBuilder() {
   });
 
   const deleteFieldMutation = useMutation({
-    mutationFn: async (field: BuilderField) => {
+    mutationFn: async ({ field, token }: { field: BuilderField; token?: string }) => {
       if (field.persistedId) {
-        return apiClient.delete(`/fields/${field.persistedId}`);
+        // The API treats every field deletion as destructive, so a confirmation
+        // token is always required — not only when records are affected.
+        return apiClient.delete(`/fields/${field.persistedId}`, { confirmation_token: token });
       }
       return Promise.resolve();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fields', tableId] });
+    },
+    onError: (_error, { field }) => {
+      // The deletion did not reach the server: put the field back rather than
+      // leaving the canvas showing a removal that never happened.
+      setFields((prev) =>
+        prev.some((f) => f.id === field.id)
+          ? prev
+          : [...prev, field].sort((a, b) => a.position - b.position)
+      );
+      setSavedSnapshot((prev) => ({ ...prev, [field.id]: snapshotField(field) }));
+      setDeleteError(field.name);
     },
   });
 
@@ -286,12 +300,12 @@ function StructureBuilder() {
   }, []);
 
   const confirmRemove = useCallback(
-    (fieldId: string) => {
+    (fieldId: string, token?: string) => {
       const field = fields.find((f) => f.id === fieldId);
       if (!field) return;
 
       if (field.persistedId) {
-        deleteFieldMutation.mutate(field);
+        deleteFieldMutation.mutate({ field, token });
       }
 
       setFields((prev) => prev.filter((f) => f.id !== fieldId));
@@ -315,13 +329,14 @@ function StructureBuilder() {
       if (!field) return;
 
       if (field.persistedId) {
-        apiClient
-          .get<SchemaImpact>(`/fields/${field.persistedId}/preview-impact`)
-          .then(async (impact) => {
+        // A token is needed for every deletion; the impact only decides whether the
+        // user is warned first.
+        Promise.all([
+          apiClient.get<SchemaImpact>(`/fields/${field.persistedId}/preview-impact`),
+          apiClient.get<{ token: string }>(`/fields/${field.persistedId}/confirmation-token`),
+        ])
+          .then(([impact, tokenResponse]) => {
             if (impact.affected_records > 0) {
-              const tokenResponse = await apiClient.get<{ token: string }>(
-                `/fields/${field.persistedId}/confirmation-token`
-              );
               setPendingAction({
                 fieldId,
                 action: 'delete',
@@ -331,10 +346,10 @@ function StructureBuilder() {
                 message: t('builder.destructive.deleteMessage'),
               });
             } else {
-              confirmRemove(fieldId);
+              confirmRemove(fieldId, tokenResponse.token);
             }
           })
-          .catch(() => confirmRemove(fieldId));
+          .catch(() => setDeleteError(field.name));
       } else {
         confirmRemove(fieldId);
       }
@@ -346,7 +361,7 @@ function StructureBuilder() {
     if (!pendingAction) return;
 
     if (pendingAction.action === 'delete') {
-      confirmRemove(pendingAction.fieldId);
+      confirmRemove(pendingAction.fieldId, pendingAction.token);
       setPendingAction(null);
       return;
     }
@@ -545,6 +560,18 @@ function StructureBuilder() {
           onConfirm={handleConfirmDestructive}
           onCancel={() => setPendingAction(null)}
         />
+      )}
+
+      {deleteError && (
+        <div className="alert alert-danger alert-dismissible mt-3" role="alert">
+          {t('builder.deleteFailed', { name: deleteError })}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setDeleteError(null)}
+            aria-label={t('common.close')}
+          />
+        </div>
       )}
 
       <UnsavedChangesModal

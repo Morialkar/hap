@@ -188,6 +188,8 @@ const resources = {
       'builder.options.noOptions': 'Aucune option configurable pour ce type.',
       'builder.validation.title': 'Règles de validation',
       'builder.validation.noRules': 'Aucune règle pour ce type.',
+      'builder.deleteFailed':
+        'Le champ « {{name}} » n’a pas pu être supprimé. Il a été rétabli; réessayez.',
       'builder.status.unsaved': 'Modifications non enregistrées',
       'builder.status.saved': 'Toutes les modifications sont enregistrées',
       'unsaved.title': 'Modifications non enregistrées',
@@ -488,6 +490,8 @@ const resources = {
       'builder.options.noOptions': 'No configurable options for this type.',
       'builder.validation.title': 'Validation rules',
       'builder.validation.noRules': 'No rules for this type.',
+      'builder.deleteFailed':
+        'Field "{{name}}" could not be deleted. It has been restored; please try again.',
       'builder.status.unsaved': 'Unsaved changes',
       'builder.status.saved': 'All changes saved',
       'unsaved.title': 'Unsaved changes',
