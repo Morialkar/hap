@@ -188,7 +188,15 @@ const resources = {
       'builder.options.noOptions': 'Aucune option configurable pour ce type.',
       'builder.validation.title': 'Règles de validation',
       'builder.validation.noRules': 'Aucune règle pour ce type.',
-      'builder.saveDraft.label': 'Brouillon enregistré automatiquement',
+      'builder.deleteFailed':
+        'Le champ « {{name}} » n’a pas pu être supprimé. Il a été rétabli; réessayez.',
+      'builder.status.unsaved': 'Modifications non enregistrées',
+      'builder.status.saved': 'Toutes les modifications sont enregistrées',
+      'unsaved.title': 'Modifications non enregistrées',
+      'unsaved.message':
+        'Cette page contient des modifications qui ne sont pas encore enregistrées. Si vous quittez maintenant, elles seront perdues.',
+      'unsaved.stay': 'Rester sur la page',
+      'unsaved.leave': 'Quitter sans enregistrer',
       'builder.destructive.title': 'Changement destructif',
       'builder.destructive.affectedRecords_one': '{{count}} fiche concernée',
       'builder.destructive.affectedRecords_other': '{{count}} fiches concernées',
@@ -482,7 +490,15 @@ const resources = {
       'builder.options.noOptions': 'No configurable options for this type.',
       'builder.validation.title': 'Validation rules',
       'builder.validation.noRules': 'No rules for this type.',
-      'builder.saveDraft.label': 'Autosaved draft',
+      'builder.deleteFailed':
+        'Field "{{name}}" could not be deleted. It has been restored; please try again.',
+      'builder.status.unsaved': 'Unsaved changes',
+      'builder.status.saved': 'All changes saved',
+      'unsaved.title': 'Unsaved changes',
+      'unsaved.message':
+        'This page has changes that have not been saved yet. If you leave now, they will be lost.',
+      'unsaved.stay': 'Stay on this page',
+      'unsaved.leave': 'Leave without saving',
       'builder.destructive.title': 'Destructive change',
       'builder.destructive.affectedRecords_one': '{{count}} record affected',
       'builder.destructive.affectedRecords_other': '{{count}} records affected',
