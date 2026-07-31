@@ -16,6 +16,7 @@ import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
 import { PageActions, PageHeader } from '../components/ui/PageHeader';
 import { SurfaceCard } from '../components/ui/SurfaceCard';
+import { ShareModal } from '../components/ShareModal';
 
 export const Route = createFileRoute('/tables/$databaseId/$tableId')({
   validateSearch: (search: Record<string, unknown>): TableSearch => ({
@@ -80,6 +81,7 @@ function TableRecordsPage() {
   const [activeTab, setActiveTab] = useState<'details' | 'history'>('details');
 
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [shareViewTarget, setShareViewTarget] = useState<any>(null);
   const parentRef = useRef<HTMLDivElement>(null);
 
   // Unsaved changes guard
@@ -109,6 +111,11 @@ function TableRecordsPage() {
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', tableId],
     queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
+  });
+
+  const viewsQuery = useQuery<any[], Error>({
+    queryKey: ['views', tableId],
+    queryFn: () => apiClient.get(`/views?table_id=${tableId}`),
   });
 
   // Query records dynamically based on search, filter, and sort states
@@ -332,6 +339,30 @@ function TableRecordsPage() {
               <i className="ti ti-stack-2 me-1" aria-hidden="true" />
               {t('builder.tabs.structure')}
             </Link>
+            {viewsQuery.data && viewsQuery.data.length > 0 && (
+              <div className="dropdown d-inline-block">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                >
+                  <i className="ti ti-share me-1" />
+                  Partager la vue
+                </button>
+                <div className="dropdown-menu">
+                  {viewsQuery.data.map((v) => (
+                    <button
+                      key={v.id}
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => setShareViewTarget(v)}
+                    >
+                      {v.name} {v.is_default ? '(Par défaut)' : ''}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <button
               type="button"
               className="btn btn-primary"
@@ -795,6 +826,17 @@ function TableRecordsPage() {
             queryClient.invalidateQueries({ queryKey: ['fields'] });
             showToast('Import CSV terminé');
           }}
+        />
+      )}
+
+      {shareViewTarget && (
+        <ShareModal
+          databaseId={databaseId}
+          targetType="view"
+          targetId={shareViewTarget.id}
+          targetName={shareViewTarget.name}
+          isOpen={!!shareViewTarget}
+          onClose={() => setShareViewTarget(null)}
         />
       )}
     </div>

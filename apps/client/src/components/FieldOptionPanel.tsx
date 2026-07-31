@@ -56,6 +56,7 @@ function InputControl({
   currentField?: BuilderField;
 }) {
   const { t } = useI18n();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   switch (schema.type) {
     case 'boolean':
@@ -162,8 +163,6 @@ function InputControl({
 
     case 'string':
     default: {
-      const inputRef = useRef<HTMLInputElement>(null);
-
       const insertTag = (fieldName: string) => {
         const input = inputRef.current;
         if (!input) return;

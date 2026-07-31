@@ -21,6 +21,9 @@ function RootLayout() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
 
   const isLoginPage = location.pathname === '/login';
+  const isPublicSharePage = location.pathname.startsWith('/public-shares/');
+  const isTauriSpikePage = location.pathname === '/tauri-spike';
+  const isBarePage = isLoginPage || isPublicSharePage || isTauriSpikePage;
 
   interface Database {
     id: string;
@@ -48,14 +51,14 @@ function RootLayout() {
   });
 
   useEffect(() => {
-    if (isLoading || isAuthenticated || isLoginPage) return;
+    if (isLoading || isAuthenticated || isBarePage) return;
 
     const returnTo = location.pathname !== '/' ? location.pathname : null;
     navigate({ to: '/login', search: returnTo ? { returnTo } : undefined });
-  }, [isAuthenticated, isLoading, isLoginPage, location.pathname, navigate]);
+  }, [isAuthenticated, isLoading, isBarePage, location.pathname, navigate]);
 
   // The redirect effect owns navigation; avoid rendering protected content while it runs.
-  if (!isLoading && !isAuthenticated && !isLoginPage) {
+  if (!isLoading && !isAuthenticated && !isBarePage) {
     return null;
   }
 
@@ -70,7 +73,7 @@ function RootLayout() {
     );
   }
 
-  if (isLoginPage) {
+  if (isBarePage) {
     return <Outlet />;
   }
 

@@ -6,6 +6,8 @@ use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DatabaseMapPointController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\RecordController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UploadController;
@@ -28,10 +30,22 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('views', ViewController::class);
 
+        // Report routes
+        Route::post('reports/preview', [ReportController::class, 'preview']);
+        Route::post('reports/preview/pdf', [ReportController::class, 'previewPdf']);
+        Route::post('reports/preview/csv', [ReportController::class, 'previewCsv']);
+        Route::get('reports/{report}/export/pdf', [ReportController::class, 'exportPdf']);
+        Route::get('reports/{report}/export/csv', [ReportController::class, 'exportCsv']);
+        Route::match(['get', 'post'], 'reports/{report}/execute', [ReportController::class, 'execute']);
+        Route::apiResource('reports', ReportController::class);
+
         // Upload creation route
         Route::post('uploads', [UploadController::class, 'store']);
 
         Route::apiResource('databases', DatabaseController::class);
+        Route::get('databases/{database}/shares', [ShareController::class, 'index']);
+        Route::post('databases/{database}/shares', [ShareController::class, 'store']);
+        Route::delete('shares/{share}', [ShareController::class, 'destroy']);
         Route::get('databases/{database}/map-points', [DatabaseMapPointController::class, 'index']);
         Route::get('templates', [TemplateController::class, 'index']);
         Route::post('databases/{database}/export-template', [TemplateController::class, 'export']);
@@ -69,4 +83,10 @@ Route::prefix('v1')->group(function () {
 
     Route::get('uploads/{hash}', [UploadController::class, 'show']);
     Route::get('uploads/{hash}/thumbnail', [UploadController::class, 'showThumbnail']);
+
+    Route::middleware('throttle:60,1')->group(function () {
+        Route::get('shares/{token}', [ShareController::class, 'show']);
+        Route::get('shares/{token}/uploads/{hash}', [ShareController::class, 'serveUpload']);
+        Route::get('shares/{token}/uploads/{hash}/thumbnail', [ShareController::class, 'serveUploadThumbnail']);
+    });
 });

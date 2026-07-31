@@ -8,211 +8,293 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root';
-import { Route as WorkspacesRouteImport } from './routes/workspaces';
-import { Route as PingRouteImport } from './routes/ping';
-import { Route as NotFoundRouteImport } from './routes/not-found';
-import { Route as LoginRouteImport } from './routes/login';
-import { Route as IndexRouteImport } from './routes/index';
-import { Route as NavigationDatabaseIdRouteImport } from './routes/navigation.$databaseId';
-import { Route as TablesDatabaseIdTableIdRouteImport } from './routes/tables.$databaseId.$tableId';
-import { Route as BuilderDatabaseIdTableIdRouteImport } from './routes/builder.$databaseId.$tableId';
-import { Route as NavigationDatabaseIdRecordRecordIdRouteImport } from './routes/navigation_.$databaseId.record.$recordId';
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorkspacesRouteImport } from './routes/workspaces'
+import { Route as TauriSpikeRouteImport } from './routes/tauri-spike'
+import { Route as PingRouteImport } from './routes/ping'
+import { Route as NotFoundRouteImport } from './routes/not-found'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as SharesDatabaseIdRouteImport } from './routes/shares.$databaseId'
+import { Route as PublicSharesTokenRouteImport } from './routes/public-shares.$token'
+import { Route as NavigationDatabaseIdRouteImport } from './routes/navigation.$databaseId'
+import { Route as TablesDatabaseIdTableIdRouteImport } from './routes/tables.$databaseId.$tableId'
+import { Route as ReportsDatabaseIdTableIdRouteImport } from './routes/reports.$databaseId.$tableId'
+import { Route as BuilderDatabaseIdTableIdRouteImport } from './routes/builder.$databaseId.$tableId'
+import { Route as NavigationDatabaseIdRecordRecordIdRouteImport } from './routes/navigation_.$databaseId.record.$recordId'
 
 const WorkspacesRoute = WorkspacesRouteImport.update({
   id: '/workspaces',
   path: '/workspaces',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const TauriSpikeRoute = TauriSpikeRouteImport.update({
+  id: '/tauri-spike',
+  path: '/tauri-spike',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PingRoute = PingRouteImport.update({
   id: '/ping',
   path: '/ping',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const NotFoundRoute = NotFoundRouteImport.update({
   id: '/not-found',
   path: '/not-found',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const SharesDatabaseIdRoute = SharesDatabaseIdRouteImport.update({
+  id: '/shares/$databaseId',
+  path: '/shares/$databaseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicSharesTokenRoute = PublicSharesTokenRouteImport.update({
+  id: '/public-shares/$token',
+  path: '/public-shares/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NavigationDatabaseIdRoute = NavigationDatabaseIdRouteImport.update({
   id: '/navigation/$databaseId',
   path: '/navigation/$databaseId',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const TablesDatabaseIdTableIdRoute = TablesDatabaseIdTableIdRouteImport.update({
   id: '/tables/$databaseId/$tableId',
   path: '/tables/$databaseId/$tableId',
   getParentRoute: () => rootRouteImport,
-} as any);
-const BuilderDatabaseIdTableIdRoute = BuilderDatabaseIdTableIdRouteImport.update({
-  id: '/builder/$databaseId/$tableId',
-  path: '/builder/$databaseId/$tableId',
-  getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const ReportsDatabaseIdTableIdRoute =
+  ReportsDatabaseIdTableIdRouteImport.update({
+    id: '/reports/$databaseId/$tableId',
+    path: '/reports/$databaseId/$tableId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BuilderDatabaseIdTableIdRoute =
+  BuilderDatabaseIdTableIdRouteImport.update({
+    id: '/builder/$databaseId/$tableId',
+    path: '/builder/$databaseId/$tableId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const NavigationDatabaseIdRecordRecordIdRoute =
   NavigationDatabaseIdRecordRecordIdRouteImport.update({
     id: '/navigation_/$databaseId/record/$recordId',
     path: '/navigation/$databaseId/record/$recordId',
     getParentRoute: () => rootRouteImport,
-  } as any);
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute;
-  '/login': typeof LoginRoute;
-  '/not-found': typeof NotFoundRoute;
-  '/ping': typeof PingRoute;
-  '/workspaces': typeof WorkspacesRoute;
-  '/navigation/$databaseId': typeof NavigationDatabaseIdRoute;
-  '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute;
-  '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute;
-  '/navigation/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute;
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/not-found': typeof NotFoundRoute
+  '/ping': typeof PingRoute
+  '/tauri-spike': typeof TauriSpikeRoute
+  '/workspaces': typeof WorkspacesRoute
+  '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
+  '/public-shares/$token': typeof PublicSharesTokenRoute
+  '/shares/$databaseId': typeof SharesDatabaseIdRoute
+  '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
+  '/reports/$databaseId/$tableId': typeof ReportsDatabaseIdTableIdRoute
+  '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
+  '/navigation/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute;
-  '/login': typeof LoginRoute;
-  '/not-found': typeof NotFoundRoute;
-  '/ping': typeof PingRoute;
-  '/workspaces': typeof WorkspacesRoute;
-  '/navigation/$databaseId': typeof NavigationDatabaseIdRoute;
-  '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute;
-  '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute;
-  '/navigation/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute;
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/not-found': typeof NotFoundRoute
+  '/ping': typeof PingRoute
+  '/tauri-spike': typeof TauriSpikeRoute
+  '/workspaces': typeof WorkspacesRoute
+  '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
+  '/public-shares/$token': typeof PublicSharesTokenRoute
+  '/shares/$databaseId': typeof SharesDatabaseIdRoute
+  '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
+  '/reports/$databaseId/$tableId': typeof ReportsDatabaseIdTableIdRoute
+  '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
+  '/navigation/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  '/': typeof IndexRoute;
-  '/login': typeof LoginRoute;
-  '/not-found': typeof NotFoundRoute;
-  '/ping': typeof PingRoute;
-  '/workspaces': typeof WorkspacesRoute;
-  '/navigation/$databaseId': typeof NavigationDatabaseIdRoute;
-  '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute;
-  '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute;
-  '/navigation_/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/not-found': typeof NotFoundRoute
+  '/ping': typeof PingRoute
+  '/tauri-spike': typeof TauriSpikeRoute
+  '/workspaces': typeof WorkspacesRoute
+  '/navigation/$databaseId': typeof NavigationDatabaseIdRoute
+  '/public-shares/$token': typeof PublicSharesTokenRoute
+  '/shares/$databaseId': typeof SharesDatabaseIdRoute
+  '/builder/$databaseId/$tableId': typeof BuilderDatabaseIdTableIdRoute
+  '/reports/$databaseId/$tableId': typeof ReportsDatabaseIdTableIdRoute
+  '/tables/$databaseId/$tableId': typeof TablesDatabaseIdTableIdRoute
+  '/navigation_/$databaseId/record/$recordId': typeof NavigationDatabaseIdRecordRecordIdRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/login'
     | '/not-found'
     | '/ping'
+    | '/tauri-spike'
     | '/workspaces'
     | '/navigation/$databaseId'
+    | '/public-shares/$token'
+    | '/shares/$databaseId'
     | '/builder/$databaseId/$tableId'
+    | '/reports/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
-    | '/navigation/$databaseId/record/$recordId';
-  fileRoutesByTo: FileRoutesByTo;
+    | '/navigation/$databaseId/record/$recordId'
+  fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/not-found'
     | '/ping'
+    | '/tauri-spike'
     | '/workspaces'
     | '/navigation/$databaseId'
+    | '/public-shares/$token'
+    | '/shares/$databaseId'
     | '/builder/$databaseId/$tableId'
+    | '/reports/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
-    | '/navigation/$databaseId/record/$recordId';
+    | '/navigation/$databaseId/record/$recordId'
   id:
     | '__root__'
     | '/'
     | '/login'
     | '/not-found'
     | '/ping'
+    | '/tauri-spike'
     | '/workspaces'
     | '/navigation/$databaseId'
+    | '/public-shares/$token'
+    | '/shares/$databaseId'
     | '/builder/$databaseId/$tableId'
+    | '/reports/$databaseId/$tableId'
     | '/tables/$databaseId/$tableId'
-    | '/navigation_/$databaseId/record/$recordId';
-  fileRoutesById: FileRoutesById;
+    | '/navigation_/$databaseId/record/$recordId'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  LoginRoute: typeof LoginRoute;
-  NotFoundRoute: typeof NotFoundRoute;
-  PingRoute: typeof PingRoute;
-  WorkspacesRoute: typeof WorkspacesRoute;
-  NavigationDatabaseIdRoute: typeof NavigationDatabaseIdRoute;
-  BuilderDatabaseIdTableIdRoute: typeof BuilderDatabaseIdTableIdRoute;
-  TablesDatabaseIdTableIdRoute: typeof TablesDatabaseIdTableIdRoute;
-  NavigationDatabaseIdRecordRecordIdRoute: typeof NavigationDatabaseIdRecordRecordIdRoute;
+  IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  NotFoundRoute: typeof NotFoundRoute
+  PingRoute: typeof PingRoute
+  TauriSpikeRoute: typeof TauriSpikeRoute
+  WorkspacesRoute: typeof WorkspacesRoute
+  NavigationDatabaseIdRoute: typeof NavigationDatabaseIdRoute
+  PublicSharesTokenRoute: typeof PublicSharesTokenRoute
+  SharesDatabaseIdRoute: typeof SharesDatabaseIdRoute
+  BuilderDatabaseIdTableIdRoute: typeof BuilderDatabaseIdTableIdRoute
+  ReportsDatabaseIdTableIdRoute: typeof ReportsDatabaseIdTableIdRoute
+  TablesDatabaseIdTableIdRoute: typeof TablesDatabaseIdTableIdRoute
+  NavigationDatabaseIdRecordRecordIdRoute: typeof NavigationDatabaseIdRecordRecordIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/workspaces': {
-      id: '/workspaces';
-      path: '/workspaces';
-      fullPath: '/workspaces';
-      preLoaderRoute: typeof WorkspacesRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/workspaces'
+      path: '/workspaces'
+      fullPath: '/workspaces'
+      preLoaderRoute: typeof WorkspacesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tauri-spike': {
+      id: '/tauri-spike'
+      path: '/tauri-spike'
+      fullPath: '/tauri-spike'
+      preLoaderRoute: typeof TauriSpikeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ping': {
-      id: '/ping';
-      path: '/ping';
-      fullPath: '/ping';
-      preLoaderRoute: typeof PingRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/ping'
+      path: '/ping'
+      fullPath: '/ping'
+      preLoaderRoute: typeof PingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/not-found': {
-      id: '/not-found';
-      path: '/not-found';
-      fullPath: '/not-found';
-      preLoaderRoute: typeof NotFoundRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/not-found'
+      path: '/not-found'
+      fullPath: '/not-found'
+      preLoaderRoute: typeof NotFoundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
-      id: '/login';
-      path: '/login';
-      fullPath: '/login';
-      preLoaderRoute: typeof LoginRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
-      id: '/';
-      path: '/';
-      fullPath: '/';
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shares/$databaseId': {
+      id: '/shares/$databaseId'
+      path: '/shares/$databaseId'
+      fullPath: '/shares/$databaseId'
+      preLoaderRoute: typeof SharesDatabaseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public-shares/$token': {
+      id: '/public-shares/$token'
+      path: '/public-shares/$token'
+      fullPath: '/public-shares/$token'
+      preLoaderRoute: typeof PublicSharesTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/navigation/$databaseId': {
-      id: '/navigation/$databaseId';
-      path: '/navigation/$databaseId';
-      fullPath: '/navigation/$databaseId';
-      preLoaderRoute: typeof NavigationDatabaseIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/navigation/$databaseId'
+      path: '/navigation/$databaseId'
+      fullPath: '/navigation/$databaseId'
+      preLoaderRoute: typeof NavigationDatabaseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tables/$databaseId/$tableId': {
-      id: '/tables/$databaseId/$tableId';
-      path: '/tables/$databaseId/$tableId';
-      fullPath: '/tables/$databaseId/$tableId';
-      preLoaderRoute: typeof TablesDatabaseIdTableIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/tables/$databaseId/$tableId'
+      path: '/tables/$databaseId/$tableId'
+      fullPath: '/tables/$databaseId/$tableId'
+      preLoaderRoute: typeof TablesDatabaseIdTableIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports/$databaseId/$tableId': {
+      id: '/reports/$databaseId/$tableId'
+      path: '/reports/$databaseId/$tableId'
+      fullPath: '/reports/$databaseId/$tableId'
+      preLoaderRoute: typeof ReportsDatabaseIdTableIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/builder/$databaseId/$tableId': {
-      id: '/builder/$databaseId/$tableId';
-      path: '/builder/$databaseId/$tableId';
-      fullPath: '/builder/$databaseId/$tableId';
-      preLoaderRoute: typeof BuilderDatabaseIdTableIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/builder/$databaseId/$tableId'
+      path: '/builder/$databaseId/$tableId'
+      fullPath: '/builder/$databaseId/$tableId'
+      preLoaderRoute: typeof BuilderDatabaseIdTableIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/navigation_/$databaseId/record/$recordId': {
-      id: '/navigation_/$databaseId/record/$recordId';
-      path: '/navigation/$databaseId/record/$recordId';
-      fullPath: '/navigation/$databaseId/record/$recordId';
-      preLoaderRoute: typeof NavigationDatabaseIdRecordRecordIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/navigation_/$databaseId/record/$recordId'
+      path: '/navigation/$databaseId/record/$recordId'
+      fullPath: '/navigation/$databaseId/record/$recordId'
+      preLoaderRoute: typeof NavigationDatabaseIdRecordRecordIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -221,12 +303,17 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   NotFoundRoute: NotFoundRoute,
   PingRoute: PingRoute,
+  TauriSpikeRoute: TauriSpikeRoute,
   WorkspacesRoute: WorkspacesRoute,
   NavigationDatabaseIdRoute: NavigationDatabaseIdRoute,
+  PublicSharesTokenRoute: PublicSharesTokenRoute,
+  SharesDatabaseIdRoute: SharesDatabaseIdRoute,
   BuilderDatabaseIdTableIdRoute: BuilderDatabaseIdTableIdRoute,
+  ReportsDatabaseIdTableIdRoute: ReportsDatabaseIdTableIdRoute,
   TablesDatabaseIdTableIdRoute: TablesDatabaseIdTableIdRoute,
-  NavigationDatabaseIdRecordRecordIdRoute: NavigationDatabaseIdRecordRecordIdRoute,
-};
+  NavigationDatabaseIdRecordRecordIdRoute:
+    NavigationDatabaseIdRecordRecordIdRoute,
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()

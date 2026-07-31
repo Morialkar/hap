@@ -11,7 +11,7 @@ import { parseGpsValue } from '../lib/fieldDisplay';
 import { type BuilderField } from '../lib/fieldTypes';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
-import { PageHeader } from '../components/ui/PageHeader';
+import { PageHeader, PageActions } from '../components/ui/PageHeader';
 import { SurfaceCard } from '../components/ui/SurfaceCard';
 import { loadBundledGazetteerResolver, type LocalitySnapshot } from '@hap/core';
 
@@ -580,7 +580,24 @@ function NavigationModePage() {
         }
       `}</style>
 
-      <PageHeader pretitle={databaseQuery.data?.name} title={t('nav.navigation')} />
+      <PageHeader
+        pretitle={databaseQuery.data?.name}
+        title={t('nav.navigation')}
+        actions={
+          selectedTableId && (
+            <PageActions>
+              <Link
+                to="/reports/$databaseId/$tableId"
+                params={{ databaseId, tableId: selectedTableId }}
+                className="btn btn-outline-secondary"
+              >
+                <i className="ti ti-chart-bar me-1" aria-hidden="true" />
+                {t('workspaces.reports.action')}
+              </Link>
+            </PageActions>
+          )
+        }
+      />
 
       {/* Tabs for Front-Facing Tables */}
       <ul className="nav nav-tabs hap-navigation-tabs mb-4 border-bottom">
