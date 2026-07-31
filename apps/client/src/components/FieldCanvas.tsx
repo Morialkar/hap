@@ -30,6 +30,7 @@ interface FieldCanvasProps {
   onAdd: (type: FieldType, insertIndex?: number) => void;
   onReorder: (fields: BuilderField[]) => void;
   onRemove: (id: string) => void;
+  isDirty?: boolean;
 }
 
 interface BuilderDndProviderProps {
@@ -201,6 +202,7 @@ export function FieldCanvas({
   selectedId,
   onSelect,
   onRemove,
+  isDirty = false,
 }: Omit<FieldCanvasProps, 'onAdd' | 'onReorder'>) {
   const { t } = useI18n();
   const { active, over } = useDndContext();
@@ -226,7 +228,22 @@ export function FieldCanvas({
     <div className="card h-100">
       <div className="card-header d-flex justify-content-between align-items-center">
         <h4 className="card-title mb-0">{t('builder.canvas.title')}</h4>
-        <span className="text-muted small">{t('builder.saveDraft.label')}</span>
+        <span
+          className={`small ${isDirty ? 'text-warning' : 'text-muted'}`}
+          data-testid="builder-save-status"
+        >
+          {isDirty ? (
+            <>
+              <i className="ti ti-alert-circle me-1" aria-hidden="true" />
+              {t('builder.status.unsaved')}
+            </>
+          ) : (
+            <>
+              <i className="ti ti-check me-1" aria-hidden="true" />
+              {t('builder.status.saved')}
+            </>
+          )}
+        </span>
       </div>
       <div
         className="card-body p-0"

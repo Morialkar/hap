@@ -1,6 +1,6 @@
-import { createFileRoute, useParams } from '@tanstack/react-router';
+import { createFileRoute, useBlocker, useParams } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
 import { FIELD_TYPES, type FieldType, type BuilderField } from '../lib/fieldTypes';
@@ -9,6 +9,7 @@ import { FieldPalette } from '../components/FieldPalette';
 import { FieldCanvas, BuilderDndProvider } from '../components/FieldCanvas';
 import { FieldOptionPanel } from '../components/FieldOptionPanel';
 import { DestructiveChangeModal } from '../components/DestructiveChangeModal';
+import { UnsavedChangesModal } from '../components/UnsavedChangesModal';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
 import { PageActions, PageHeader } from '../components/ui/PageHeader';
@@ -78,6 +79,24 @@ function createNewField(type: FieldType, position: number): BuilderField {
   };
 }
 
+/**
+ * Serialize the parts of a field that `handleSaveAll` persists, so the draft can be
+ * compared against what the server currently holds.
+ */
+function snapshotField(field: BuilderField): string {
+  return JSON.stringify({
+    name: field.name,
+    type: field.type,
+    position: field.position,
+    options: field.options,
+    validation: field.validation,
+  });
+}
+
+function snapshotFields(fields: BuilderField[]): Record<string, string> {
+  return Object.fromEntries(fields.map((f) => [f.id, snapshotField(f)]));
+}
+
 function StructureBuilder() {
   const { databaseId, tableId } = useParams({ from: '/builder/$databaseId/$tableId' });
   const { t } = useI18n();
@@ -87,6 +106,9 @@ function StructureBuilder() {
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'structure' | 'layout'>('structure');
   const initializedRef = useRef(false);
+  // Snapshot of what the server holds, keyed by draft field id. Compared against the
+  // live draft to know whether leaving the page would discard work.
+  const [savedSnapshot, setSavedSnapshot] = useState<Record<string, string>>({});
   const [pendingAction, setPendingAction] = useState<{
     fieldId: string;
     action: 'delete' | 'type-change';
@@ -182,6 +204,7 @@ function StructureBuilder() {
 
       const sorted = [...loadedFields].sort((a, b) => a.position - b.position);
       setFields(sorted);
+      setSavedSnapshot(snapshotFields(sorted));
       if (sorted.length > 0) {
         setSelectedFieldId(sorted[0].id);
       }
@@ -272,6 +295,13 @@ function StructureBuilder() {
       }
 
       setFields((prev) => prev.filter((f) => f.id !== fieldId));
+      // The removal is persisted immediately (or the field never existed server-side),
+      // so drop it from the baseline rather than reporting it as an unsaved change.
+      setSavedSnapshot((prev) => {
+        const next = { ...prev };
+        delete next[fieldId];
+        return next;
+      });
       if (selectedFieldId === fieldId) {
         setSelectedFieldId(null);
       }
@@ -339,6 +369,12 @@ function StructureBuilder() {
       .put<Field>(`/fields/${field.persistedId}`, payload)
       .then(() => {
         setPendingAction(null);
+        // This field is now persisted with its new type; rebase it so it no longer
+        // counts as an unsaved change.
+        setSavedSnapshot((prev) => ({
+          ...prev,
+          [field.id]: snapshotField({ ...field, type: pendingAction.newType ?? field.type }),
+        }));
         queryClient.invalidateQueries({ queryKey: ['fields', tableId] });
       })
       .catch(() => {
@@ -354,9 +390,26 @@ function StructureBuilder() {
       ...newFields.map((f) => saveFieldMutation.mutateAsync(f)),
       ...existingFields.map((f) => saveFieldMutation.mutateAsync(f)),
     ]).then(() => {
+      setSavedSnapshot(snapshotFields(fields));
       queryClient.invalidateQueries({ queryKey: ['fields', tableId] });
     });
   }, [fields, queryClient, tableId, saveFieldMutation]);
+
+  const isDirty = useMemo(() => {
+    const current = snapshotFields(fields);
+    const currentIds = Object.keys(current);
+    const savedIds = Object.keys(savedSnapshot);
+
+    if (currentIds.length !== savedIds.length) return true;
+    return currentIds.some((id) => current[id] !== savedSnapshot[id]);
+  }, [fields, savedSnapshot]);
+
+  // Covers in-app navigation; `enableBeforeUnload` covers tab close and reload.
+  const blocker = useBlocker({
+    shouldBlockFn: () => isDirty,
+    enableBeforeUnload: () => isDirty,
+    withResolver: true,
+  });
 
   const selectedField = selectedFieldId ? fields.find((f) => f.id === selectedFieldId) : undefined;
 
@@ -459,6 +512,7 @@ function StructureBuilder() {
                 selectedId={selectedFieldId}
                 onSelect={setSelectedFieldId}
                 onRemove={handleRemove}
+                isDirty={isDirty}
               />
             </div>
 
@@ -492,6 +546,12 @@ function StructureBuilder() {
           onCancel={() => setPendingAction(null)}
         />
       )}
+
+      <UnsavedChangesModal
+        isOpen={blocker.status === 'blocked'}
+        onLeave={() => blocker.proceed?.()}
+        onStay={() => blocker.reset?.()}
+      />
     </div>
   );
 }
