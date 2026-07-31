@@ -38,14 +38,23 @@ function TauriSpikePage() {
   return (
     <main className="container py-5" data-testid="tauri-spike-page">
       <h1 className="h3">HAP R3-A — Tauri Spike</h1>
-      <p className="text-muted">Preuves natives isolées; aucune donnée HAP de production n’est écrite.</p>
+      <p className="text-muted">
+        Preuves natives isolées; aucune donnée HAP de production n’est écrite.
+      </p>
 
-      {!isNative && <div className="alert alert-warning">Cette page doit être ouverte dans Tauri.</div>}
+      {!isNative && (
+        <div className="alert alert-warning">Cette page doit être ouverte dans Tauri.</div>
+      )}
 
       <section className="card mb-3">
         <div className="card-body">
           <h2 className="h5">SQLite</h2>
-          <button type="button" className="btn btn-primary" disabled={!isNative} onClick={verifySqlite}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={!isNative}
+            onClick={verifySqlite}
+          >
             Vérifier l’écriture et la réouverture
           </button>
           <output className="d-block mt-2" data-testid="sqlite-spike-result">
@@ -57,7 +66,12 @@ function TauriSpikePage() {
       <section className="card">
         <div className="card-body">
           <h2 className="h5">Vault Markdown</h2>
-          <button type="button" className="btn btn-primary" disabled={!isNative} onClick={verifyVault}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={!isNative}
+            onClick={verifyVault}
+          >
             Choisir un dossier et écrire la sonde
           </button>
           <output className="d-block mt-2" data-testid="vault-spike-result">

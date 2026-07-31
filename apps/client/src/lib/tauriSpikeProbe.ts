@@ -42,7 +42,11 @@ export const tauriSpikeProbe: LocalPlatformProbe = {
   },
 
   async selectVaultDirectory(): Promise<string | null> {
-    const result = await open({ directory: true, multiple: false, title: 'Choisir le dossier du vault de test' });
+    const result = await open({
+      directory: true,
+      multiple: false,
+      title: 'Choisir le dossier du vault de test',
+    });
     return typeof result === 'string' ? result : null;
   },
 

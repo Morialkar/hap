@@ -54,7 +54,9 @@ describe('tauriSpikeProbe', () => {
 
   test('writes and reads the UTF-8 vault fixture in the selected directory', async () => {
     mocks.join.mockResolvedValue('/vault/hap-r3-a-vault-probe.md');
-    mocks.readTextFile.mockResolvedValue('# HAP R3-A vault probe\n\nCette fiche confirme l’écriture locale UTF-8.\n');
+    mocks.readTextFile.mockResolvedValue(
+      '# HAP R3-A vault probe\n\nCette fiche confirme l’écriture locale UTF-8.\n'
+    );
 
     await expect(tauriSpikeProbe.writeVaultProbe('/vault')).resolves.toEqual({
       contents: '# HAP R3-A vault probe\n\nCette fiche confirme l’écriture locale UTF-8.\n',
