@@ -191,6 +191,31 @@ class ReportController extends Controller
         return $this->generatePdfResponse($reportName, $result['columns'], $result['groups'], $ast['group_by'] ?? null, $filename, $layout);
     }
 
+    /**
+     * Same document as the PDF export, served as HTML so the print preview can show
+     * and print exactly what the PDF contains.
+     */
+    public function previewHtml(Request $request)
+    {
+        $validated = $request->validate([
+            'table_id' => 'required|uuid|exists:tables,id',
+            'name' => 'sometimes|required|string|max:255',
+            'query' => 'nullable|array',
+            'layout' => 'nullable|array',
+        ]);
+
+        $table = Table::findOrFail($validated['table_id']);
+        $reportName = $validated['name'] ?? 'Rapport temporaire';
+        $ast = $validated['query'] ?? [];
+        $layout = $validated['layout'] ?? null;
+
+        $result = $this->queryService->execute($table, $ast, null, null, $layout);
+
+        $html = $this->renderReportHtml($reportName, $result['columns'], $result['groups'], $ast['group_by'] ?? null, $layout);
+
+        return response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+    }
+
     public function previewCsv(Request $request)
     {
         $validated = $request->validate([
@@ -209,14 +234,18 @@ class ReportController extends Controller
         return $this->generateCsvResponse($result['columns'], $result['groups'], $ast['group_by'] ?? null, $filename, $layout);
     }
 
-    private function generatePdfResponse(string $reportName, array $columns, array $groups, ?string $groupBy, string $filename, ?array $layout = null)
+    /**
+     * The single rendering of a report document. The PDF export and the on-screen
+     * print preview both go through here, so what is previewed is what is printed.
+     */
+    private function renderReportHtml(string $reportName, array $columns, array $groups, ?string $groupBy, ?array $layout = null): string
     {
         $view = null;
         if ($layout && isset($layout['view_id'])) {
             $view = View::with('table.fields')->find($layout['view_id']);
         }
 
-        $html = view('reports.pdf', [
+        return view('reports.pdf', [
             'reportName' => $reportName,
             'columns' => $columns,
             'groups' => $groups,
@@ -224,6 +253,11 @@ class ReportController extends Controller
             'layout' => $layout,
             'view' => $view,
         ])->render();
+    }
+
+    private function generatePdfResponse(string $reportName, array $columns, array $groups, ?string $groupBy, string $filename, ?array $layout = null)
+    {
+        $html = $this->renderReportHtml($reportName, $columns, $groups, $groupBy, $layout);
 
         $dompdf = new Dompdf([
             'isHtml5ParserEnabled' => true,

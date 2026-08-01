@@ -34,6 +34,7 @@ Route::prefix('v1')->group(function () {
         Route::post('reports/preview', [ReportController::class, 'preview']);
         Route::post('reports/preview/pdf', [ReportController::class, 'previewPdf']);
         Route::post('reports/preview/csv', [ReportController::class, 'previewCsv']);
+        Route::post('reports/preview/html', [ReportController::class, 'previewHtml']);
         Route::get('reports/{report}/export/pdf', [ReportController::class, 'exportPdf']);
         Route::get('reports/{report}/export/csv', [ReportController::class, 'exportCsv']);
         Route::match(['get', 'post'], 'reports/{report}/execute', [ReportController::class, 'execute']);
