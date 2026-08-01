@@ -401,11 +401,37 @@ function StructureBuilder() {
     const newFields = fields.filter((f) => f.isNew);
     const existingFields = fields.filter((f) => !f.isNew);
 
-    Promise.all([
-      ...newFields.map((f) => saveFieldMutation.mutateAsync(f)),
-      ...existingFields.map((f) => saveFieldMutation.mutateAsync(f)),
-    ]).then(() => {
-      setSavedSnapshot(snapshotFields(fields));
+    const saveField = async (field: BuilderField): Promise<[string, Field | null]> => {
+      try {
+        return [field.id, await saveFieldMutation.mutateAsync(field)];
+      } catch {
+        return [field.id, null];
+      }
+    };
+
+    Promise.all([...newFields.map(saveField), ...existingFields.map(saveField)]).then((results) => {
+      const savedByDraftId = new Map(results);
+
+      // Rebase drafts onto what the server persisted: without this a field created in
+      // this session keeps isNew/persistedId=null and the next save POSTs it again,
+      // duplicating it on the table. Fields whose save failed keep their draft state.
+      setFields((prev) =>
+        prev.map((f) => {
+          const persistedId = savedByDraftId.get(f.id)?.id ?? f.persistedId;
+          if (!persistedId) return f;
+          return { ...f, isNew: false, persistedId };
+        })
+      );
+
+      // Only the fields that round-tripped are what the server now holds. Snapshot
+      // those and leave the rest alone, so a field whose save failed stays dirty and
+      // still trips the unsaved-changes guard.
+      const persisted = [...newFields, ...existingFields].filter((f) => savedByDraftId.get(f.id));
+      setSavedSnapshot((prev) => ({
+        ...prev,
+        ...Object.fromEntries(persisted.map((f) => [f.id, snapshotField(f)])),
+      }));
+
       queryClient.invalidateQueries({ queryKey: ['fields', tableId] });
     });
   }, [fields, queryClient, tableId, saveFieldMutation]);
