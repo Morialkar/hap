@@ -6,6 +6,7 @@ use App\Models\Record;
 use App\Models\Report;
 use App\Models\Table;
 use App\Models\User;
+use App\Models\View;
 use App\Models\Workspace;
 use App\Models\WorkspaceMember;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -358,4 +359,76 @@ test('export saved report and preview as PDF and CSV formats', function () {
     $previewCsvResponse->assertStatus(200);
     expect($previewCsvResponse->headers->get('Content-Type'))->toContain('text/csv');
     expect(str_contains($previewCsvResponse->streamedContent(), 'title'))->toBeTrue();
+});
+
+test('layout view_id, show_headers_only and per_page survive save and reload', function () {
+    $setup = createAuthenticatedUser();
+    $user = $setup['user'];
+    $table = $setup['table'];
+    $view = View::factory()->create(['table_id' => $table->id]);
+
+    $payload = [
+        'table_id' => $table->id,
+        'name' => 'Rapport avec vue',
+        'query' => ['select' => ['Nom'], 'group_by' => 'Ville'],
+        'layout' => [
+            'fields' => [['name' => 'Nom', 'visible' => true, 'order' => 1]],
+            'view_id' => $view->id,
+            'show_headers_only' => true,
+            'per_page' => 25,
+        ],
+    ];
+
+    $created = $this->actingAs($user)->postJson('/api/v1/reports', $payload);
+    $created->assertStatus(201);
+
+    $report = Report::find($created->json('id'));
+    expect($report->layout['view_id'])->toBe($view->id);
+    expect($report->layout['show_headers_only'])->toBeTrue();
+    expect($report->layout['per_page'])->toBe(25);
+
+    // The same keys must also survive an update.
+    $otherView = View::factory()->create(['table_id' => $table->id]);
+    $payload['layout']['view_id'] = $otherView->id;
+    $payload['layout']['per_page'] = 50;
+
+    $this->actingAs($user)
+        ->putJson("/api/v1/reports/{$report->id}", $payload)
+        ->assertStatus(200);
+
+    $report->refresh();
+    expect($report->layout['view_id'])->toBe($otherView->id);
+    expect($report->layout['per_page'])->toBe(50);
+});
+
+test('csv export emits the group field once when it is also a selected column', function () {
+    $setup = createAuthenticatedUser();
+    $user = $setup['user'];
+    $table = $setup['table'];
+
+    Field::factory()->create(['table_id' => $table->id, 'name' => 'Ville', 'type' => 'text']);
+    Field::factory()->create(['table_id' => $table->id, 'name' => 'Nom', 'type' => 'text']);
+
+    Record::create([
+        'table_id' => $table->id,
+        'data' => ['Ville' => 'Québec', 'Nom' => 'Tremblay'],
+        'version' => 1,
+    ]);
+
+    $response = $this->actingAs($user)->postJson('/api/v1/reports/preview/csv', [
+        'table_id' => $table->id,
+        'query' => ['select' => ['Ville', 'Nom'], 'group_by' => 'Ville'],
+        'layout' => ['fields' => [
+            ['name' => 'Ville', 'visible' => true, 'order' => 1],
+            ['name' => 'Nom', 'visible' => true, 'order' => 2],
+        ]],
+    ]);
+
+    $response->assertStatus(200);
+    $csv = $response->streamedContent();
+    $headerLine = str_getcsv(explode("\n", trim($csv))[0]);
+    $headerLine[0] = preg_replace('/^\x{FEFF}/u', '', $headerLine[0]);
+
+    expect($headerLine)->toBe(['Ville', 'Nom']);
+    expect(array_count_values($headerLine)['Ville'])->toBe(1);
 });
