@@ -1,6 +1,6 @@
-import { createFileRoute, useParams } from '@tanstack/react-router';
+import { createFileRoute, useBlocker, useParams } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '../contexts/I18nContext';
 import { apiClient } from '../lib/apiClient';
 import { FIELD_TYPES, type FieldType, type BuilderField } from '../lib/fieldTypes';
@@ -9,6 +9,7 @@ import { FieldPalette } from '../components/FieldPalette';
 import { FieldCanvas, BuilderDndProvider } from '../components/FieldCanvas';
 import { FieldOptionPanel } from '../components/FieldOptionPanel';
 import { DestructiveChangeModal } from '../components/DestructiveChangeModal';
+import { UnsavedChangesModal } from '../components/UnsavedChangesModal';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
 import { PageActions, PageHeader } from '../components/ui/PageHeader';
@@ -78,6 +79,24 @@ function createNewField(type: FieldType, position: number): BuilderField {
   };
 }
 
+/**
+ * Serialize the parts of a field that `handleSaveAll` persists, so the draft can be
+ * compared against what the server currently holds.
+ */
+function snapshotField(field: BuilderField): string {
+  return JSON.stringify({
+    name: field.name,
+    type: field.type,
+    position: field.position,
+    options: field.options,
+    validation: field.validation,
+  });
+}
+
+function snapshotFields(fields: BuilderField[]): Record<string, string> {
+  return Object.fromEntries(fields.map((f) => [f.id, snapshotField(f)]));
+}
+
 function StructureBuilder() {
   const { databaseId, tableId } = useParams({ from: '/builder/$databaseId/$tableId' });
   const { t } = useI18n();
@@ -87,6 +106,10 @@ function StructureBuilder() {
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'structure' | 'layout'>('structure');
   const initializedRef = useRef(false);
+  // Snapshot of what the server holds, keyed by draft field id. Compared against the
+  // live draft to know whether leaving the page would discard work.
+  const [savedSnapshot, setSavedSnapshot] = useState<Record<string, string>>({});
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<{
     fieldId: string;
     action: 'delete' | 'type-change';
@@ -146,14 +169,27 @@ function StructureBuilder() {
   });
 
   const deleteFieldMutation = useMutation({
-    mutationFn: async (field: BuilderField) => {
+    mutationFn: async ({ field, token }: { field: BuilderField; token?: string }) => {
       if (field.persistedId) {
-        return apiClient.delete(`/fields/${field.persistedId}`);
+        // The API treats every field deletion as destructive, so a confirmation
+        // token is always required — not only when records are affected.
+        return apiClient.delete(`/fields/${field.persistedId}`, { confirmation_token: token });
       }
       return Promise.resolve();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fields', tableId] });
+    },
+    onError: (_error, { field }) => {
+      // The deletion did not reach the server: put the field back rather than
+      // leaving the canvas showing a removal that never happened.
+      setFields((prev) =>
+        prev.some((f) => f.id === field.id)
+          ? prev
+          : [...prev, field].sort((a, b) => a.position - b.position)
+      );
+      setSavedSnapshot((prev) => ({ ...prev, [field.id]: snapshotField(field) }));
+      setDeleteError(field.name);
     },
   });
 
@@ -182,6 +218,7 @@ function StructureBuilder() {
 
       const sorted = [...loadedFields].sort((a, b) => a.position - b.position);
       setFields(sorted);
+      setSavedSnapshot(snapshotFields(sorted));
       if (sorted.length > 0) {
         setSelectedFieldId(sorted[0].id);
       }
@@ -263,15 +300,22 @@ function StructureBuilder() {
   }, []);
 
   const confirmRemove = useCallback(
-    (fieldId: string) => {
+    (fieldId: string, token?: string) => {
       const field = fields.find((f) => f.id === fieldId);
       if (!field) return;
 
       if (field.persistedId) {
-        deleteFieldMutation.mutate(field);
+        deleteFieldMutation.mutate({ field, token });
       }
 
       setFields((prev) => prev.filter((f) => f.id !== fieldId));
+      // The removal is persisted immediately (or the field never existed server-side),
+      // so drop it from the baseline rather than reporting it as an unsaved change.
+      setSavedSnapshot((prev) => {
+        const next = { ...prev };
+        delete next[fieldId];
+        return next;
+      });
       if (selectedFieldId === fieldId) {
         setSelectedFieldId(null);
       }
@@ -285,13 +329,14 @@ function StructureBuilder() {
       if (!field) return;
 
       if (field.persistedId) {
-        apiClient
-          .get<SchemaImpact>(`/fields/${field.persistedId}/preview-impact`)
-          .then(async (impact) => {
+        // A token is needed for every deletion; the impact only decides whether the
+        // user is warned first.
+        Promise.all([
+          apiClient.get<SchemaImpact>(`/fields/${field.persistedId}/preview-impact`),
+          apiClient.get<{ token: string }>(`/fields/${field.persistedId}/confirmation-token`),
+        ])
+          .then(([impact, tokenResponse]) => {
             if (impact.affected_records > 0) {
-              const tokenResponse = await apiClient.get<{ token: string }>(
-                `/fields/${field.persistedId}/confirmation-token`
-              );
               setPendingAction({
                 fieldId,
                 action: 'delete',
@@ -301,10 +346,10 @@ function StructureBuilder() {
                 message: t('builder.destructive.deleteMessage'),
               });
             } else {
-              confirmRemove(fieldId);
+              confirmRemove(fieldId, tokenResponse.token);
             }
           })
-          .catch(() => confirmRemove(fieldId));
+          .catch(() => setDeleteError(field.name));
       } else {
         confirmRemove(fieldId);
       }
@@ -316,7 +361,7 @@ function StructureBuilder() {
     if (!pendingAction) return;
 
     if (pendingAction.action === 'delete') {
-      confirmRemove(pendingAction.fieldId);
+      confirmRemove(pendingAction.fieldId, pendingAction.token);
       setPendingAction(null);
       return;
     }
@@ -339,6 +384,12 @@ function StructureBuilder() {
       .put<Field>(`/fields/${field.persistedId}`, payload)
       .then(() => {
         setPendingAction(null);
+        // This field is now persisted with its new type; rebase it so it no longer
+        // counts as an unsaved change.
+        setSavedSnapshot((prev) => ({
+          ...prev,
+          [field.id]: snapshotField({ ...field, type: pendingAction.newType ?? field.type }),
+        }));
         queryClient.invalidateQueries({ queryKey: ['fields', tableId] });
       })
       .catch(() => {
@@ -372,9 +423,34 @@ function StructureBuilder() {
         })
       );
 
+      // Only the fields that round-tripped are what the server now holds. Snapshot
+      // those and leave the rest alone, so a field whose save failed stays dirty and
+      // still trips the unsaved-changes guard.
+      const persisted = [...newFields, ...existingFields].filter((f) => savedByDraftId.get(f.id));
+      setSavedSnapshot((prev) => ({
+        ...prev,
+        ...Object.fromEntries(persisted.map((f) => [f.id, snapshotField(f)])),
+      }));
+
       queryClient.invalidateQueries({ queryKey: ['fields', tableId] });
     });
   }, [fields, queryClient, tableId, saveFieldMutation]);
+
+  const isDirty = useMemo(() => {
+    const current = snapshotFields(fields);
+    const currentIds = Object.keys(current);
+    const savedIds = Object.keys(savedSnapshot);
+
+    if (currentIds.length !== savedIds.length) return true;
+    return currentIds.some((id) => current[id] !== savedSnapshot[id]);
+  }, [fields, savedSnapshot]);
+
+  // Covers in-app navigation; `enableBeforeUnload` covers tab close and reload.
+  const blocker = useBlocker({
+    shouldBlockFn: () => isDirty,
+    enableBeforeUnload: () => isDirty,
+    withResolver: true,
+  });
 
   const selectedField = selectedFieldId ? fields.find((f) => f.id === selectedFieldId) : undefined;
 
@@ -477,6 +553,7 @@ function StructureBuilder() {
                 selectedId={selectedFieldId}
                 onSelect={setSelectedFieldId}
                 onRemove={handleRemove}
+                isDirty={isDirty}
               />
             </div>
 
@@ -510,6 +587,24 @@ function StructureBuilder() {
           onCancel={() => setPendingAction(null)}
         />
       )}
+
+      {deleteError && (
+        <div className="alert alert-danger alert-dismissible mt-3" role="alert">
+          {t('builder.deleteFailed', { name: deleteError })}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setDeleteError(null)}
+            aria-label={t('common.close')}
+          />
+        </div>
+      )}
+
+      <UnsavedChangesModal
+        isOpen={blocker.status === 'blocked'}
+        onLeave={() => blocker.proceed?.()}
+        onStay={() => blocker.reset?.()}
+      />
     </div>
   );
 }
