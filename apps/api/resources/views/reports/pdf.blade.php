@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <title>{{ $reportName }}</title>
     <style>
+        /* Dompdf takes the orientation from its constructor; this rule is what makes
+           the browser print the iframe preview on the same paper. */
+        @page {
+            size: A4 {{ ($layout['orientation'] ?? 'portrait') === 'landscape' ? 'landscape' : 'portrait' }};
+        }
         body {
             font-family: 'DejaVu Sans', sans-serif;
             font-size: 9.5pt;
@@ -54,16 +59,27 @@
             text-transform: uppercase;
             border-top: 1px solid #e2e8f0;
         }
+        .report-card-grid {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 0;
+        }
+        .report-card-cell {
+            vertical-align: top;
+            border: none;
+            padding: 0 5px 0 0;
+        }
         .report-card {
             border: 1px solid #e2e8f0;
             border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 12px;
+            padding: {{ ($layout['compact_cards'] ?? false) ? '6px' : '12px' }};
+            margin-bottom: {{ ($layout['compact_cards'] ?? false) ? '6px' : '12px' }};
             background-color: #fff;
             page-break-inside: avoid;
         }
         .report-card-title {
-            font-size: 11pt;
+            font-size: {{ ($layout['compact_cards'] ?? false) ? '9.5pt' : '11pt' }};
             font-weight: bold;
             color: #0f172a;
             border-bottom: 1px solid #e2e8f0;
@@ -74,11 +90,11 @@
             border: 1px dashed #cbd5e1;
             border-radius: 4px;
             background-color: #f8fafc;
-            padding: 8px;
-            min-height: 80px;
+            padding: {{ ($layout['compact_cards'] ?? false) ? '5px' : '8px' }};
+            min-height: {{ ($layout['compact_cards'] ?? false) ? '0' : '80px' }};
         }
         .report-card-field {
-            margin-bottom: 6px;
+            margin-bottom: {{ ($layout['compact_cards'] ?? false) ? '2px' : '6px' }};
         }
         .report-card-field-label {
             font-size: 7.5pt;
@@ -115,64 +131,81 @@
             @endif
             @if (!($layout['show_headers_only'] ?? false))
                 @if ($view && isset($view->config['columns']))
-                    @foreach ($group['records'] as $rec)
-                        @php
-                            $titleField = $view->table->fields->first(fn($f) => ($f->options['is_title'] ?? false) || $f->type === 'title');
-                            $titleVal = null;
-                            if ($titleField) {
-                                foreach ($rec as $k => $v) {
-                                    if (strcasecmp($k, $titleField->name) === 0) {
-                                        $titleVal = $v;
-                                        break;
-                                    }
-                                }
-                            }
-                            $columnsLayout = $view->config['columns'];
-                            $colCount = count($columnsLayout);
-                            $colWidth = $colCount > 1 ? '48%' : '100%';
-                        @endphp
-                        <div class="report-card">
-                            @if ($titleVal)
-                                <div class="report-card-title">{{ $titleVal }}</div>
-                            @endif
-                            <table style="width: 100%; border: none; margin: 0; border-collapse: collapse;">
-                                <tr style="border: none;">
-                                    @foreach ($columnsLayout as $colFields)
-                                        <td style="width: {{ $colWidth }}; vertical-align: top; border: none; padding: 0 10px 0 0;">
-                                            <div class="report-card-col">
-                                                @foreach ($colFields as $fId)
-                                                    @php
-                                                        $cleanId = str_starts_with($fId, 'draft-') ? substr($fId, 6) : $fId;
-                                                        $fieldDef = $view->table->fields->first(fn($f) => $f->id === $cleanId);
-                                                    @endphp
-                                                    @if ($fieldDef && $fieldDef->type !== 'title')
-                                                        @php
-                                                            $fieldVal = null;
-                                                            foreach ($rec as $k => $v) {
-                                                                if (strcasecmp($k, $fieldDef->name) === 0) {
-                                                                    $fieldVal = $v;
-                                                                    break;
-                                                                }
-                                                            }
-                                                        @endphp
-                                                        <div class="report-card-field">
-                                                            <div class="report-card-field-label">{{ $fieldDef->name }}</div>
-                                                            <div class="report-card-field-value">
-                                                                @if (is_array($fieldVal))
-                                                                    {{ implode(', ', $fieldVal) }}
-                                                                @else
-                                                                    {{ $fieldVal ?? '-' }}
+                    @php
+                        // Cards are laid out N per row; a wider grid fits far more records
+                        // per sheet for concise views.
+                        $cardColumns = max(1, min(4, (int) ($layout['card_columns'] ?? 1)));
+                        $cardCellWidth = round(100 / $cardColumns, 2).'%';
+                    @endphp
+                    @foreach (array_chunk($group['records'], $cardColumns) as $cardRow)
+                        <table class="report-card-grid">
+                            <tr>
+                                @foreach ($cardRow as $rec)
+                                    <td class="report-card-cell" style="width: {{ $cardCellWidth }};">
+                                    @php
+                                        $titleField = $view->table->fields->first(fn($f) => ($f->options['is_title'] ?? false) || $f->type === 'title');
+                                        $titleVal = null;
+                                        if ($titleField) {
+                                            foreach ($rec as $k => $v) {
+                                                if (strcasecmp($k, $titleField->name) === 0) {
+                                                    $titleVal = $v;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        $columnsLayout = $view->config['columns'];
+                                        $innerColCount = count($columnsLayout);
+                                        $innerColWidth = $innerColCount > 1 ? round(100 / $innerColCount, 2).'%' : '100%';
+                                    @endphp
+                                    <div class="report-card">
+                                        @if ($titleVal)
+                                            <div class="report-card-title">{{ $titleVal }}</div>
+                                        @endif
+                                        <table style="width: 100%; border: none; margin: 0; border-collapse: collapse;">
+                                            <tr style="border: none;">
+                                                @foreach ($columnsLayout as $colFields)
+                                                    <td style="width: {{ $innerColWidth }}; vertical-align: top; border: none; padding: 0 6px 0 0;">
+                                                        <div class="report-card-col">
+                                                            @foreach ($colFields as $fId)
+                                                                @php
+                                                                    $cleanId = str_starts_with($fId, 'draft-') ? substr($fId, 6) : $fId;
+                                                                    $fieldDef = $view->table->fields->first(fn($f) => $f->id === $cleanId);
+                                                                @endphp
+                                                                @if ($fieldDef && $fieldDef->type !== 'title')
+                                                                    @php
+                                                                        $fieldVal = null;
+                                                                        foreach ($rec as $k => $v) {
+                                                                            if (strcasecmp($k, $fieldDef->name) === 0) {
+                                                                                $fieldVal = $v;
+                                                                                break;
+                                                                            }
+                                                                        }
+                                                                    @endphp
+                                                                    <div class="report-card-field">
+                                                                        <div class="report-card-field-label">{{ $fieldDef->name }}</div>
+                                                                        <div class="report-card-field-value">
+                                                                            @if (is_array($fieldVal))
+                                                                                {{ implode(', ', $fieldVal) }}
+                                                                            @else
+                                                                                {{ $fieldVal ?? '-' }}
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
                                                                 @endif
-                                                            </div>
+                                                            @endforeach
                                                         </div>
-                                                    @endif
+                                                    </td>
                                                 @endforeach
-                                            </div>
-                                        </td>
-                                    @endforeach
-                                </tr>
-                            </table>
-                        </div>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    </td>
+                                @endforeach
+                                @for ($filler = count($cardRow); $filler < $cardColumns; $filler++)
+                                    <td class="report-card-cell" style="width: {{ $cardCellWidth }};"></td>
+                                @endfor
+                            </tr>
+                        </table>
                     @endforeach
                 @else
                     <table class="report-table">

@@ -60,6 +60,9 @@ class ReportController extends Controller
             'layout.view_id' => 'nullable|uuid|exists:views,id',
             'layout.show_headers_only' => 'nullable|boolean',
             'layout.per_page' => 'nullable|integer|min:1|max:100',
+            'layout.card_columns' => 'nullable|integer|min:1|max:4',
+            'layout.orientation' => 'nullable|in:portrait,landscape',
+            'layout.compact_cards' => 'nullable|boolean',
         ]);
 
         $report = Report::create($validated);
@@ -94,6 +97,9 @@ class ReportController extends Controller
             'layout.view_id' => 'nullable|uuid|exists:views,id',
             'layout.show_headers_only' => 'nullable|boolean',
             'layout.per_page' => 'nullable|integer|min:1|max:100',
+            'layout.card_columns' => 'nullable|integer|min:1|max:4',
+            'layout.orientation' => 'nullable|in:portrait,landscape',
+            'layout.compact_cards' => 'nullable|boolean',
         ]);
 
         $report->update($validated);
@@ -259,12 +265,15 @@ class ReportController extends Controller
     {
         $html = $this->renderReportHtml($reportName, $columns, $groups, $groupBy, $layout);
 
+        $orientation = ($layout['orientation'] ?? 'portrait') === 'landscape' ? 'landscape' : 'portrait';
+
         $dompdf = new Dompdf([
             'isHtml5ParserEnabled' => true,
             'isPhpEnabled' => false,
             'defaultPaperSize' => 'a4',
-            'defaultPaperOrientation' => 'portrait',
+            'defaultPaperOrientation' => $orientation,
         ]);
+        $dompdf->setPaper('a4', $orientation);
         $dompdf->loadHtml($html);
         $dompdf->render();
 

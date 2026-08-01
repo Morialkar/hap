@@ -128,3 +128,70 @@ describe('report exports follow the on-screen configuration', () => {
     expect(JSON.parse(init.body).name).toBe('Rapport sauvegarde');
   });
 });
+
+describe('printed layout options', () => {
+  let fetchMock: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    vi.spyOn(apiClient, 'get').mockImplementation((url: string) => {
+      if (url.startsWith('/databases/'))
+        return Promise.resolve({ id: 'db-1', name: 'Base' }) as any;
+      if (url.startsWith('/tables/')) return Promise.resolve({ id: 'tbl-1', name: 'Table' }) as any;
+      if (url.startsWith('/fields')) return Promise.resolve(mockFields) as any;
+      if (url.startsWith('/reports')) return Promise.resolve([savedReport]) as any;
+      if (url.startsWith('/views'))
+        return Promise.resolve([
+          { id: 'view-1', table_id: 'tbl-1', name: 'Fiche', type: 'card', config: { columns: [] } },
+        ]) as any;
+      return Promise.resolve([]) as any;
+    });
+    vi.spyOn(apiClient, 'post').mockResolvedValue({ columns: ['Titre'], groups: [] } as any);
+
+    fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: { get: () => 'attachment; filename="rapport.pdf"' },
+      blob: async () => new Blob(['pdf']),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    window.matchMedia = vi.fn().mockReturnValue({ matches: false }) as any;
+    vi.stubGlobal('URL', {
+      ...window.URL,
+      createObjectURL: vi.fn(() => 'blob:mock'),
+      revokeObjectURL: vi.fn(),
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('sends orientation, cards per row and the compact flag with the export', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    // Selecting the saved report restores its view, which reveals the card options.
+    await user.click(await screen.findByRole('button', { name: /Rapport sauvegarde/ }));
+
+    await user.selectOptions(await screen.findByLabelText('Document orientation'), 'landscape');
+    await user.selectOptions(await screen.findByLabelText('Cards per row'), '3');
+    await user.click(screen.getByLabelText('Condensed cards'));
+
+    await user.click(screen.getByRole('button', { name: /PDF/ }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body.layout.orientation).toBe('landscape');
+    expect(body.layout.card_columns).toBe(3);
+    expect(body.layout.compact_cards).toBe(true);
+  });
+
+  it('hides the card options when no view is selected', async () => {
+    renderPage();
+
+    // Orientation applies to the table layout too, so it stays available.
+    expect(await screen.findByLabelText('Document orientation')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Cards per row')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Condensed cards')).not.toBeInTheDocument();
+  });
+});
