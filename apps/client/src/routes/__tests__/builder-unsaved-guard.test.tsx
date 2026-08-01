@@ -37,6 +37,18 @@ const mockFields = [
   },
 ];
 
+// The layout builder keys its columns by draft field id, which the page derives from the
+// persisted id.
+const mockViews = [
+  {
+    id: 'view-1',
+    table_id: 'tbl-1',
+    name: 'Fiche',
+    type: 'card',
+    config: { columnCount: 1, columns: [['draft-f1']] },
+  },
+];
+
 function renderBuilder() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -55,6 +67,7 @@ describe('schema builder unsaved-changes guard', () => {
       if (url.startsWith('/tables/')) return Promise.resolve(mockTable) as any;
       if (url.startsWith('/fields?')) return Promise.resolve(mockFields) as any;
       if (url.startsWith('/tables?')) return Promise.resolve([mockTable]) as any;
+      if (url.startsWith('/views')) return Promise.resolve(mockViews) as any;
       return Promise.resolve([]) as any;
     });
   });
@@ -80,6 +93,25 @@ describe('schema builder unsaved-changes guard', () => {
 
     // Both in-app navigation and tab close/reload must be guarded.
     expect(blockerOpts?.shouldBlockFn()).toBe(true);
+    expect(blockerOpts?.enableBeforeUnload()).toBe(true);
+  });
+
+  it('blocks navigation once the layout tab holds unsaved edits', async () => {
+    const user = userEvent.setup();
+    renderBuilder();
+
+    await user.click(await screen.findByTestId('layout-tab'));
+
+    // The saved layout is loaded as-is, so nothing is at risk yet.
+    const removeButton = await screen.findByTitle('Retirer');
+    expect(blockerOpts?.shouldBlockFn()).toBe(false);
+
+    // Pull the field out of its column without saving.
+    await user.click(removeButton);
+
+    await waitFor(() => {
+      expect(blockerOpts?.shouldBlockFn()).toBe(true);
+    });
     expect(blockerOpts?.enableBeforeUnload()).toBe(true);
   });
 

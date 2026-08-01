@@ -27,6 +27,11 @@ import { LoadingSpinner } from './LoadingSpinner';
 interface CardLayoutBuilderProps {
   tableId: string;
   fields: BuilderField[];
+  /**
+   * Reports whether the working layout differs from the selected view's saved config, so
+   * the route can guard navigation. Must be referentially stable.
+   */
+  onDirtyChange?: (isDirty: boolean) => void;
 }
 
 interface View {
@@ -59,7 +64,32 @@ function DroppableColumn({ id, children, className, style }: DroppableColumnProp
   );
 }
 
-export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
+/** Flatten the drag-and-drop containers into the column array the API stores. */
+function columnsOf(items: Record<string, string[]>, columnCount: number): string[][] {
+  return Array.from({ length: columnCount }).map((_, idx) => items[`column-${idx}`] || []);
+}
+
+/**
+ * Serialize the parts of the layout that `handleSave` persists, so the working copy can be
+ * compared against what the selected view holds server-side. Fields left unassigned are
+ * excluded because their order is not part of the saved config.
+ */
+function snapshotLayout(
+  columnCount: number,
+  columns: string[][],
+  hiddenLabels: Record<string, boolean>
+): string {
+  return JSON.stringify({
+    columnCount,
+    columns,
+    // Toggling a label off leaves an explicit `false`, which is equivalent to absent.
+    hiddenLabels: Object.keys(hiddenLabels)
+      .filter((id) => hiddenLabels[id])
+      .sort(),
+  });
+}
+
+export function CardLayoutBuilder({ tableId, fields, onDirtyChange }: CardLayoutBuilderProps) {
   const { t } = useI18n();
   const queryClient = useQueryClient();
 
@@ -73,6 +103,10 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   });
 
   const [hiddenLabels, setHiddenLabels] = useState<Record<string, boolean>>({});
+
+  // Snapshot of the selected view's saved config, compared against the working layout to
+  // know whether leaving the page would discard work.
+  const [savedLayout, setSavedLayout] = useState<string>(() => snapshotLayout(1, [[]], {}));
 
   // Dragging states
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -102,25 +136,19 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
 
   // Sync state with selected view layout config
   useEffect(() => {
-    if (!selectedView) {
-      setColumnCount(1);
-      setLayoutItems({
-        unassigned: [],
-        'column-0': fields.map((f) => f.id),
-      });
-      setHiddenLabels({});
-      return;
-    }
+    // Fallback for a view with no usable config: every field stacked in one column.
+    let nextCount = 1;
+    let nextItems: Record<string, string[]> = {
+      unassigned: [],
+      'column-0': fields.map((f) => f.id),
+    };
+    let nextLabels: Record<string, boolean> = {};
 
-    const fieldIdsMap = new Set(fields.map((f) => f.id));
-    const config = selectedView.config;
+    const config = selectedView?.config;
 
     if (config && config.columns && typeof config.columnCount === 'number') {
-      setColumnCount(config.columnCount);
-
-      const newItems: Record<string, string[]> = {
-        unassigned: [],
-      };
+      const fieldIdsMap = new Set(fields.map((f) => f.id));
+      nextCount = config.columnCount;
 
       // Load columns
       const loadedColumns = config.columns.map((col) => col.filter((id) => fieldIdsMap.has(id)));
@@ -133,25 +161,44 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
         loadedColumns.splice(config.columnCount);
       }
 
+      nextItems = { unassigned: [] };
       loadedColumns.forEach((col, idx) => {
-        newItems[`column-${idx}`] = col;
+        nextItems[`column-${idx}`] = col;
       });
 
       // Find any fields in table that are not placed in columns
       const placedIds = new Set(loadedColumns.flat());
-      newItems.unassigned = fields.map((f) => f.id).filter((id) => !placedIds.has(id));
+      nextItems.unassigned = fields.map((f) => f.id).filter((id) => !placedIds.has(id));
 
-      setLayoutItems(newItems);
-      setHiddenLabels(config.hiddenLabels ?? {});
-    } else {
-      setColumnCount(1);
-      setLayoutItems({
-        unassigned: [],
-        'column-0': fields.map((f) => f.id),
-      });
-      setHiddenLabels({});
+      nextLabels = config.hiddenLabels ?? {};
     }
+
+    setColumnCount(nextCount);
+    setLayoutItems(nextItems);
+    setHiddenLabels(nextLabels);
+    // Rebase the baseline onto what was just loaded, normalized the same way the working
+    // copy is, so dropped fields and padded columns do not read as user edits.
+    setSavedLayout(snapshotLayout(nextCount, columnsOf(nextItems, nextCount), nextLabels));
   }, [selectedView, fields]);
+
+  const isLayoutDirty = useMemo(() => {
+    // Without a selected view there is nothing to save to, so nothing can be lost.
+    if (!selectedViewId) return false;
+    return (
+      snapshotLayout(columnCount, columnsOf(layoutItems, columnCount), hiddenLabels) !== savedLayout
+    );
+  }, [selectedViewId, columnCount, layoutItems, hiddenLabels, savedLayout]);
+
+  // Report upward so the route-level blocker guards this tab too.
+  useEffect(() => {
+    onDirtyChange?.(isLayoutDirty);
+  }, [isLayoutDirty, onDirtyChange]);
+
+  // The working layout lives in this component: once it unmounts the edits are already
+  // gone, so there is nothing left for the route to warn about.
+  useEffect(() => {
+    return () => onDirtyChange?.(false);
+  }, [onDirtyChange]);
 
   // Change columns count handler
   const handleColumnCountChange = (newCount: number) => {
@@ -217,8 +264,11 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
         config,
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, config) => {
       queryClient.invalidateQueries({ queryKey: ['views', tableId] });
+      // Rebase immediately rather than waiting for the refetch, so the guard stops firing
+      // as soon as the save lands.
+      setSavedLayout(snapshotLayout(config.columnCount, config.columns, config.hiddenLabels ?? {}));
       showToast(t('layout.saveSuccess'));
     },
   });
@@ -350,12 +400,9 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   };
 
   const handleSave = () => {
-    const colsArray = Array.from({ length: columnCount }).map(
-      (_, idx) => layoutItems[`column-${idx}`] || []
-    );
     saveLayoutMutation.mutate({
       columnCount,
-      columns: colsArray,
+      columns: columnsOf(layoutItems, columnCount),
       hiddenLabels,
     });
   };
@@ -380,9 +427,7 @@ export function CardLayoutBuilder({ tableId, fields }: CardLayoutBuilderProps) {
   const activeField = activeId ? fieldMap.get(activeId) : null;
 
   const unassigned = layoutItems.unassigned || [];
-  const columns = Array.from({ length: columnCount }).map(
-    (_, idx) => layoutItems[`column-${idx}`] || []
-  );
+  const columns = columnsOf(layoutItems, columnCount);
 
   if (viewsQuery.isLoading) {
     return (
