@@ -55,6 +55,11 @@ class ReportController extends Controller
             'layout.fields.*.order' => 'sometimes|integer',
             'layout.group_order' => 'nullable|array',
             'layout.group_order.*' => 'string',
+            // Declared explicitly: validate() only returns keys that carry a rule, so
+            // anything omitted here is dropped before the report is persisted.
+            'layout.view_id' => 'nullable|uuid|exists:views,id',
+            'layout.show_headers_only' => 'nullable|boolean',
+            'layout.per_page' => 'nullable|integer|min:1|max:100',
         ]);
 
         $report = Report::create($validated);
@@ -84,6 +89,11 @@ class ReportController extends Controller
             'layout.fields.*.order' => 'sometimes|integer',
             'layout.group_order' => 'nullable|array',
             'layout.group_order.*' => 'string',
+            // Declared explicitly: validate() only returns keys that carry a rule, so
+            // anything omitted here is dropped before the report is persisted.
+            'layout.view_id' => 'nullable|uuid|exists:views,id',
+            'layout.show_headers_only' => 'nullable|boolean',
+            'layout.per_page' => 'nullable|integer|min:1|max:100',
         ]);
 
         $report->update($validated);
@@ -243,11 +253,13 @@ class ReportController extends Controller
 
             $csvHeaders = [];
             $showHeadersOnly = ($layout['show_headers_only'] ?? false) === true;
+            // The group field is commonly also a selected column; emit it once.
+            $groupIsSelectedColumn = $groupBy !== null && in_array($groupBy, $columns, true);
             if ($showHeadersOnly) {
                 $csvHeaders[] = $groupBy ?? 'Groupe';
                 $csvHeaders[] = 'Nombre de fiches';
             } else {
-                if ($groupBy) {
+                if ($groupBy && ! $groupIsSelectedColumn) {
                     $csvHeaders[] = $groupBy;
                 }
                 foreach ($columns as $col) {
@@ -264,7 +276,7 @@ class ReportController extends Controller
                 } else {
                     foreach ($group['records'] as $rec) {
                         $row = [];
-                        if ($groupBy) {
+                        if ($groupBy && ! $groupIsSelectedColumn) {
                             $row[] = $groupKey;
                         }
                         foreach ($columns as $col) {
