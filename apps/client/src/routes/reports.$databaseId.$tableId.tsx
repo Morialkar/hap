@@ -53,6 +53,9 @@ interface Report {
     view_id?: string;
     show_headers_only?: boolean;
     per_page?: number;
+    orientation?: 'portrait' | 'landscape';
+    card_columns?: number;
+    compact_cards?: boolean;
   } | null;
 }
 
@@ -84,6 +87,11 @@ export function ReportBuilderPage() {
   const [groupField, setGroupField] = useState<string>('');
   const [selectedViewId, setSelectedViewId] = useState<string>('');
   const [showHeadersOnly, setShowHeadersOnly] = useState<boolean>(false);
+  // Printed-document layout: paper orientation, how many cards sit side by side,
+  // and whether card chrome is tightened.
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
+  const [cardColumns, setCardColumns] = useState<number>(1);
+  const [compactCards, setCompactCards] = useState<boolean>(false);
   const [sorts, setSorts] = useState<SortRule[]>([]);
   const [conditions, setConditions] = useState<Condition[]>([]);
   const [logic, setLogic] = useState<'and' | 'or'>('and');
@@ -263,6 +271,9 @@ export function ReportBuilderPage() {
         setSelectedViewId(report.layout?.view_id ?? '');
         setShowHeadersOnly(report.layout?.show_headers_only ?? false);
         setPerPage(report.layout?.per_page ?? 10);
+        setOrientation(report.layout?.orientation ?? 'portrait');
+        setCardColumns(report.layout?.card_columns ?? 1);
+        setCompactCards(report.layout?.compact_cards ?? false);
 
         // Restore sorts
         const sortRules = (report.query?.sort ?? []).map((s) => ({
@@ -294,6 +305,9 @@ export function ReportBuilderPage() {
       setSelectedViewId('');
       setShowHeadersOnly(false);
       setPerPage(10);
+      setOrientation('portrait');
+      setCardColumns(1);
+      setCompactCards(false);
       setSorts([]);
       setConditions([]);
       setLogic('and');
@@ -335,8 +349,19 @@ export function ReportBuilderPage() {
       show_headers_only: showHeadersOnly,
       view_id: selectedViewId || undefined,
       per_page: perPage,
+      orientation,
+      card_columns: cardColumns,
+      compact_cards: compactCards,
     }),
-    [selectedColumns, showHeadersOnly, selectedViewId, perPage]
+    [
+      selectedColumns,
+      showHeadersOnly,
+      selectedViewId,
+      perPage,
+      orientation,
+      cardColumns,
+      compactCards,
+    ]
   );
 
   // Mutators for Saving, Updating and Deleting Reports
@@ -833,6 +858,62 @@ export function ReportBuilderPage() {
                   ))}
                 </select>
               </div>
+
+              {/* Print and PDF layout: these only change the exported document */}
+              <div className="mb-3">
+                <label className="form-label" htmlFor="report-orientation">
+                  {t('reports.orientation.label')}
+                </label>
+                <select
+                  id="report-orientation"
+                  className="form-select form-select-sm"
+                  value={orientation}
+                  onChange={(e) => setOrientation(e.target.value as 'portrait' | 'landscape')}
+                >
+                  <option value="portrait">{t('reports.orientation.portrait')}</option>
+                  <option value="landscape">{t('reports.orientation.landscape')}</option>
+                </select>
+              </div>
+
+              {selectedViewId && (
+                <>
+                  <div className="mb-3">
+                    <label className="form-label" htmlFor="report-card-columns">
+                      {t('reports.cardColumns.label')}
+                    </label>
+                    <select
+                      id="report-card-columns"
+                      className="form-select form-select-sm"
+                      value={cardColumns}
+                      onChange={(e) => setCardColumns(Number(e.target.value))}
+                    >
+                      {[1, 2, 3, 4].map((n) => (
+                        <option key={n} value={n}>
+                          {t('reports.cardColumns.option', { count: n })}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="form-hint small">{t('reports.cardColumns.hint')}</div>
+                  </div>
+
+                  <div className="form-check form-switch mb-3">
+                    <input
+                      className="form-check-input cursor-pointer"
+                      type="checkbox"
+                      role="switch"
+                      id="compact-cards"
+                      checked={compactCards}
+                      onChange={(e) => setCompactCards(e.target.checked)}
+                    />
+                    <label
+                      className="form-check-label small cursor-pointer"
+                      htmlFor="compact-cards"
+                    >
+                      {t('reports.compactCards.label')}
+                    </label>
+                  </div>
+                </>
+              )}
 
               {/* Page Size Selector */}
               {!showHeadersOnly && (

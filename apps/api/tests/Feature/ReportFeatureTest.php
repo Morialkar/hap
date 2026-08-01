@@ -516,3 +516,128 @@ test('print preview html honours the selected card view', function () {
     // Card markup, not the fallback table.
     expect($response->getContent())->toContain('report-card');
 });
+
+test('layout orientation, card columns and compact flag survive a save', function () {
+    $setup = createAuthenticatedUser();
+    $user = $setup['user'];
+    $table = $setup['table'];
+    $view = View::factory()->create(['table_id' => $table->id]);
+
+    $created = $this->actingAs($user)->postJson('/api/v1/reports', [
+        'table_id' => $table->id,
+        'name' => 'Rapport paysage',
+        'query' => ['select' => ['Nom']],
+        'layout' => [
+            'fields' => [['name' => 'Nom', 'visible' => true, 'order' => 1]],
+            'view_id' => $view->id,
+            'orientation' => 'landscape',
+            'card_columns' => 3,
+            'compact_cards' => true,
+        ],
+    ]);
+
+    $created->assertStatus(201);
+
+    $report = Report::find($created->json('id'));
+    expect($report->layout['orientation'])->toBe('landscape');
+    expect($report->layout['card_columns'])->toBe(3);
+    expect($report->layout['compact_cards'])->toBeTrue();
+});
+
+test('card columns are rejected outside the supported range', function () {
+    $setup = createAuthenticatedUser();
+    $user = $setup['user'];
+    $table = $setup['table'];
+
+    $this->actingAs($user)->postJson('/api/v1/reports', [
+        'table_id' => $table->id,
+        'name' => 'Trop de colonnes',
+        'layout' => ['card_columns' => 9],
+    ])->assertStatus(422);
+
+    $this->actingAs($user)->postJson('/api/v1/reports', [
+        'table_id' => $table->id,
+        'name' => 'Orientation inconnue',
+        'layout' => ['orientation' => 'diagonal'],
+    ])->assertStatus(422);
+});
+
+test('card grid lays records out side by side and landscape changes the paper', function () {
+    $setup = createAuthenticatedUser();
+    $user = $setup['user'];
+    $table = $setup['table'];
+
+    $ville = Field::factory()->create(['table_id' => $table->id, 'name' => 'Ville', 'type' => 'text']);
+    $view = View::factory()->create([
+        'table_id' => $table->id,
+        'type' => 'card',
+        'config' => ['columns' => [[$ville->id]]],
+    ]);
+
+    foreach (range(1, 6) as $i) {
+        Record::create([
+            'table_id' => $table->id,
+            'data' => ['Ville' => "Ville {$i}"],
+            'version' => 1,
+        ]);
+    }
+
+    $payload = fn (array $extra) => [
+        'table_id' => $table->id,
+        'name' => 'Grille',
+        'query' => ['select' => ['Ville']],
+        'layout' => array_merge([
+            'fields' => [['name' => 'Ville', 'visible' => true, 'order' => 1]],
+            'view_id' => $view->id,
+        ], $extra),
+    ];
+
+    // One card per row: six rows of one cell.
+    $single = $this->actingAs($user)->postJson('/api/v1/reports/preview/html', $payload([]));
+    expect(substr_count($single->getContent(), '<table class="report-card-grid">'))->toBe(6);
+
+    // Three per row: two rows, still six cards.
+    $grid = $this->actingAs($user)->postJson('/api/v1/reports/preview/html', $payload(['card_columns' => 3]));
+    $gridHtml = $grid->getContent();
+    expect(substr_count($gridHtml, '<table class="report-card-grid">'))->toBe(2);
+    expect(substr_count($gridHtml, 'class="report-card"'))->toBe(6);
+
+    // Landscape must reach both the browser (@page) and Dompdf (paper size).
+    $landscape = $this->actingAs($user)->postJson('/api/v1/reports/preview/html', $payload(['orientation' => 'landscape']));
+    expect($landscape->getContent())->toContain('size: A4 landscape');
+
+    $pdf = $this->actingAs($user)->postJson('/api/v1/reports/preview/pdf', $payload(['orientation' => 'landscape']));
+    $pdf->assertStatus(200);
+    preg_match('/MediaBox\s*\[\s*[\d.]+\s+[\d.]+\s+([\d.]+)\s+([\d.]+)/', $pdf->getContent(), $box);
+    expect((float) $box[1])->toBeGreaterThan((float) $box[2]);
+});
+
+test('compact cards tighten the card chrome', function () {
+    $setup = createAuthenticatedUser();
+    $user = $setup['user'];
+    $table = $setup['table'];
+
+    $ville = Field::factory()->create(['table_id' => $table->id, 'name' => 'Ville', 'type' => 'text']);
+    $view = View::factory()->create([
+        'table_id' => $table->id,
+        'type' => 'card',
+        'config' => ['columns' => [[$ville->id]]],
+    ]);
+
+    Record::create(['table_id' => $table->id, 'data' => ['Ville' => 'Québec'], 'version' => 1]);
+
+    $base = [
+        'table_id' => $table->id,
+        'name' => 'Condense',
+        'query' => ['select' => ['Ville']],
+        'layout' => ['view_id' => $view->id, 'fields' => [['name' => 'Ville', 'visible' => true, 'order' => 1]]],
+    ];
+
+    $normal = $this->actingAs($user)->postJson('/api/v1/reports/preview/html', $base);
+    expect($normal->getContent())->toContain('min-height: 80px');
+
+    $base['layout']['compact_cards'] = true;
+    $compact = $this->actingAs($user)->postJson('/api/v1/reports/preview/html', $base);
+    expect($compact->getContent())->toContain('min-height: 0');
+    expect($compact->getContent())->not->toContain('min-height: 80px');
+});
