@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { CardLayoutBuilder } from '../CardLayoutBuilder';
 import { type BuilderField } from '../../lib/fieldTypes';
@@ -69,5 +69,110 @@ describe('CardLayoutBuilder', () => {
     await waitFor(() => {
       expect(screen.getAllByTitle('Retirer')).toHaveLength(1);
     });
+  });
+});
+
+describe('CardLayoutBuilder unsaved-changes signal', () => {
+  function renderBuilder(onDirtyChange: (isDirty: boolean) => void) {
+    // A fresh client per test, so a cached view list cannot leak between them.
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    return render(
+      <QueryClientProvider client={client}>
+        <CardLayoutBuilder tableId="tbl-1" fields={mockFields} onDirtyChange={onDirtyChange} />
+      </QueryClientProvider>
+    );
+  }
+
+  /** Wait for the saved view to load, then report the last dirty value seen. */
+  async function lastDirty(onDirtyChange: ReturnType<typeof vi.fn>) {
+    await waitFor(() => {
+      expect(screen.getAllByTitle('Retirer')).toHaveLength(2);
+    });
+    return onDirtyChange.mock.calls.at(-1)?.[0];
+  }
+
+  beforeEach(() => {
+    vi.spyOn(apiClient, 'get').mockImplementation((url) => {
+      if (url.startsWith('/views')) {
+        return Promise.resolve(mockViews);
+      }
+      return Promise.reject(new Error('Unexpected URL'));
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('reports clean while the working layout still matches the saved view', async () => {
+    const onDirtyChange = vi.fn();
+    renderBuilder(onDirtyChange);
+
+    expect(await lastDirty(onDirtyChange)).toBe(false);
+  });
+
+  it('reports dirty once a field is moved out of a column', async () => {
+    const onDirtyChange = vi.fn();
+    renderBuilder(onDirtyChange);
+
+    expect(await lastDirty(onDirtyChange)).toBe(false);
+
+    fireEvent.click(screen.getAllByTitle('Retirer')[0]);
+
+    await waitFor(() => {
+      expect(onDirtyChange.mock.calls.at(-1)?.[0]).toBe(true);
+    });
+  });
+
+  it('reports dirty once the column count changes', async () => {
+    const onDirtyChange = vi.fn();
+    renderBuilder(onDirtyChange);
+
+    expect(await lastDirty(onDirtyChange)).toBe(false);
+
+    fireEvent.click(screen.getByRole('button', { name: '3 columns' }));
+
+    await waitFor(() => {
+      expect(onDirtyChange.mock.calls.at(-1)?.[0]).toBe(true);
+    });
+  });
+
+  it('reports clean again once the layout is saved', async () => {
+    const put = vi.spyOn(apiClient, 'put').mockResolvedValue({});
+    const onDirtyChange = vi.fn();
+    renderBuilder(onDirtyChange);
+
+    expect(await lastDirty(onDirtyChange)).toBe(false);
+
+    fireEvent.click(screen.getAllByTitle('Retirer')[0]);
+    await waitFor(() => {
+      expect(onDirtyChange.mock.calls.at(-1)?.[0]).toBe(true);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /Save Layout/ }));
+
+    await waitFor(() => {
+      expect(put).toHaveBeenCalledWith('/views/view-1', {
+        config: { columnCount: 2, columns: [[], ['f2']], hiddenLabels: {} },
+      });
+    });
+    await waitFor(() => {
+      expect(onDirtyChange.mock.calls.at(-1)?.[0]).toBe(false);
+    });
+  });
+
+  it('reports clean on unmount, since the working layout goes with it', async () => {
+    const onDirtyChange = vi.fn();
+    const { unmount } = renderBuilder(onDirtyChange);
+
+    expect(await lastDirty(onDirtyChange)).toBe(false);
+
+    fireEvent.click(screen.getAllByTitle('Retirer')[0]);
+    await waitFor(() => {
+      expect(onDirtyChange.mock.calls.at(-1)?.[0]).toBe(true);
+    });
+
+    unmount();
+    expect(onDirtyChange.mock.calls.at(-1)?.[0]).toBe(false);
   });
 });

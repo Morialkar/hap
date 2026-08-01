@@ -109,6 +109,9 @@ function StructureBuilder() {
   // Snapshot of what the server holds, keyed by draft field id. Compared against the
   // live draft to know whether leaving the page would discard work.
   const [savedSnapshot, setSavedSnapshot] = useState<Record<string, string>>({});
+  // The layout tab keeps its own working state; `CardLayoutBuilder` reports whether it
+  // holds edits that the explicit Save has not persisted yet.
+  const [isLayoutDirty, setIsLayoutDirty] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<{
     fieldId: string;
@@ -410,7 +413,7 @@ function StructureBuilder() {
     });
   }, [fields, queryClient, tableId, saveFieldMutation]);
 
-  const isDirty = useMemo(() => {
+  const isStructureDirty = useMemo(() => {
     const current = snapshotFields(fields);
     const currentIds = Object.keys(current);
     const savedIds = Object.keys(savedSnapshot);
@@ -418,6 +421,9 @@ function StructureBuilder() {
     if (currentIds.length !== savedIds.length) return true;
     return currentIds.some((id) => current[id] !== savedSnapshot[id]);
   }, [fields, savedSnapshot]);
+
+  // Either tab holds work behind an explicit Save, so either can be lost on navigation.
+  const isDirty = isStructureDirty || isLayoutDirty;
 
   // Covers in-app navigation; `enableBeforeUnload` covers tab close and reload.
   const blocker = useBlocker({
@@ -527,7 +533,7 @@ function StructureBuilder() {
                 selectedId={selectedFieldId}
                 onSelect={setSelectedFieldId}
                 onRemove={handleRemove}
-                isDirty={isDirty}
+                isDirty={isStructureDirty}
               />
             </div>
 
@@ -548,7 +554,7 @@ function StructureBuilder() {
           </div>
         </BuilderDndProvider>
       ) : (
-        <CardLayoutBuilder tableId={tableId} fields={fields} />
+        <CardLayoutBuilder tableId={tableId} fields={fields} onDirtyChange={setIsLayoutDirty} />
       )}
 
       {pendingAction && (
