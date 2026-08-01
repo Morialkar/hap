@@ -67,7 +67,7 @@ interface SortRule {
   direction: 'asc' | 'desc';
 }
 
-function ReportBuilderPage() {
+export function ReportBuilderPage() {
   const { databaseId, tableId } = useParams({ from: '/reports/$databaseId/$tableId' });
   const { t } = useI18n();
   const queryClient = useQueryClient();
@@ -300,42 +300,44 @@ function ReportBuilderPage() {
     }
   }, [selectedReportId, reportsQuery.data, fieldsQuery.data]);
 
+  // Single description of the configuration on screen, shared by the preview, the
+  // save payload and both exports so they cannot drift apart.
+  const buildQueryAST = () => ({
+    select: selectedColumns,
+    group_by: groupField || undefined,
+    sort: sorts.map((s) => ({ field: s.field, direction: s.direction })),
+    where:
+      conditions.length > 0
+        ? {
+            logic,
+            conditions: conditions.map((c) => ({
+              field: c.field,
+              operator: c.operator,
+              value: c.value,
+            })),
+          }
+        : undefined,
+  });
+
+  const buildLayout = () => ({
+    fields: selectedColumns.map((col, idx) => ({
+      name: col,
+      visible: true,
+      order: idx + 1,
+    })),
+    show_headers_only: showHeadersOnly,
+    view_id: selectedViewId || undefined,
+    per_page: perPage,
+  });
+
   // Mutators for Saving, Updating and Deleting Reports
   const saveReportMutation = useMutation({
     mutationFn: async () => {
-      const queryAST = {
-        select: selectedColumns,
-        group_by: groupField || undefined,
-        sort: sorts.map((s) => ({ field: s.field, direction: s.direction })),
-        where:
-          conditions.length > 0
-            ? {
-                logic,
-                conditions: conditions.map((c) => ({
-                  field: c.field,
-                  operator: c.operator,
-                  value: c.value,
-                })),
-              }
-            : undefined,
-      };
-
-      const layoutObj = {
-        fields: selectedColumns.map((col, idx) => ({
-          name: col,
-          visible: true,
-          order: idx + 1,
-        })),
-        show_headers_only: showHeadersOnly,
-        view_id: selectedViewId || undefined,
-        per_page: perPage,
-      };
-
       const payload = {
         table_id: tableId,
         name: reportName || t('reports.newReport'),
-        query: queryAST,
-        layout: layoutObj,
+        query: buildQueryAST(),
+        layout: buildLayout(),
       };
 
       if (selectedReportId) {
@@ -378,43 +380,14 @@ function ReportBuilderPage() {
       currentPage,
       perPage,
     ],
-    queryFn: () => {
-      const queryAST = {
-        select: selectedColumns,
-        group_by: groupField || undefined,
-        sort: sorts.map((s) => ({ field: s.field, direction: s.direction })),
-        where:
-          conditions.length > 0
-            ? {
-                logic,
-                conditions: conditions.map((c) => ({
-                  field: c.field,
-                  operator: c.operator,
-                  value: c.value,
-                })),
-              }
-            : undefined,
-      };
-
-      const layoutObj = {
-        fields: selectedColumns.map((col, idx) => ({
-          name: col,
-          visible: true,
-          order: idx + 1,
-        })),
-        show_headers_only: showHeadersOnly,
-        view_id: selectedViewId || undefined,
-        per_page: perPage,
-      };
-
-      return apiClient.post('/reports/preview', {
+    queryFn: () =>
+      apiClient.post('/reports/preview', {
         table_id: tableId,
-        query: queryAST,
-        layout: layoutObj,
+        query: buildQueryAST(),
+        layout: buildLayout(),
         per_page: showHeadersOnly ? undefined : perPage,
         page: showHeadersOnly ? undefined : currentPage,
-      });
-    },
+      }),
     enabled: selectedColumns.length > 0,
   });
 
@@ -468,7 +441,10 @@ function ReportBuilderPage() {
     url: string,
     method: 'GET' | 'POST',
     body?: any,
-    defaultFilename: string = 'export'
+    defaultFilename: string = 'export',
+    // The preview endpoints always answer with a generic filename; when the report
+    // has a name, prefer it over what the server suggests.
+    forceFilename = false
   ) => {
     try {
       const response = await fetch(url.startsWith('/api') ? url : `/api/v1${url}`, {
@@ -486,7 +462,7 @@ function ReportBuilderPage() {
 
       const disposition = response.headers.get('Content-Disposition');
       let filename = defaultFilename;
-      if (disposition && disposition.indexOf('attachment') !== -1) {
+      if (!forceFilename && disposition && disposition.indexOf('attachment') !== -1) {
         const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
         const matches = filenameRegex.exec(disposition);
         if (matches != null && matches[1]) {
@@ -509,105 +485,38 @@ function ReportBuilderPage() {
     }
   };
 
+  /**
+   * Exports go through the preview endpoints with the configuration currently on
+   * screen. Routing a selected report to /reports/{id}/export instead would export
+   * the last *saved* state, so exports would silently ignore unsaved edits.
+   */
   const handleExportCsv = () => {
-    const queryAST = {
-      select: selectedColumns,
-      group_by: groupField || undefined,
-      sort: sorts.map((s) => ({ field: s.field, direction: s.direction })),
-      where:
-        conditions.length > 0
-          ? {
-              logic,
-              conditions: conditions.map((c) => ({
-                field: c.field,
-                operator: c.operator,
-                value: c.value,
-              })),
-            }
-          : undefined,
-    };
-
-    const layoutObj = {
-      fields: selectedColumns.map((col, idx) => ({
-        name: col,
-        visible: true,
-        order: idx + 1,
-      })),
-      show_headers_only: showHeadersOnly,
-      view_id: selectedViewId || undefined,
-      per_page: perPage,
-    };
-
-    if (selectedReportId) {
-      void downloadFile(
-        `/reports/${selectedReportId}/export/csv`,
-        'GET',
-        undefined,
-        `${reportName || 'rapport'}.csv`
-      );
-    } else {
-      void downloadFile(
-        '/reports/preview/csv',
-        'POST',
-        {
-          table_id: tableId,
-          query: queryAST,
-          layout: layoutObj,
-        },
-        'rapport_apercu.csv'
-      );
-    }
+    void downloadFile(
+      '/reports/preview/csv',
+      'POST',
+      {
+        table_id: tableId,
+        query: buildQueryAST(),
+        layout: buildLayout(),
+      },
+      `${reportName || 'rapport'}.csv`,
+      true
+    );
   };
 
   const handleExportPdf = () => {
-    const queryAST = {
-      select: selectedColumns,
-      group_by: groupField || undefined,
-      sort: sorts.map((s) => ({ field: s.field, direction: s.direction })),
-      where:
-        conditions.length > 0
-          ? {
-              logic,
-              conditions: conditions.map((c) => ({
-                field: c.field,
-                operator: c.operator,
-                value: c.value,
-              })),
-            }
-          : undefined,
-    };
-
-    const layoutObj = {
-      fields: selectedColumns.map((col, idx) => ({
-        name: col,
-        visible: true,
-        order: idx + 1,
-      })),
-      show_headers_only: showHeadersOnly,
-      view_id: selectedViewId || undefined,
-      per_page: perPage,
-    };
-
-    if (selectedReportId) {
-      void downloadFile(
-        `/reports/${selectedReportId}/export/pdf`,
-        'GET',
-        undefined,
-        `${reportName || 'rapport'}.pdf`
-      );
-    } else {
-      void downloadFile(
-        '/reports/preview/pdf',
-        'POST',
-        {
-          table_id: tableId,
-          name: reportName || 'Rapport temporaire',
-          query: queryAST,
-          layout: layoutObj,
-        },
-        'rapport_apercu.pdf'
-      );
-    }
+    void downloadFile(
+      '/reports/preview/pdf',
+      'POST',
+      {
+        table_id: tableId,
+        name: reportName || t('reports.newReport'),
+        query: buildQueryAST(),
+        layout: buildLayout(),
+      },
+      `${reportName || 'rapport'}.pdf`,
+      true
+    );
   };
 
   const handleDeleteReport = () => {
