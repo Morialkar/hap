@@ -432,3 +432,87 @@ test('csv export emits the group field once when it is also a selected column', 
     expect($headerLine)->toBe(['Ville', 'Nom']);
     expect(array_count_values($headerLine)['Ville'])->toBe(1);
 });
+
+test('print preview html is the same document the pdf export renders', function () {
+    $setup = createAuthenticatedUser();
+    $user = $setup['user'];
+    $table = $setup['table'];
+
+    Field::factory()->create(['table_id' => $table->id, 'name' => 'Ville', 'type' => 'text']);
+    Field::factory()->create(['table_id' => $table->id, 'name' => 'Nom', 'type' => 'text']);
+
+    // More records than a preview page holds, so pagination would be visible.
+    foreach (range(1, 25) as $i) {
+        Record::create([
+            'table_id' => $table->id,
+            'data' => ['Ville' => 'Québec', 'Nom' => "Tremblay {$i}"],
+            'version' => 1,
+        ]);
+    }
+
+    $payload = [
+        'table_id' => $table->id,
+        'name' => 'Rapport imprimable',
+        'query' => ['select' => ['Ville', 'Nom'], 'group_by' => 'Ville'],
+        'layout' => ['fields' => [
+            ['name' => 'Ville', 'visible' => true, 'order' => 1],
+            ['name' => 'Nom', 'visible' => true, 'order' => 2],
+        ]],
+    ];
+
+    $html = $this->actingAs($user)->postJson('/api/v1/reports/preview/html', $payload);
+    $html->assertStatus(200);
+    $html->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+
+    $body = $html->getContent();
+    expect($body)->toContain('Rapport imprimable');
+    // The document carries its own styles, so the iframe renders it standalone.
+    expect($body)->toContain('report-table');
+
+    // Not paginated: the preview shows every record the PDF would contain. The old
+    // JSX preview rendered only the current preview page, so the two disagreed.
+    expect($body)->toContain('Tremblay 1');
+    expect($body)->toContain('Tremblay 25');
+
+    $pdf = $this->actingAs($user)->postJson('/api/v1/reports/preview/pdf', $payload);
+    $pdf->assertStatus(200);
+    expect($pdf->headers->get('Content-Type'))->toBe('application/pdf');
+});
+
+test('print preview html honours the selected card view', function () {
+    $setup = createAuthenticatedUser();
+    $user = $setup['user'];
+    $table = $setup['table'];
+
+    $ville = Field::factory()->create(['table_id' => $table->id, 'name' => 'Ville', 'type' => 'text']);
+    $nom = Field::factory()->create(['table_id' => $table->id, 'name' => 'Nom', 'type' => 'text']);
+
+    $view = View::factory()->create([
+        'table_id' => $table->id,
+        'type' => 'card',
+        'config' => ['columns' => [[$ville->id], [$nom->id]]],
+    ]);
+
+    Record::create([
+        'table_id' => $table->id,
+        'data' => ['Ville' => 'Québec', 'Nom' => 'Tremblay'],
+        'version' => 1,
+    ]);
+
+    $response = $this->actingAs($user)->postJson('/api/v1/reports/preview/html', [
+        'table_id' => $table->id,
+        'name' => 'Rapport carte',
+        'query' => ['select' => ['Ville', 'Nom']],
+        'layout' => [
+            'fields' => [
+                ['name' => 'Ville', 'visible' => true, 'order' => 1],
+                ['name' => 'Nom', 'visible' => true, 'order' => 2],
+            ],
+            'view_id' => $view->id,
+        ],
+    ]);
+
+    $response->assertStatus(200);
+    // Card markup, not the fallback table.
+    expect($response->getContent())->toContain('report-card');
+});

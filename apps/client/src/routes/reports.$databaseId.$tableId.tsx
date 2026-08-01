@@ -8,6 +8,7 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { PageActions, PageHeader } from '../components/ui/PageHeader';
 import { SurfaceCard } from '../components/ui/SurfaceCard';
 import { ShareModal } from '../components/ShareModal';
+import { ReportPrintPreview } from '../components/ReportPrintPreview';
 
 export const Route = createFileRoute('/reports/$databaseId/$tableId')({
   component: ReportBuilderPage,
@@ -302,33 +303,41 @@ export function ReportBuilderPage() {
 
   // Single description of the configuration on screen, shared by the preview, the
   // save payload and both exports so they cannot drift apart.
-  const buildQueryAST = () => ({
-    select: selectedColumns,
-    group_by: groupField || undefined,
-    sort: sorts.map((s) => ({ field: s.field, direction: s.direction })),
-    where:
-      conditions.length > 0
-        ? {
-            logic,
-            conditions: conditions.map((c) => ({
-              field: c.field,
-              operator: c.operator,
-              value: c.value,
-            })),
-          }
-        : undefined,
-  });
+  // Memoized rather than rebuilt per render: the print preview takes these as props
+  // and refetches whenever their identity changes.
+  const printQuery = useMemo(
+    () => ({
+      select: selectedColumns,
+      group_by: groupField || undefined,
+      sort: sorts.map((s) => ({ field: s.field, direction: s.direction })),
+      where:
+        conditions.length > 0
+          ? {
+              logic,
+              conditions: conditions.map((c) => ({
+                field: c.field,
+                operator: c.operator,
+                value: c.value,
+              })),
+            }
+          : undefined,
+    }),
+    [selectedColumns, groupField, sorts, conditions, logic]
+  );
 
-  const buildLayout = () => ({
-    fields: selectedColumns.map((col, idx) => ({
-      name: col,
-      visible: true,
-      order: idx + 1,
-    })),
-    show_headers_only: showHeadersOnly,
-    view_id: selectedViewId || undefined,
-    per_page: perPage,
-  });
+  const printLayout = useMemo(
+    () => ({
+      fields: selectedColumns.map((col, idx) => ({
+        name: col,
+        visible: true,
+        order: idx + 1,
+      })),
+      show_headers_only: showHeadersOnly,
+      view_id: selectedViewId || undefined,
+      per_page: perPage,
+    }),
+    [selectedColumns, showHeadersOnly, selectedViewId, perPage]
+  );
 
   // Mutators for Saving, Updating and Deleting Reports
   const saveReportMutation = useMutation({
@@ -336,8 +345,8 @@ export function ReportBuilderPage() {
       const payload = {
         table_id: tableId,
         name: reportName || t('reports.newReport'),
-        query: buildQueryAST(),
-        layout: buildLayout(),
+        query: printQuery,
+        layout: printLayout,
       };
 
       if (selectedReportId) {
@@ -383,8 +392,8 @@ export function ReportBuilderPage() {
     queryFn: () =>
       apiClient.post('/reports/preview', {
         table_id: tableId,
-        query: buildQueryAST(),
-        layout: buildLayout(),
+        query: printQuery,
+        layout: printLayout,
         per_page: showHeadersOnly ? undefined : perPage,
         page: showHeadersOnly ? undefined : currentPage,
       }),
@@ -496,8 +505,8 @@ export function ReportBuilderPage() {
       'POST',
       {
         table_id: tableId,
-        query: buildQueryAST(),
-        layout: buildLayout(),
+        query: printQuery,
+        layout: printLayout,
       },
       `${reportName || 'rapport'}.csv`,
       true
@@ -511,8 +520,8 @@ export function ReportBuilderPage() {
       {
         table_id: tableId,
         name: reportName || t('reports.newReport'),
-        query: buildQueryAST(),
-        layout: buildLayout(),
+        query: printQuery,
+        layout: printLayout,
       },
       `${reportName || 'rapport'}.pdf`,
       true
@@ -666,87 +675,6 @@ export function ReportBuilderPage() {
         .preview-pane-table th {
           background-color: var(--tblr-bg-surface-secondary, #f8f9fa);
           font-weight: 600;
-        }
-        .print-layout-container {
-          background: white;
-          color: #1e293b;
-          font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
-          border: 1px solid #e2e8f0;
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-          padding: 2cm;
-          min-height: 29.7cm;
-          box-sizing: border-box;
-          width: 21cm;
-          margin: 0 auto;
-          border-radius: 8px;
-        }
-        .print-layout-container table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 1rem;
-          margin-bottom: 1.5rem;
-        }
-        .print-layout-container th, .print-layout-container td {
-          border-bottom: 1px solid #e2e8f0;
-          padding: 10px 12px;
-          text-align: left;
-          font-size: 9.5pt;
-        }
-        .print-layout-container th {
-          background-color: #f8fafc;
-          color: #475569;
-          font-weight: 600;
-          text-transform: uppercase;
-          font-size: 8pt;
-          letter-spacing: 0.05em;
-          border-top: 1px solid #e2e8f0;
-        }
-        .print-layout-container h1 {
-          font-family: inherit;
-          font-size: 24pt;
-          font-weight: 700;
-          color: #0f172a;
-          text-align: left;
-          margin-bottom: 0.5rem;
-        }
-        .print-layout-container .group-header {
-          font-weight: 700;
-          font-size: 12pt;
-          color: #0f172a;
-          margin-top: 2rem;
-          margin-bottom: 0.75rem;
-          padding-bottom: 4px;
-          border-bottom: 2px solid #cbd5e1;
-        }
-        .print-layout-container .report-meta {
-          border-bottom: 1px solid #e2e8f0;
-          padding-bottom: 0.75rem;
-          margin-bottom: 1.5rem;
-          color: #64748b;
-          font-size: 9pt;
-        }
-        @media print {
-          body, .page, #root, .page-wrapper, .page-body, .container-xl {
-            background: white !important;
-            color: black !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: none !important;
-            box-shadow: none !important;
-          }
-          .d-print-none, header, nav, .navbar, .page-header, .report-sidebar, .report-editor-card, .nav-tabs, .btn, .pagination-wrapper, .tanstack-router-devtools {
-            display: none !important;
-          }
-          .print-layout-container {
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            width: 100% !important;
-            min-height: 0 !important;
-            margin: 0 !important;
-          }
         }
       `}</style>
 
@@ -1359,161 +1287,14 @@ export function ReportBuilderPage() {
                 </SurfaceCard>
               )}
 
-              {/* Print Preview Tab (visible in tab, and always active during print rendering) */}
-              {(activePreviewTab === 'print' || window.matchMedia('print').matches) && (
-                <div>
-                  <div className="d-flex justify-content-end mb-3 d-print-none">
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() => window.print()}
-                    >
-                      <i className="ti ti-printer me-1" />
-                      {t('reports.print')}
-                    </button>
-                  </div>
-
-                  <div className="print-layout-container">
-                    <h1>{reportName || t('reports.newReport')}</h1>
-                    <div className="report-meta d-flex justify-content-between">
-                      <div>
-                        <strong>Base :</strong> {databaseQuery.data?.name} •{' '}
-                        <strong>Table :</strong> {tableQuery.data?.name}
-                      </div>
-                      <div>
-                        <strong>Date :</strong> {new Date().toLocaleDateString('fr-FR')}
-                      </div>
-                    </div>
-
-                    {previewData?.groups?.map((group: any, gIdx: number) => (
-                      <div key={gIdx} className="mb-4">
-                        {group.key && (
-                          <div className="group-header">
-                            {groupField} : {group.key} ({group.records.length})
-                          </div>
-                        )}
-                        {!showHeadersOnly &&
-                          (selectedViewId ? (
-                            <div className="vstack gap-3 d-flex flex-column">
-                              {group.records.map((rec: any, rIdx: number) => {
-                                const titleFieldDef = fieldsQuery.data?.find(
-                                  (f) => f.options?.is_title === true || f.type === 'title'
-                                );
-                                const titleValKey = titleFieldDef
-                                  ? Object.keys(rec).find(
-                                      (k) => k.toLowerCase() === titleFieldDef.name.toLowerCase()
-                                    )
-                                  : null;
-                                const cardTitle = titleValKey ? rec[titleValKey] : null;
-
-                                return (
-                                  <div
-                                    className="card p-3 border mb-3 bg-white w-100 text-start"
-                                    key={rIdx}
-                                    style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
-                                  >
-                                    {cardTitle && (
-                                      <div className="border-bottom pb-1 mb-2">
-                                        <h4
-                                          className="fw-bold mb-0 text-primary text-start"
-                                          style={{ fontSize: '12pt' }}
-                                        >
-                                          {String(cardTitle)}
-                                        </h4>
-                                      </div>
-                                    )}
-                                    <div className="row g-2">
-                                      {columnsLayout.map((colFields, colIdx) => {
-                                        const colWidthClass =
-                                          columnsLayout.length === 1 ? 'col-12' : 'col-6';
-                                        return (
-                                          <div key={colIdx} className={colWidthClass}>
-                                            <div className="p-2 border border-dashed rounded bg-light-subtle h-100">
-                                              {colFields.map((fId) => {
-                                                const cleanId = fId.startsWith('draft-')
-                                                  ? fId.substring(6)
-                                                  : fId;
-                                                const fieldDef = fieldsByIdMap.get(cleanId);
-                                                if (!fieldDef || fieldDef.type === 'title')
-                                                  return null;
-
-                                                return (
-                                                  <div key={cleanId} className="mb-2 text-start">
-                                                    <div
-                                                      className="text-muted fw-bold text-uppercase"
-                                                      style={{
-                                                        fontSize: '7pt',
-                                                        letterSpacing: '0.05em',
-                                                      }}
-                                                    >
-                                                      {fieldDef.name}
-                                                    </div>
-                                                    <div
-                                                      style={{ fontSize: '9pt', color: '#1e293b' }}
-                                                    >
-                                                      {renderCardField(fieldDef, rec)}
-                                                    </div>
-                                                  </div>
-                                                );
-                                              })}
-                                            </div>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <table>
-                              <thead>
-                                <tr>
-                                  {previewData?.columns?.map((col: string) => {
-                                    const colDef = availableColumns.find(
-                                      (c) => c.name.toLowerCase() === col.toLowerCase()
-                                    );
-                                    return <th key={col}>{colDef ? colDef.label : col}</th>;
-                                  })}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {group.records.length === 0 ? (
-                                  <tr>
-                                    <td
-                                      colSpan={previewData?.columns?.length || 1}
-                                      className="text-center text-muted"
-                                    >
-                                      Aucune fiche
-                                    </td>
-                                  </tr>
-                                ) : (
-                                  group.records.map((rec: any, rIdx: number) => (
-                                    <tr key={rIdx}>
-                                      {previewData?.columns?.map((col: string) => {
-                                        const val = rec[col];
-                                        return (
-                                          <td key={col}>
-                                            {Array.isArray(val)
-                                              ? val.join(', ')
-                                              : typeof val === 'object' && val !== null
-                                                ? val.lat !== undefined && val.lng !== undefined
-                                                  ? `${val.lat}, ${val.lng}`
-                                                  : JSON.stringify(val)
-                                                : (val ?? '-')}
-                                          </td>
-                                        );
-                                      })}
-                                    </tr>
-                                  ))
-                                )}
-                              </tbody>
-                            </table>
-                          ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {/* Print Preview Tab: renders the API's report document so print matches the PDF */}
+              {activePreviewTab === 'print' && (
+                <ReportPrintPreview
+                  tableId={tableId}
+                  reportName={reportName || t('reports.newReport')}
+                  query={printQuery}
+                  layout={printLayout}
+                />
               )}
             </div>
           )}
