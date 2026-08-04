@@ -135,8 +135,102 @@ sqlite3 "<app data>/hap-r3-a-spike.sqlite" \
   "SELECT verdict FROM probe_verdicts WHERE probe='offline-map';"
 ```
 
-## Cibles restantes
+## iOS simulator (2026-08-03) : PASS
 
-Windows, iOS simulator, Android emulator : non exécutées. Les trois capacités sont
-prouvées sur macOS; aucune conclusion Go/No-go n'est déclarée avant que la matrice
-complète soit couverte.
+iPhone 17 Pro, runtime iOS 26.3.1, build `tauri ios build --target aarch64-sim`,
+installé et lancé via `simctl`. Verdict relu dans le conteneur de l'application :
+
+```json
+{ "ok": true, "sourceFeatures": 48, "renderedFeatures": 3,
+  "blockedRequests": [], "transport": "tauri-fs" }
+```
+
+- **Carte hors-ligne : PASS** — 48 entités décodées, 3 peintes, aucune requête réseau.
+  L'archive est lue depuis le bundle de l'app
+  (`…/HAP Tauri Spike.app/assets/fixtures/r3a-countries.pmtiles`).
+- **SQLite : PASS** — la table `probe_verdicts` est créée et écrite par l'application
+  elle-même; sans SQLite fonctionnel il n'y aurait aucun verdict à lire.
+- **Vault : non exercé.** La sonde vault dépend du sélecteur de dossier, qui exige une
+  interaction. Le spec n'impose sur mobile qu'un contrôle de capacité; celui-ci reste à
+  faire.
+
+Moins d'entités que sur macOS (48 contre 87) simplement parce que la fenêtre est plus
+petite : moins de tuiles sont dans le champ de vue.
+
+## Android emulator (2026-08-03) : PASS
+
+AVD `Medium_Phone_API_36.1` (API 36.1), APK debug universel installé via `adb`.
+
+```json
+{ "ok": true, "sourceFeatures": 48, "renderedFeatures": 3,
+  "blockedRequests": [], "transport": "tauri-fs" }
+```
+
+- **Carte hors-ligne : PASS**, **SQLite : PASS**, **Vault : non exercé** — mêmes
+  conclusions qu'iOS.
+- **Différence de plateforme à noter :** `resolveResource` renvoie ici
+  `asset://localhost/fixtures/r3a-countries.pmtiles`, une URI et non un chemin de
+  système de fichiers. Le plugin `fs` l'ouvre et la lit par plages sans adaptation :
+  la même source PMTiles fonctionne donc sur les trois plateformes malgré des formes
+  d'adresse différentes.
+- L'identifiant du paquet installé porte le suffixe `.debug`
+  (`android.debugApplicationIdSuffix`), à savoir pour les scripts de smoke.
+
+## Reproduire les builds mobiles
+
+Les projets `gen/apple` et `gen/android` ne sont pas versionnés : ce sont des
+échafaudages de build (855 Mo), régénérés à l'identique par `init`.
+
+```sh
+export PATH="$HOME/.cargo/bin:$PATH"          # rustup, pas le rust Homebrew
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export NDK_HOME="$ANDROID_HOME/ndk/27.0.12077973"
+export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+
+pnpm --dir apps/desktop tauri ios init
+pnpm --dir apps/desktop tauri ios build --target aarch64-sim   # au premier plan
+
+pnpm --dir apps/desktop tauri android init
+pnpm --dir apps/desktop tauri android build --debug --target aarch64
+```
+
+## Chaîne d'outils mobile : ce qu'il a fallu
+
+Rien de tout cela ne relève de Tauri ni du code du spike, mais tout a bloqué un build :
+
+- **Rust doit venir de rustup**, pas de Homebrew : la formule ne fournit que la cible
+  hôte, sans bibliothèques standard iOS/Android.
+- **`tauri ios build` doit tourner au premier plan.** Le script Xcode « Build Rust Code »
+  se connecte en WebSocket au CLI parent; détaché, la connexion est refusée et le build
+  échoue en `Abort trap: 6`.
+- **Le runtime simulateur doit exister**, et `xcodebuild -downloadPlatform iOS` installe
+  toujours la dernière version, sans possibilité de cibler. SDK 26.2 + runtime 26.3.1
+  fonctionne.
+- **Gradle 8.14.3 refuse les JDK trop récents** : JDK 26 donne « Unsupported class file
+  major version 70 ». JDK 17 fonctionne. Le cask Temurin exige sudo; la formule
+  `openjdk@17` non.
+
+## Windows : SUPPOSÉ, NON TESTÉ
+
+Décision prise le 2026-08-03 : Windows n'est pas exécuté, le comportement est supposé
+identique à macOS. **Ce n'est pas une preuve** et le dossier ne le compte pas comme telle.
+
+Ce que macOS ne couvre pas, et qui reste donc ouvert :
+
+- Windows utilise WebView2 (Chromium) là où macOS utilise WKWebView; les moteurs
+  diffèrent notamment sur WebGL, dont dépend MapLibre.
+- Le protocole applicatif y a sa propre implémentation. C'est précisément là qu'a été
+  trouvée la contrainte de byte serving sur macOS; rien ne garantit qu'elle se comporte
+  pareil, ni en mieux ni en pire.
+
+## État de la matrice
+
+| Cible | Build | SQLite | Vault | PMTiles hors-ligne |
+| --- | --- | --- | --- | --- |
+| macOS | PASS | PASS | PASS | PASS |
+| iOS simulator | PASS | PASS | non exercé | PASS |
+| Android emulator | PASS | PASS | non exercé | PASS |
+| Windows | supposé | supposé | supposé | supposé |
+
+Deux réserves subsistent avant toute conclusion Go/No-go : Windows n'a pas été exécuté
+(décision du 2026-08-03), et le contrôle de capacité du vault sur mobile reste à faire.

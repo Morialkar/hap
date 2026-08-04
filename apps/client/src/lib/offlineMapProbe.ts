@@ -55,7 +55,16 @@ async function registerArchive(protocol: {
   return { sourceUrl: `pmtiles://${path}`, transport: 'tauri-fs' };
 }
 
+/**
+ * The map from the previous run, kept so a human can still see the proof after the
+ * numbers are in. Torn down when the probe runs again.
+ */
+let liveMap: { remove: () => void } | null = null;
+
 export async function runOfflineMapProbe(container: HTMLElement): Promise<OfflineMapProbeResult> {
+  liveMap?.remove();
+  liveMap = null;
+
   const [{ default: maplibregl }, { Protocol }] = await Promise.all([
     import('maplibre-gl'),
     import('pmtiles'),
@@ -145,7 +154,9 @@ export async function runOfflineMapProbe(container: HTMLElement): Promise<Offlin
       ? map.queryRenderedFeatures(undefined, { layers: ['countries-fill'] }).length
       : null;
 
-    map.remove();
+    // Left on screen on purpose: destroying it here is what made the map flash and
+    // vanish the moment the probe succeeded.
+    liveMap = map;
 
     return {
       sourceFeatures,
@@ -154,7 +165,9 @@ export async function runOfflineMapProbe(container: HTMLElement): Promise<Offlin
       fixtureUrl: sourceUrl,
       transport,
     };
-  } finally {
+  } catch (error) {
+    // Only tear down when the run failed; a successful map stays visible.
     maplibregl.removeProtocol('pmtiles');
+    throw error;
   }
 }
