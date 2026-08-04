@@ -85,7 +85,8 @@ export const tauriSpikeProbe: LocalPlatformProbe = {
 
     // A directory picker that is missing usually rejects immediately; one that exists
     // would block on UI, which a smoke run must not do. Time-box it either way.
-    let directoryPicker: VaultCapabilityResult['directoryPicker'] = 'unknown';
+    // Both branches below assign it, so an initial value would be dead.
+    let directoryPicker: VaultCapabilityResult['directoryPicker'];
     try {
       const picked = await Promise.race([
         open({ directory: true, multiple: false, title: 'Capability probe' }),
