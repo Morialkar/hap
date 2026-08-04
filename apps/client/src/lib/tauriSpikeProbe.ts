@@ -41,6 +41,21 @@ export const tauriSpikeProbe: LocalPlatformProbe = {
     }
   },
 
+  async recordProbeVerdict(probe: string, verdict: unknown): Promise<void> {
+    const database = await Database.load('sqlite:hap-r3-a-spike.sqlite');
+    try {
+      await database.execute(
+        'CREATE TABLE IF NOT EXISTS probe_verdicts (probe TEXT PRIMARY KEY, verdict TEXT NOT NULL, recorded_at TEXT NOT NULL)'
+      );
+      await database.execute(
+        'INSERT OR REPLACE INTO probe_verdicts (probe, verdict, recorded_at) VALUES ($1, $2, $3)',
+        [probe, JSON.stringify(verdict), new Date().toISOString()]
+      );
+    } finally {
+      await database.close();
+    }
+  },
+
   async selectVaultDirectory(): Promise<string | null> {
     const result = await open({
       directory: true,

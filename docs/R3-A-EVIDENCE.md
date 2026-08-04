@@ -2,7 +2,7 @@
 
 Preuves reproductibles du spike Tauri 2 (voir [R3-A-TAURI-SPIKE.md](R3-A-TAURI-SPIKE.md)).
 Aucune conclusion Go/No-go n'est déclarée tant que la matrice complète (macOS, Windows,
-iOS, Android) et la preuve PMTiles hors-ligne ne sont pas couvertes.
+iOS, Android) n'est pas couverte. Les trois capacités requises sont prouvées sur macOS.
 
 ## Environnement (macOS)
 
@@ -61,12 +61,82 @@ doit ajouter explicitement :
   `CREATE TABLE`/`INSERT` sont refusés à l'exécution.
 - `fs:allow-read-text-file` et `fs:allow-write-text-file` — `fs:default` ne couvre que
   la lecture des dossiers applicatifs.
+- `fs:allow-open`, `fs:allow-seek`, `fs:allow-read`, `fs:allow-fstat` — l'API bas niveau
+  de descripteurs de fichier a ses propres commandes ACL, indépendantes des helpers
+  `readFile`/`writeTextFile`. Sans elles : « Command plugin:fs|seek not allowed by ACL ».
+  Attention, `fs:allow-close` **n'existe pas** et fait échouer la compilation.
+- Portée `fs:scope` sur `$RESOURCE/fixtures/*` pour lire l'archive embarquée.
 
-## macOS — PMTiles hors-ligne : NON EXÉCUTÉ
+## macOS — PMTiles hors-ligne (2026-08-03) : PASS
 
-Fixture PMTiles et sonde carte non implémentées à ce jour. Bloquant pour toute
-conclusion, y compris un go conditionnel.
+Sonde exécutée automatiquement au démarrage de la fenêtre native, verdict écrit dans la
+base du spike (`probe_verdicts`) pour être relu sans interaction :
+
+```json
+{
+  "ok": true,
+  "sourceFeatures": 87,
+  "renderedFeatures": 7,
+  "blockedRequests": [],
+  "transport": "tauri-fs"
+}
+```
+
+- **87 entités décodées** depuis l'archive embarquée et **7 réellement peintes** — la carte
+  s'affiche, elle n'est pas seulement chargée.
+- **`blockedRequests: []`** : aucune ressource réseau n'a même été demandée. Le style
+  n'utilise ni glyphes ni sprites, qui seraient des dépendances réseau cachées.
+- Fixture : polygones de pays Natural Earth (domaine public, donc redistribuable),
+  générée depuis les données déjà présentes dans le dépôt par
+  `packages/core/scripts/build-pmtiles-fixture.mjs`. **Aucun téléchargement, aucune donnée
+  dérivée d'OSM, aucun préchargement de serveur de tuiles.** 598 Kio, zooms 0 à 4.
+
+### Contrainte plateforme majeure : pas de byte serving sur `tauri://`
+
+PMTiles lit une archive par plages d'octets. Le protocole applicatif de Tauri **ignore
+l'en-tête `Range`** :
+
+| Demande | Réponse |
+| --- | --- |
+| `Range: bytes=0-126` | `200`, `Content-Range: null`, **612 390 octets** (fichier entier) |
+
+La bibliothèque refuse explicitement ce backend : *« Check that your storage backend
+supports HTTP Byte Serving »*. **Servir l'archive via `tauri://localhost` ne fonctionne
+donc pas.**
+
+Contournement retenu et prouvé : embarquer l'archive comme ressource
+(`bundle.resources`) et la lire par plages avec le plugin `fs`
+(`apps/client/src/lib/tauriPmtilesSource.ts`). C'est plus proche de ce que ferait une
+application locale de toute façon.
+
+### Piège de concurrence à retenir
+
+Un `seek` suivi d'un `read` sont deux allers-retours sur **un curseur partagé**, et
+MapLibre demande plusieurs tuiles simultanément. Sans sérialisation des accès, les seeks
+s'entrelacent et chaque lecture reçoit les octets d'une autre plage; le symptôme
+apparaît très loin de la cause, sous la forme d'une tuile corrompue (« Extra bytes past
+the end »). La source sérialise donc ses lectures.
+
+### Validation de la fixture
+
+Indépendamment du spike, `apps/client/src/lib/__tests__/pmtilesFixture.test.ts` vérifie
+l'en-tête v3, le type MVT, la couche déclarée et la taille. Les tuiles ont par ailleurs
+été parsées avec `@mapbox/vector-tile` : 7 tuiles sur 7 décodées avec la couche
+`countries` peuplée.
+
+## Exécution non assistée
+
+La sonde carte s'exécute au démarrage et écrit son verdict dans la table
+`probe_verdicts` de la base du spike. Les smoke tests Windows, iOS et Android pourront
+donc lire le résultat sans piloter d'interface :
+
+```sh
+sqlite3 "<app data>/hap-r3-a-spike.sqlite" \
+  "SELECT verdict FROM probe_verdicts WHERE probe='offline-map';"
+```
 
 ## Cibles restantes
 
-Windows, iOS simulator, Android emulator : non exécutées.
+Windows, iOS simulator, Android emulator : non exécutées. Les trois capacités sont
+prouvées sur macOS; aucune conclusion Go/No-go n'est déclarée avant que la matrice
+complète soit couverte.

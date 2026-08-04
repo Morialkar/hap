@@ -11,7 +11,20 @@
     "sql:allow-execute",
     "dialog:default",
     "fs:default",
+    "fs:allow-open",
+    "fs:allow-read-file",
     "fs:allow-read-text-file",
-    "fs:allow-write-text-file"
+    "fs:allow-write-text-file",
+    "fs:allow-seek",
+    "fs:allow-read",
+    "fs:allow-fstat",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        {
+          "path": "$RESOURCE/fixtures/*"
+        }
+      ]
+    }
   ]
 }
