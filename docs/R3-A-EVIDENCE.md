@@ -1,8 +1,24 @@
 # R3-A — Evidence bundle
 
 Preuves reproductibles du spike Tauri 2 (voir [R3-A-TAURI-SPIKE.md](R3-A-TAURI-SPIKE.md)).
-Aucune conclusion Go/No-go n'est déclarée tant que la matrice complète (macOS, Windows,
-iOS, Android) n'est pas couverte. Les trois capacités requises sont prouvées sur macOS.
+
+## Décision : GO
+
+Déclarée par Naomi Gilbert le 2026-08-03, sur la base des preuves ci-dessous : les trois
+capacités requises — SQLite local, écriture Markdown, carte PMTiles hors-ligne — sont
+exercées et passent sur macOS, sur le simulateur iOS et sur l'émulateur Android, soit
+deux moteurs de webview distincts.
+
+Deux points sont ouverts et portés avec la décision, ils ne sont pas refermés par elle :
+
+1. **Windows n'a pas été testé** (décision du 2026-08-03). Risque résiduel jugé faible
+   depuis qu'Android valide la pile sur un webview Chromium, mais ce n'est pas une preuve.
+2. **Le modèle de vault mobile reste à trancher.** Le sélecteur de dossier n'existe pas
+   sur iOS ni Android; le vault du bureau n'a donc pas d'équivalent direct. Trois options
+   sont documentées plus bas et le choix conditionne la conception du vault. À décider
+   avant R3-B.
+
+Le fallback ratifié en D8 (Capacitor + Electron) n'est pas retenu.
 
 ## Environnement (macOS)
 
