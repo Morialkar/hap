@@ -212,16 +212,24 @@ Rien de tout cela ne relève de Tauri ni du code du spike, mais tout a bloqué u
 
 ## Windows : SUPPOSÉ, NON TESTÉ
 
-Décision prise le 2026-08-03 : Windows n'est pas exécuté, le comportement est supposé
-identique à macOS. **Ce n'est pas une preuve** et le dossier ne le compte pas comme telle.
+Décision prise le 2026-08-03 : Windows n'est pas exécuté. **Ce n'est pas une preuve** et
+le dossier ne le compte pas comme telle — mais le risque résiduel est faible et il a
+beaucoup baissé depuis.
 
-Ce que macOS ne couvre pas, et qui reste donc ouvert :
+Ce qui rassure : les trois capacités passent désormais sur **trois moteurs de webview
+distincts** — WKWebView (macOS et iOS) et le WebView Android (Chromium). MapLibre, WebGL,
+le plugin SQLite et la lecture par plages du plugin `fs` fonctionnent donc déjà sur du
+Chromium, qui est ce que Windows utilise via WebView2. Le contournement adopté ne dépend
+d'ailleurs pas du protocole applicatif, puisqu'il lit le fichier nativement.
 
-- Windows utilise WebView2 (Chromium) là où macOS utilise WKWebView; les moteurs
-  diffèrent notamment sur WebGL, dont dépend MapLibre.
-- Le protocole applicatif y a sa propre implémentation. C'est précisément là qu'a été
-  trouvée la contrainte de byte serving sur macOS; rien ne garantit qu'elle se comporte
-  pareil, ni en mieux ni en pire.
+Ce qui reste néanmoins non vérifié :
+
+- WebView2 est un Chromium distinct de celui d'Android, avec sa propre pile graphique;
+  l'accélération WebGL sous Windows dépend du pilote et bascule parfois sur un rendu
+  logiciel.
+- Les chemins de ressources et la portée `fs` y ont une autre forme — Android a déjà
+  montré une troisième forme (`asset://localhost/...`), donc cette partie varie
+  réellement d'une plateforme à l'autre.
 
 ## État de la matrice
 
