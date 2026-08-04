@@ -266,7 +266,7 @@ split when their release approaches).
 **Epic R2-C Share (P2 ✅):** signed read-only share links for records/views (squares full-auth with shareability).
 
 ### R3 — Local-first desktop & mobile
-**Epic R3-A Spike (timeboxed, first):** Tauri 2 on macOS/Windows/iOS/Android — SQLite plugin, filesystem vault write, MapLibre+PMTiles offline render. Go/no-go informs D8 fallback (Flutter reconsidered only if this fails).
+**Epic R3-A Spike (timeboxed, first): ✅ done — GO (2026-08-03).** Tauri 2 proven on macOS, iOS simulator and Android emulator (Windows assumed, not executed): SQLite plugin, filesystem vault write, MapLibre+PMTiles offline render. D8 stands, fallback not triggered. Two findings carried forward: the app protocol does not support HTTP byte serving, so the PMTiles archive must be read natively (informs R3-D offline map bundles); and **no mobile directory picker exists → D16**. Evidence: `docs/R3-A-EVIDENCE.md`.
 **Epic R3-B Local driver:** SQLite mirror schema; repository local-driver; offline queue; no-auth local mode.
 **Epic R3-C Vault:** Markdown vault writer (+ SQLite export); continuous on-change export; re-import path (vault → database) so the format is truly reusable.
 **Epic R3-D Packaging:** installers, auto-update, mobile store readiness; offline map bundles.
@@ -324,7 +324,7 @@ lookups are real referenced tables with views.
 | D5 | Visual direction: **Tabler (MIT, Bootstrap 5) as the code base, re-skinned with a Maxton-inspired design language.** User holds Maxton via **Envato Elements** (no redistribution in open source → its files/SCSS/markup never enter the repo; the template stays on the user's machine as a **visual reference only**). From Maxton we take *ideas*: **horizontal menu layout**, the blue-theme's deep-dark aesthetic re-expressed as a **green dark theme** (v2 greens `#459e00` primary / `#67b021` hover over deep green-tinted dark backgrounds), popping accent colors and strong contrasts. Implemented natively with Tabler's SCSS variables/components + Tabler Icons (MIT); charts ApexCharts-react; tables TanStack Table. Fully AGPL-compatible — license gate dissolved | ✅ **Ratified** |
 | D6 | Dump local; long-term form | ✅ Resolved (private forever — P28 rejected) |
 | D7 | Full-auth web; **amended:** desktop/mobile local mode = no auth, auth only for sync | ✅ Amended |
-| **D8** | Client stack: React+TS everywhere, Tauri 2 shells; **fallback = Capacitor (mobile) + Electron (desktop)**, Flutter dropped | ✅ **Ratified** |
+| **D8** | Client stack: React+TS everywhere, Tauri 2 shells; **fallback = Capacitor (mobile) + Electron (desktop)**, Flutter dropped. **R3-A spike closed GO on 2026-08-03** — SQLite, Markdown write and offline PMTiles all exercised on macOS, iOS simulator and Android emulator (two webview engines); fallback not triggered. Windows was not executed (accepted risk). Evidence: `docs/R3-A-EVIDENCE.md` | ✅ **Ratified — spike confirmed** |
 | **D9** | Storage: hybrid JSONB document model + side tables | ✅ **Ratified** |
 | **D10** | Postgres + PostGIS (replaces MySQL 8 decision) | ✅ **Ratified** |
 | **D11** | MapLibre + Protomaps/OSM tiles; Photon reverse geocoding, **bundled as an optional compose profile with country extracts + graceful degradation** | ✅ **Ratified** |
@@ -332,6 +332,7 @@ lookups are real referenced tables with views.
 | **D13** | Product name: **Heritage Archives Patrimoine (HAP)** — bilingual (EN/FR) in the name itself; repo dir rename optional/whenever convenient | ✅ **Ratified** |
 | **D14** | Platform license: **AGPL-3.0** | ✅ **Ratified** |
 | **D15** | Deployment reality: hosted instances may live on **cPanel shared hosting** for a while (family instance, registration closed); needs the no-docker deployment mode. **PostgreSQL confirmed available on the host** ✅ | ✅ **Resolved** |
+| **D16** | **Mobile vault model — open.** The R3-A spike found no directory picker on either mobile platform ("Folder picker is not implemented on mobile"), so the desktop vault — an arbitrary user-chosen folder such as an Obsidian directory — has no mobile equivalent. Mobile can write Markdown only inside app-private storage, invisible to other apps and deleted with the app. Options: (a) app-scoped vault + explicit import/export; (b) system document picker (UIDocumentPicker / Storage Access Framework) via a Tauri plugin to write or source — URI-based, often time-limited grants, not a stable path; (c) vault on desktop only, mobile read/consult. Affects Working Agreement 5 and both R3-B and R3-C | ⏳ **To ratify before R3-C** |
 
 ## 9. Working Agreements
 1. AFTER: no feature before its contract; Eusèbe goldens gate R1.
