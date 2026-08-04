@@ -3,7 +3,12 @@ import { join } from '@tauri-apps/api/path';
 import { open } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 import Database from '@tauri-apps/plugin-sql';
-import type { LocalPlatformProbe, SqliteProbeResult, VaultProbeResult } from '@hap/core';
+import type {
+  LocalPlatformProbe,
+  SqliteProbeResult,
+  VaultCapabilityResult,
+  VaultProbeResult,
+} from '@hap/core';
 
 const SPIKE_VALUE = 'hap-r3-a-sqlite-persistence';
 const SPIKE_FILE = 'hap-r3-a-vault-probe.md';
@@ -54,6 +59,53 @@ export const tauriSpikeProbe: LocalPlatformProbe = {
     } finally {
       await database.close();
     }
+  },
+
+  /**
+   * Runs without interaction, so the mobile targets can be checked by a smoke script.
+   *
+   * The desktop vault hands the user an arbitrary folder. Mobile may not allow that at
+   * all, and the spec requires recording the constraint rather than pretending desktop
+   * semantics carry over — so this reports both what app-scoped storage can do and
+   * whether a directory picker exists.
+   */
+  async probeVaultCapability(): Promise<VaultCapabilityResult> {
+    let appScopedWrite: VaultCapabilityResult['appScopedWrite'] = null;
+    const notes: string[] = [];
+
+    try {
+      const { writeTextFile, readTextFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
+      const contents = '# HAP R3-A vault capability\n\nEcriture UTF-8 en stockage applicatif.\n';
+      await writeTextFile(SPIKE_FILE, contents, { baseDir: BaseDirectory.AppData });
+      const readBack = await readTextFile(SPIKE_FILE, { baseDir: BaseDirectory.AppData });
+      appScopedWrite = { path: `AppData/${SPIKE_FILE}`, roundTrip: readBack === contents };
+    } catch (error) {
+      notes.push(`app-scoped write failed: ${error instanceof Error ? error.message : error}`);
+    }
+
+    // A directory picker that is missing usually rejects immediately; one that exists
+    // would block on UI, which a smoke run must not do. Time-box it either way.
+    let directoryPicker: VaultCapabilityResult['directoryPicker'] = 'unknown';
+    try {
+      const picked = await Promise.race([
+        open({ directory: true, multiple: false, title: 'Capability probe' }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('__ui_shown__')), 2500)),
+      ]);
+      directoryPicker = 'supported';
+      notes.push(`picker returned ${JSON.stringify(picked)}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message === '__ui_shown__') {
+        // It opened and is waiting for a human: the capability exists.
+        directoryPicker = 'supported';
+        notes.push('picker opened and awaited interaction');
+      } else {
+        directoryPicker = 'unsupported';
+        notes.push(`picker rejected: ${message}`);
+      }
+    }
+
+    return { appScopedWrite, directoryPicker, detail: notes.join(' | ') };
   },
 
   async selectVaultDirectory(): Promise<string | null> {

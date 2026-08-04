@@ -150,9 +150,8 @@ installé et lancé via `simctl`. Verdict relu dans le conteneur de l'applicatio
   (`…/HAP Tauri Spike.app/assets/fixtures/r3a-countries.pmtiles`).
 - **SQLite : PASS** — la table `probe_verdicts` est créée et écrite par l'application
   elle-même; sans SQLite fonctionnel il n'y aurait aucun verdict à lire.
-- **Vault : non exercé.** La sonde vault dépend du sélecteur de dossier, qui exige une
-  interaction. Le spec n'impose sur mobile qu'un contrôle de capacité; celui-ci reste à
-  faire.
+- **Vault : contrôle de capacité PASS, avec une contrainte majeure** — voir la section
+  dédiée ci-dessous.
 
 Moins d'entités que sur macOS (48 contre 87) simplement parce que la fenêtre est plus
 petite : moins de tuiles sont dans le champ de vue.
@@ -166,7 +165,7 @@ AVD `Medium_Phone_API_36.1` (API 36.1), APK debug universel installé via `adb`.
   "blockedRequests": [], "transport": "tauri-fs" }
 ```
 
-- **Carte hors-ligne : PASS**, **SQLite : PASS**, **Vault : non exercé** — mêmes
+- **Carte hors-ligne : PASS**, **SQLite : PASS**, **Vault : capacité vérifiée** — mêmes
   conclusions qu'iOS.
 - **Différence de plateforme à noter :** `resolveResource` renvoie ici
   `asset://localhost/fixtures/r3a-countries.pmtiles`, une URI et non un chemin de
@@ -193,6 +192,41 @@ pnpm --dir apps/desktop tauri ios build --target aarch64-sim   # au premier plan
 pnpm --dir apps/desktop tauri android init
 pnpm --dir apps/desktop tauri android build --debug --target aarch64
 ```
+
+## Vault sur mobile : le sélecteur de dossier n'existe pas
+
+Contrôle non assisté exécuté sur les trois plateformes le 2026-08-03.
+
+| Plateforme | Écriture en stockage applicatif | Sélecteur de dossier |
+| --- | --- | --- |
+| macOS | PASS (aller-retour UTF-8) | **supporté** |
+| iOS 26.3.1 | PASS (aller-retour UTF-8) | **non supporté** |
+| Android 36.1 | PASS (aller-retour UTF-8) | **non supporté** |
+
+Message renvoyé par le plugin sur les deux plateformes mobiles :
+
+```
+Folder picker is not implemented on mobile
+```
+
+**Conséquence pour l'architecture, à trancher avant R3-B.** Le vault du bureau repose sur
+un dossier arbitraire choisi par l'utilisateur — typiquement un dossier Obsidian ou un
+dossier synchronisé. Cette notion **n'existe pas** sur iOS ni Android avec la pile
+actuelle. Le mobile peut écrire du Markdown, mais uniquement dans le stockage propre à
+l'application, invisible aux autres applications et supprimé avec elle.
+
+Les options se limitent donc à :
+
+1. **Vault en stockage applicatif sur mobile**, avec import/export explicite. Simple,
+   mais le vault mobile n'est plus le même objet que celui du bureau.
+2. **Passer par le sélecteur de documents du système** (`UIDocumentPicker` sur iOS,
+   Storage Access Framework sur Android) via un plugin Tauri à écrire ou à trouver. Les
+   accès y sont accordés par URI, souvent limités dans le temps, et se réautorisent — ce
+   n'est pas un chemin de système de fichiers stable.
+3. **Vault desktop uniquement**, le mobile étant en lecture/consultation.
+
+Le spec exige de consigner la contrainte plutôt que de simuler les sémantiques du bureau;
+c'est fait ici. **Le choix reste ouvert et conditionne la conception du vault.**
 
 ## Chaîne d'outils mobile : ce qu'il a fallu
 
@@ -236,9 +270,14 @@ Ce qui reste néanmoins non vérifié :
 | Cible | Build | SQLite | Vault | PMTiles hors-ligne |
 | --- | --- | --- | --- | --- |
 | macOS | PASS | PASS | PASS | PASS |
-| iOS simulator | PASS | PASS | non exercé | PASS |
-| Android emulator | PASS | PASS | non exercé | PASS |
+| iOS simulator | PASS | PASS | capacité vérifiée (contrainte) | PASS |
+| Android emulator | PASS | PASS | capacité vérifiée (contrainte) | PASS |
 | Windows | supposé | supposé | supposé | supposé |
 
-Deux réserves subsistent avant toute conclusion Go/No-go : Windows n'a pas été exécuté
-(décision du 2026-08-03), et le contrôle de capacité du vault sur mobile reste à faire.
+Une seule réserve subsiste côté exécution : Windows n'a pas été testé (décision du
+2026-08-03), avec un risque résiduel jugé faible depuis qu'Android valide la pile sur un
+webview Chromium.
+
+Le contrôle de capacité du vault mobile est fait, et il est concluant au sens du spec :
+il a **révélé une contrainte** qui n'invalide pas la faisabilité de Tauri, mais qui
+impose un choix d'architecture pour le vault mobile avant R3-B.

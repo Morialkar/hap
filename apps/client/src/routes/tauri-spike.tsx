@@ -109,6 +109,13 @@ function TauriSpikePage() {
         .recordProbeVerdict('offline-map-diagnostics', { rangeCheck, nativeRead })
         .catch(() => {});
 
+      // What the vault can rely on here. On mobile this is the whole proof the spec
+      // asks for, since an arbitrary user-chosen folder may not exist as a concept.
+      const vaultCapability = await tauriSpikeProbe
+        .probeVaultCapability()
+        .catch((error) => ({ error: error instanceof Error ? error.message : String(error) }));
+      await tauriSpikeProbe.recordProbeVerdict('vault-capability', vaultCapability).catch(() => {});
+
       let payload: Record<string, unknown>;
       try {
         payload = {

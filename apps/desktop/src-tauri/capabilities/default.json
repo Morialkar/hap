@@ -18,6 +18,8 @@
     "fs:allow-seek",
     "fs:allow-read",
     "fs:allow-fstat",
+    "fs:allow-appdata-write-recursive",
+    "fs:allow-appdata-read-recursive",
     {
       "identifier": "fs:scope",
       "allow": [
