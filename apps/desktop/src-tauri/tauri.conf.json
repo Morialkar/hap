@@ -36,6 +36,9 @@
     ],
     "android": {
       "debugApplicationIdSuffix": ".debug"
+    },
+    "resources": {
+      "../../client/public/fixtures/r3a-countries.pmtiles": "fixtures/r3a-countries.pmtiles"
     }
   }
 }
