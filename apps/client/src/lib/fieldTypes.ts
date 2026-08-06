@@ -1,18 +1,6 @@
-export type FieldType =
-  | 'title'
-  | 'text'
-  | 'long_text'
-  | 'number'
-  | 'date'
-  | 'boolean'
-  | 'select'
-  | 'reference'
-  | 'image'
-  | 'file'
-  | 'url'
-  | 'email'
-  | 'gps'
-  | 'compound';
+// The union lives in @hap/core so drivers and UI cannot drift apart.
+export type { FieldType } from '@hap/core';
+import type { FieldType } from '@hap/core';
 
 export interface FieldOptionSchema {
   key: string;

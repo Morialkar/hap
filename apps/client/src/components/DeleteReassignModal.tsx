@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
-import type { ApiErrorLike, ApiRecord, DeleteConflictData } from '../lib/apiTypes';
+import { useRepository } from '../contexts/RepositoryContext';
+import type { Paginated, RecordEntity } from '@hap/core';
+import type { ApiErrorLike, DeleteConflictData } from '../lib/apiTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 
 interface DeleteReassignModalProps {
@@ -20,15 +21,16 @@ export function DeleteReassignModal({
   onClose,
   onSuccess,
 }: DeleteReassignModalProps) {
+  const repository = useRepository();
   const { t } = useI18n();
   const queryClient = useQueryClient();
   const [targetRecordId, setTargetRecordId] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Fetch candidate replacement records (same table, excluding current record)
-  const candidatesQuery = useQuery<{ data: ApiRecord[] }, Error>({
+  const candidatesQuery = useQuery<Paginated<RecordEntity>, Error>({
     queryKey: ['records-reassign-candidates', tableId],
-    queryFn: () => apiClient.get(`/records?table_id=${tableId}&per_page=100`),
+    queryFn: () => repository.records.list({ table_id: tableId, per_page: 100 }),
   });
 
   const candidates = useMemo(() => {
@@ -45,12 +47,10 @@ export function DeleteReassignModal({
   const reassignMutation = useMutation({
     mutationFn: async () => {
       // 1. Reassign links to target record B
-      await apiClient.post(`/records/${recordId}/reassign-links`, {
-        to_record_id: targetRecordId,
-      });
+      await repository.records.reassignLinks(recordId, targetRecordId);
 
       // 2. Perform deletion
-      await apiClient.delete(`/records/${recordId}`);
+      await repository.records.remove(recordId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['records'] });

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import { PageHeader } from '../components/ui/PageHeader';
 import { SurfaceCard } from '../components/ui/SurfaceCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -25,16 +25,17 @@ interface Table {
 }
 
 function HomePage() {
+  const repository = useRepository();
   const { t } = useI18n();
 
   const databasesQuery = useQuery<Database[], Error>({
     queryKey: ['databases'],
-    queryFn: () => apiClient.get('/databases'),
+    queryFn: () => repository.databases.list(),
   });
 
   const tablesQuery = useQuery<Table[], Error>({
     queryKey: ['tables'],
-    queryFn: () => apiClient.get('/tables'),
+    queryFn: () => repository.tables.list(),
   });
 
   const isLoading = databasesQuery.isLoading || tablesQuery.isLoading;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 
 interface ShareModalProps {
   databaseId: string;
@@ -19,6 +19,7 @@ export function ShareModal({
   isOpen,
   onClose,
 }: ShareModalProps) {
+  const repository = useRepository();
   const [shareName, setShareName] = useState('');
   const [expiryOption, setExpiryOption] = useState<'24h' | '7d' | '30d' | 'never'>('never');
   const [shareLink, setShareLink] = useState('');
@@ -44,7 +45,7 @@ export function ShareModal({
         expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
       }
 
-      return apiClient.post(`/databases/${databaseId}/shares`, {
+      return repository.shares.create(databaseId, {
         name: shareName || `Partage ${targetType}`,
         target_type: targetType,
         target_id: targetId,

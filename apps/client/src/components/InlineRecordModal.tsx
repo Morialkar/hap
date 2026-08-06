@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import { type BuilderField } from '../lib/fieldTypes';
 import { RecordForm } from './RecordForm';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -19,19 +19,26 @@ interface InlineRecordModalProps {
 }
 
 export function InlineRecordModal({ tableId, isOpen, onClose, onSuccess }: InlineRecordModalProps) {
+  const repository = useRepository();
   const { t } = useI18n();
 
   // Fetch the target table details
   const tableQuery = useQuery<Table, Error>({
     queryKey: ['tables', tableId],
-    queryFn: () => apiClient.get(`/tables/${tableId}`),
+    queryFn: () => repository.tables.get(tableId),
     enabled: isOpen && !!tableId,
   });
 
   // Fetch the fields schema for this target table
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', tableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
+    // The API may omit options/validation; the builder shape requires them.
+    queryFn: async () =>
+      (await repository.fields.listByTable(tableId)).map((field) => ({
+        ...field,
+        options: field.options ?? {},
+        validation: field.validation ?? {},
+      })),
     enabled: isOpen && !!tableId,
   });
 

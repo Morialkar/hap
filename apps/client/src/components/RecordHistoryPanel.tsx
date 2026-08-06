@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import type { ApiRecordData, ApiValue } from '../lib/apiTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 import { formatDistanceToNow } from 'date-fns';
@@ -32,20 +32,19 @@ interface RecordHistoryPanelProps {
 }
 
 export function RecordHistoryPanel({ recordId, onRestoreSuccess }: RecordHistoryPanelProps) {
+  const repository = useRepository();
   const { t } = useI18n();
   const queryClient = useQueryClient();
 
   const historyQuery = useQuery<{ data: HistoryLog[] }, Error>({
     queryKey: ['records-history', recordId],
-    queryFn: () => apiClient.get(`/records/${recordId}/history`),
+    queryFn: () => repository.records.history(recordId),
     enabled: !!recordId,
   });
 
   const restoreMutation = useMutation({
     mutationFn: (logId: number) =>
-      apiClient.post(`/records/${recordId}/restore-version`, {
-        log_id: logId,
-      }),
+      repository.records.restoreVersion(recordId, logId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       onRestoreSuccess();
