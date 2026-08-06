@@ -1,13 +1,10 @@
-export type ApiPrimitive = string | number | boolean | null;
-export type ApiValue = ApiPrimitive | ApiValue[] | { [key: string]: ApiValue };
-export type ApiRecordData = Record<string, ApiValue>;
+// The record shape lives in @hap/core so both drivers and the UI share it.
+import type { RecordData, RecordEntity, RecordPrimitive, RecordValue } from '@hap/core';
 
-export interface ApiRecord {
-  id: string;
-  table_id: string;
-  data: ApiRecordData;
-  version: number;
-}
+export type ApiPrimitive = RecordPrimitive;
+export type ApiValue = RecordValue;
+export type ApiRecordData = RecordData;
+export type ApiRecord = RecordEntity;
 
 export interface ApiErrorPayload {
   message?: string;

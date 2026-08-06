@@ -8,7 +8,7 @@ export interface LocalitySnapshot {
   region: string | null;
   country: string | null;
   dataset_version: string;
-  resolution_source: 'embedded_gazetteer';
+  resolution_source: "embedded_gazetteer";
 }
 
 export interface GazetteerAttribution {
@@ -22,7 +22,12 @@ export interface GazetteerMetadata {
   attributions: GazetteerAttribution[];
 }
 
-export type BoundingBox = readonly [minLng: number, minLat: number, maxLng: number, maxLat: number];
+export type BoundingBox = readonly [
+  minLng: number,
+  minLat: number,
+  maxLng: number,
+  maxLat: number,
+];
 export type Ring = ReadonlyArray<readonly [lng: number, lat: number]>;
 
 export interface AdministrativeArea {

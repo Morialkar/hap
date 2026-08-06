@@ -101,7 +101,9 @@ describe('RecordDetailView', () => {
         return Promise.resolve(mockReferencingFields);
       }
       if (url.startsWith('/views')) {
-        return Promise.resolve({ data: [] });
+        // The endpoint answers with a bare array — ViewFeatureTest asserts a root
+        // count of two. The old envelope here hid a bug where no view ever applied.
+        return Promise.resolve([]);
       }
       if (url.startsWith('/records/rec-1/referencing-records')) {
         return Promise.resolve(mockReferencingRecords);

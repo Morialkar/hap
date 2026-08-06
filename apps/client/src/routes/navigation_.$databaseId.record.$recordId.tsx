@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { RecordDetailView } from '../components/RecordDetailView';
 import { useI18n } from '../contexts/I18nContext';
@@ -16,13 +16,14 @@ export const Route = createFileRoute('/navigation_/$databaseId/record/$recordId'
 export function SingleRecordPage() {
   const { databaseId, recordId } = Route.useParams();
   const { t } = useI18n();
+  const repository = useRepository();
   const navigate = useNavigate();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // 1. Fetch the record
   const recordQuery = useQuery<ApiRecord, Error>({
     queryKey: ['records', recordId],
-    queryFn: () => apiClient.get(`/records/${recordId}`),
+    queryFn: () => repository.records.get(recordId),
     enabled: !!recordId,
   });
 
@@ -31,14 +32,14 @@ export function SingleRecordPage() {
   // 2. Fetch the table details
   const tableQuery = useQuery<{ id: string; name: string }, Error>({
     queryKey: ['tables', tableId],
-    queryFn: () => apiClient.get(`/tables/${tableId}`),
+    queryFn: () => repository.tables.get(tableId!),
     enabled: !!tableId,
   });
 
   // 3. Fetch fields to extract the title/label
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', tableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
+    queryFn: () => repository.fields.listByTable(tableId!),
     enabled: !!tableId,
   });
 

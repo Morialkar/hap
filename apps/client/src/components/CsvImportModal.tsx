@@ -57,14 +57,12 @@ export function CsvImportModal({ tableId, fields, onClose, onImported }: CsvImpo
   };
 
   const dryRunMutation = useMutation({
-    mutationFn: () =>
-      repository.tables.csvImportDryRun(tableId, buildFormData()),
+    mutationFn: () => repository.tables.csvImportDryRun(tableId, buildFormData()),
     onSuccess: setResult,
   });
 
   const importMutation = useMutation({
-    mutationFn: () =>
-      repository.tables.csvImport(tableId, buildFormData()),
+    mutationFn: () => repository.tables.csvImport(tableId, buildFormData()),
     onSuccess: (data) => {
       setResult(data);
       onImported();

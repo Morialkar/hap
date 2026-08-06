@@ -1,6 +1,6 @@
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
 import { PageHeader } from '../components/ui/PageHeader';
@@ -31,23 +31,24 @@ interface Database {
 function SharesManagement() {
   const { databaseId } = useParams({ from: '/shares/$databaseId' });
   const queryClient = useQueryClient();
+  const repository = useRepository();
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Fetch Database details
   const databaseQuery = useQuery<Database, Error>({
     queryKey: ['database', databaseId],
-    queryFn: () => apiClient.get(`/databases/${databaseId}`),
+    queryFn: () => repository.databases.get(databaseId),
   });
 
   // Fetch Shares list
   const sharesQuery = useQuery<ShareItem[], Error>({
     queryKey: ['shares', databaseId],
-    queryFn: () => apiClient.get(`/databases/${databaseId}/shares`),
+    queryFn: () => repository.shares.listByDatabase(databaseId),
   });
 
   // Mutation to Revoke (delete) Share link
   const revokeShareMutation = useMutation({
-    mutationFn: (shareId: string) => apiClient.delete(`/shares/${shareId}`),
+    mutationFn: (shareId: string) => repository.shares.remove(shareId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shares', databaseId] });
     },

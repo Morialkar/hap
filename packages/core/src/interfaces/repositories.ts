@@ -1,5 +1,6 @@
 import type {
   Database,
+  RecordData,
   Field,
   Paginated,
   RecordEntity,
@@ -9,7 +10,7 @@ import type {
   Table,
   Template,
   ViewEntity,
-} from '../domain/types';
+} from "../domain/types";
 
 /**
  * The data access contract the client codes against, so the shell choice stays
@@ -24,7 +25,8 @@ export interface DatabaseRepository {
   list(): Promise<Database[]>;
   get(id: string): Promise<Database>;
   create(input: { name: string; workspace_id: string }): Promise<Database>;
-  mapPoints(databaseId: string): Promise<unknown[]>;
+  /** Also envelope-wrapped; callers narrow the point shape. */
+  mapPoints<T = unknown>(databaseId: string): Promise<{ data: T[] }>;
 }
 
 export interface CsvImportResult {
@@ -34,7 +36,11 @@ export interface CsvImportResult {
   accepted_count: number;
   rejected_count: number;
   warnings: string[];
-  accepted_rows: Array<{ row: number; data: Record<string, unknown>; record_id?: string }>;
+  accepted_rows: Array<{
+    row: number;
+    data: Record<string, unknown>;
+    record_id?: string;
+  }>;
   rejected_rows: Array<{ row: number; errors: Record<string, string[]> }>;
 }
 
@@ -54,11 +60,20 @@ export interface TableRepository {
 export interface FieldRepository {
   listByTable(tableId: string): Promise<Field[]>;
   create(input: Partial<Field> & { table_id: string }): Promise<Field>;
-  update(id: string, input: Partial<Field> & { confirmation_token?: string }): Promise<Field>;
+  update(
+    id: string,
+    input: Partial<Field> & { confirmation_token?: string },
+  ): Promise<Field>;
   /** Deleting a field is always destructive server-side, so a token is always required. */
   remove(id: string, confirmationToken?: string): Promise<void>;
   previewImpact(id: string): Promise<SchemaImpact>;
   confirmationToken(id: string): Promise<{ token: string }>;
+}
+
+export interface RecordFilter {
+  field: string;
+  operator: string;
+  value: string;
 }
 
 export interface RecordListParams {
@@ -68,17 +83,19 @@ export interface RecordListParams {
   search?: string;
   sort?: string;
   /** Named after the query parameter the API actually reads. */
-  sort_dir?: 'asc' | 'desc';
-  filters?: Record<string, unknown>;
+  sort_dir?: "asc" | "desc";
+  /** Sent JSON-encoded; an array, not a map — the UI allows repeated fields. */
+  filters?: RecordFilter[];
 }
 
 export interface RecordRepository {
   list(params: RecordListParams): Promise<Paginated<RecordEntity>>;
   get(id: string): Promise<RecordEntity>;
-  create(input: { table_id: string; data: Record<string, unknown> }): Promise<RecordEntity>;
+  create(input: { table_id: string; data: RecordData }): Promise<RecordEntity>;
+  /** `version` drives the optimistic-concurrency guard when the caller has one. */
   update(
     id: string,
-    input: { data: Record<string, unknown>; version: number }
+    input: { data: RecordData; version?: number },
   ): Promise<RecordEntity>;
   remove(id: string): Promise<void>;
 
@@ -99,7 +116,9 @@ export interface RecordRepository {
 
 export interface ViewRepository {
   listByTable(tableId: string): Promise<ViewEntity[]>;
-  create(input: Partial<ViewEntity> & { table_id: string }): Promise<ViewEntity>;
+  create(
+    input: Partial<ViewEntity> & { table_id: string },
+  ): Promise<ViewEntity>;
   update(id: string, input: Partial<ViewEntity>): Promise<ViewEntity>;
   remove(id: string): Promise<void>;
 }
@@ -120,21 +139,29 @@ export interface ReportRepository {
 
 export interface ShareInput {
   name: string;
-  target_type: string;
+  target_type: Share["target_type"];
   target_id: string;
   expires_at: string | null;
 }
 
 export interface ShareRepository {
   listByDatabase(databaseId: string): Promise<Share[]>;
-  create(databaseId: string, input: ShareInput): Promise<Share & { token?: string }>;
+  create(databaseId: string, input: ShareInput): Promise<Share>;
   remove(id: string): Promise<void>;
   getByToken(token: string): Promise<unknown>;
 }
 
+export interface TemplateInstallInput {
+  format_version: number;
+  template_version: string;
+  name: string;
+  payload: Template["payload"];
+}
+
 export interface TemplateRepository {
   list(): Promise<Template[]>;
-  install(workspaceId: string, input: { template_id: string }): Promise<unknown>;
+  /** The whole payload travels: the installer rewrites the database name into it. */
+  install(workspaceId: string, input: TemplateInstallInput): Promise<unknown>;
 }
 
 /** Everything the client needs, in one injectable object. */

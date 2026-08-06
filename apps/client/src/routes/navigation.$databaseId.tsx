@@ -5,7 +5,7 @@ import { useI18n } from '../contexts/I18nContext';
 import { GpsMapPicker } from '../components/GpsMapPicker';
 import { GpsLocalityLabel } from '../components/GpsLocalityLabel';
 import { DatabaseMapView, type DatabaseMapPoint } from '../components/DatabaseMapView';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import type { ApiRecord, ApiRecordData } from '../lib/apiTypes';
 import { parseGpsValue } from '../lib/fieldDisplay';
 import { type BuilderField } from '../lib/fieldTypes';
@@ -74,6 +74,7 @@ function NavigationModePage() {
   const searchParams = useSearch({ from: '/navigation/$databaseId' });
   const navigate = useNavigate({ from: '/navigation/$databaseId' });
   const { t } = useI18n();
+  const repository = useRepository();
 
   const [activeLightboxHash, setActiveLightboxHash] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(false);
@@ -88,12 +89,12 @@ function NavigationModePage() {
   // Queries
   const databaseQuery = useQuery<Database, Error>({
     queryKey: ['database', databaseId],
-    queryFn: () => apiClient.get(`/databases/${databaseId}`),
+    queryFn: () => repository.databases.get(databaseId),
   });
 
   const tablesQuery = useQuery<Table[], Error>({
     queryKey: ['tables', databaseId],
-    queryFn: () => apiClient.get(`/tables?database_id=${databaseId}`),
+    queryFn: () => repository.tables.list(databaseId),
   });
 
   // Extract front-facing tables
@@ -115,39 +116,33 @@ function NavigationModePage() {
 
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', selectedTableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${selectedTableId}`),
+    queryFn: () => repository.fields.listByTable(selectedTableId!),
     enabled: !!selectedTableId,
   });
 
   const viewsQuery = useQuery<ViewSchema[], Error>({
     queryKey: ['views', selectedTableId],
-    queryFn: () => apiClient.get(`/views?table_id=${selectedTableId}`),
+    queryFn: () => repository.views.listByTable(selectedTableId!),
     enabled: !!selectedTableId,
   });
 
   const recordsQuery = useQuery<{ data: ApiRecord[] }, Error>({
     queryKey: ['records', selectedTableId, searchQuery, sortBy, sortDir],
     queryFn: () => {
-      const qParams = new URLSearchParams();
-      qParams.append('table_id', selectedTableId!);
-      qParams.append('per_page', '100');
-
-      if (searchQuery.trim()) {
-        qParams.append('search', searchQuery.trim());
-      }
-      if (sortBy) {
-        qParams.append('sort', sortBy);
-        qParams.append('sort_dir', sortDir);
-      }
-
-      return apiClient.get(`/records?${qParams.toString()}`);
+      return repository.records.list({
+        table_id: selectedTableId!,
+        per_page: 100,
+        search: searchQuery.trim() || undefined,
+        sort: sortBy || undefined,
+        sort_dir: sortBy ? sortDir : undefined,
+      });
     },
     enabled: !!selectedTableId,
   });
 
   const mapPointsQuery = useQuery<{ data: DatabaseMapPoint[] }, Error>({
     queryKey: ['database-map-points', databaseId],
-    queryFn: () => apiClient.get(`/databases/${databaseId}/map-points`),
+    queryFn: () => repository.databases.mapPoints(databaseId),
     enabled: !!databaseId,
   });
 
@@ -992,9 +987,10 @@ function ReferenceLabel({
   className?: string;
   databaseId: string;
 }) {
+  const repository = useRepository();
   const recordQuery = useQuery<ApiRecord, Error>({
     queryKey: ['records', targetRecordId],
-    queryFn: () => apiClient.get(`/records/${targetRecordId}`),
+    queryFn: () => repository.records.get(targetRecordId),
     enabled: !!targetRecordId && targetRecordId !== '--',
   });
 
@@ -1002,7 +998,7 @@ function ReferenceLabel({
 
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', targetTableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${targetTableId}`),
+    queryFn: () => repository.fields.listByTable(targetTableId!),
     enabled: !!targetTableId,
   });
 

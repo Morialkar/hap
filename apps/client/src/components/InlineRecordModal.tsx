@@ -32,13 +32,7 @@ export function InlineRecordModal({ tableId, isOpen, onClose, onSuccess }: Inlin
   // Fetch the fields schema for this target table
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', tableId],
-    // The API may omit options/validation; the builder shape requires them.
-    queryFn: async () =>
-      (await repository.fields.listByTable(tableId)).map((field) => ({
-        ...field,
-        options: field.options ?? {},
-        validation: field.validation ?? {},
-      })),
+    queryFn: () => repository.fields.listByTable(tableId),
     enabled: isOpen && !!tableId,
   });
 

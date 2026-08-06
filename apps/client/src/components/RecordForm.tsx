@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, type ComponentType, type ReactNod
 import { useForm, useStore } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import type { ApiRecord, ApiRecordData, ApiValue } from '../lib/apiTypes';
 import { type BuilderField } from '../lib/fieldTypes';
 import { GpsMapPicker } from './GpsMapPicker';
@@ -62,6 +62,7 @@ export function RecordForm({
 }: RecordFormProps) {
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const repository = useRepository();
   const formRef = useRef<HTMLFormElement>(null);
 
   // Modal state for inline reference creation
@@ -82,7 +83,7 @@ export function RecordForm({
 
   const recordQuery = useQuery<ApiRecord, Error>({
     queryKey: ['records', recordId],
-    queryFn: () => apiClient.get(`/records/${recordId}`),
+    queryFn: () => repository.records.get(recordId!),
     enabled: !!recordId,
   });
 
@@ -140,7 +141,7 @@ export function RecordForm({
 
   // Mutations
   const createMutation = useMutation({
-    mutationFn: (payload: RecordPayload) => apiClient.post<ApiRecord>('/records', payload),
+    mutationFn: (payload: RecordPayload) => repository.records.create(payload),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       queryClient.invalidateQueries({ queryKey: ['records-select'] });
@@ -150,7 +151,7 @@ export function RecordForm({
 
   const updateMutation = useMutation({
     mutationFn: (payload: RecordPayload) =>
-      apiClient.put<ApiRecord>(`/records/${recordId}`, {
+      repository.records.update(recordId!, {
         data: payload.data,
         version: payload.version,
       }),
@@ -692,13 +693,14 @@ function ReferenceFieldEditor({
   onOpenInlineModal,
 }: ReferenceFieldEditorProps) {
   const { t } = useI18n();
+  const repository = useRepository();
   const targetTableId = String(field.options?.target_table || '');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch referencing records of target table
   const recordsQuery = useQuery<{ data: ApiRecord[] }, Error>({
     queryKey: ['records-select', targetTableId],
-    queryFn: () => apiClient.get(`/records?table_id=${targetTableId}&per_page=100`),
+    queryFn: () => repository.records.list({ table_id: targetTableId, per_page: 100 }),
     enabled: !!targetTableId,
   });
 

@@ -2,7 +2,7 @@ import { createFileRoute, useParams } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query';
 import { useEffect, useMemo, useState, Fragment } from 'react';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { EmptyState } from '../components/ui/EmptyState';
 import { PageActions, PageHeader } from '../components/ui/PageHeader';
@@ -75,6 +75,7 @@ export function ReportBuilderPage() {
   const { databaseId, tableId } = useParams({ from: '/reports/$databaseId/$tableId' });
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const repository = useRepository();
 
   // Basic Page States
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
@@ -103,29 +104,29 @@ export function ReportBuilderPage() {
   // Load Database and Table Details
   const databaseQuery = useQuery<Database, Error>({
     queryKey: ['database', databaseId],
-    queryFn: () => apiClient.get(`/databases/${databaseId}`),
+    queryFn: () => repository.databases.get(databaseId),
   });
 
   const tableQuery = useQuery<Table, Error>({
     queryKey: ['table', tableId],
-    queryFn: () => apiClient.get(`/tables/${tableId}`),
+    queryFn: () => repository.tables.get(tableId),
   });
 
   const fieldsQuery = useQuery<Field[], Error>({
     queryKey: ['fields', tableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
+    queryFn: () => repository.fields.listByTable(tableId),
   });
 
   // Load table Views / Dispositions
   const viewsQuery = useQuery<any[], Error>({
     queryKey: ['views', tableId],
-    queryFn: () => apiClient.get(`/views?table_id=${tableId}`),
+    queryFn: () => repository.views.listByTable(tableId),
   });
 
   // Load Saved Reports
   const reportsQuery = useQuery<Report[], Error>({
     queryKey: ['reports', tableId],
-    queryFn: () => apiClient.get(`/reports?table_id=${tableId}`),
+    queryFn: () => repository.reports.listByTable(tableId),
   });
 
   // Get unique related table IDs from reference fields
@@ -141,7 +142,7 @@ export function ReportBuilderPage() {
   const targetTablesQueries = useQueries({
     queries: targetTableIds.map((targetId) => ({
       queryKey: ['fields', targetId],
-      queryFn: () => apiClient.get(`/fields?table_id=${targetId}`),
+      queryFn: () => repository.fields.listByTable(targetId),
       enabled: !!targetId,
     })),
   });
@@ -150,7 +151,7 @@ export function ReportBuilderPage() {
   const targetRecordsQueries = useQueries({
     queries: targetTableIds.map((targetId) => ({
       queryKey: ['records', targetId],
-      queryFn: () => apiClient.get(`/records?table_id=${targetId}&per_page=100`),
+      queryFn: () => repository.records.list({ table_id: targetId, per_page: 100 }),
       enabled: !!targetId,
     })),
   });
@@ -375,9 +376,9 @@ export function ReportBuilderPage() {
       };
 
       if (selectedReportId) {
-        return apiClient.put(`/reports/${selectedReportId}`, payload);
+        return repository.reports.update(selectedReportId, payload);
       }
-      return apiClient.post('/reports', payload);
+      return repository.reports.create(payload);
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['reports', tableId] });
@@ -390,7 +391,7 @@ export function ReportBuilderPage() {
   const deleteReportMutation = useMutation({
     mutationFn: async () => {
       if (selectedReportId) {
-        return apiClient.delete(`/reports/${selectedReportId}`);
+        return repository.reports.remove(selectedReportId);
       }
     },
     onSuccess: () => {
@@ -415,7 +416,7 @@ export function ReportBuilderPage() {
       perPage,
     ],
     queryFn: () =>
-      apiClient.post('/reports/preview', {
+      repository.reports.preview({
         table_id: tableId,
         query: printQuery,
         layout: printLayout,

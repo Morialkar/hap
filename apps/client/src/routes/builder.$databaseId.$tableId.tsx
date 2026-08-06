@@ -2,7 +2,8 @@ import { createFileRoute, useBlocker, useParams } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
+import type { Database, Field, SchemaImpact, Table } from '@hap/core';
+import { useRepository } from '../contexts/RepositoryContext';
 import { FIELD_TYPES, type FieldType, type BuilderField } from '../lib/fieldTypes';
 import { generateId } from '../lib/id';
 import { FieldPalette } from '../components/FieldPalette';
@@ -19,37 +20,6 @@ import { CardLayoutBuilder } from '../components/CardLayoutBuilder';
 export const Route = createFileRoute('/builder/$databaseId/$tableId')({
   component: StructureBuilder,
 });
-
-interface Table {
-  id: string;
-  name: string;
-  database_id: string;
-  is_front_facing?: boolean;
-}
-
-interface Database {
-  id: string;
-  name: string;
-  workspace_id: string;
-}
-
-interface Field {
-  id: string;
-  name: string;
-  type: FieldType;
-  position: number;
-  options: Record<string, unknown>;
-  validation: Record<string, unknown>;
-  table_id: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-interface SchemaImpact {
-  affected_records: number;
-  orphaned_values: number;
-  coercion_required: boolean;
-}
 
 function createNewField(type: FieldType, position: number): BuilderField {
   const definition = FIELD_TYPES[type];
@@ -101,6 +71,7 @@ function StructureBuilder() {
   const { databaseId, tableId } = useParams({ from: '/builder/$databaseId/$tableId' });
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const repository = useRepository();
 
   const [fields, setFields] = useState<BuilderField[]>([]);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
@@ -125,22 +96,22 @@ function StructureBuilder() {
 
   const databaseQuery = useQuery<Database, Error>({
     queryKey: ['database', databaseId],
-    queryFn: () => apiClient.get(`/databases/${databaseId}`),
+    queryFn: () => repository.databases.get(databaseId),
   });
 
   const tableQuery = useQuery<Table, Error>({
     queryKey: ['table', tableId],
-    queryFn: () => apiClient.get(`/tables/${tableId}`),
+    queryFn: () => repository.tables.get(tableId),
   });
 
   const fieldsQuery = useQuery<Field[], Error>({
     queryKey: ['fields', tableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
+    queryFn: () => repository.fields.listByTable(tableId),
   });
 
   const tablesQuery = useQuery<Table[], Error>({
     queryKey: ['tables', databaseId],
-    queryFn: () => apiClient.get(`/tables?database_id=${databaseId}`),
+    queryFn: () => repository.tables.list(databaseId),
   });
 
   const saveFieldMutation = useMutation({
@@ -161,10 +132,10 @@ function StructureBuilder() {
       };
 
       if (field.isNew) {
-        return apiClient.post<Field>('/fields', payload);
+        return repository.fields.create(payload);
       }
 
-      return apiClient.put<Field>(`/fields/${field.persistedId}`, payload);
+      return repository.fields.update(field.persistedId!, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fields', tableId] });
@@ -176,7 +147,7 @@ function StructureBuilder() {
       if (field.persistedId) {
         // The API treats every field deletion as destructive, so a confirmation
         // token is always required — not only when records are affected.
-        return apiClient.delete(`/fields/${field.persistedId}`, { confirmation_token: token });
+        return repository.fields.remove(field.persistedId, token);
       }
       return Promise.resolve();
     },
@@ -198,7 +169,7 @@ function StructureBuilder() {
 
   const updateTableMutation = useMutation({
     mutationFn: (isFrontFacing: boolean) =>
-      apiClient.put<Table>(`/tables/${tableId}`, { is_front_facing: isFrontFacing }),
+      repository.tables.update(tableId, { is_front_facing: isFrontFacing }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['table', tableId] });
       queryClient.invalidateQueries({ queryKey: ['tables', databaseId] });
@@ -233,14 +204,10 @@ function StructureBuilder() {
       if (!field.persistedId) return;
 
       try {
-        const impact = await apiClient.get<SchemaImpact>(
-          `/fields/${field.persistedId}/preview-impact`
-        );
+        const impact = await repository.fields.previewImpact(field.persistedId);
 
         if (impact.affected_records > 0) {
-          const token = await apiClient.get<{ token: string }>(
-            `/fields/${field.persistedId}/confirmation-token`
-          );
+          const token = await repository.fields.confirmationToken(field.persistedId);
 
           setPendingAction({
             fieldId: field.id,
@@ -335,8 +302,8 @@ function StructureBuilder() {
         // A token is needed for every deletion; the impact only decides whether the
         // user is warned first.
         Promise.all([
-          apiClient.get<SchemaImpact>(`/fields/${field.persistedId}/preview-impact`),
-          apiClient.get<{ token: string }>(`/fields/${field.persistedId}/confirmation-token`),
+          repository.fields.previewImpact(field.persistedId),
+          repository.fields.confirmationToken(field.persistedId),
         ])
           .then(([impact, tokenResponse]) => {
             if (impact.affected_records > 0) {
@@ -383,8 +350,8 @@ function StructureBuilder() {
       confirmation_token: pendingAction.token,
     };
 
-    apiClient
-      .put<Field>(`/fields/${field.persistedId}`, payload)
+    repository.fields
+      .update(field.persistedId, payload)
       .then(() => {
         setPendingAction(null);
         // This field is now persisted with its new type; rebase it so it no longer

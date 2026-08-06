@@ -43,8 +43,7 @@ export function RecordHistoryPanel({ recordId, onRestoreSuccess }: RecordHistory
   });
 
   const restoreMutation = useMutation({
-    mutationFn: (logId: number) =>
-      repository.records.restoreVersion(recordId, logId),
+    mutationFn: (logId: number) => repository.records.restoreVersion(recordId, logId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       onRestoreSuccess();

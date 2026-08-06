@@ -23,6 +23,11 @@ import { apiClient } from './apiClient';
  * same contract is what makes the local mode possible (R3-B).
  */
 
+/** The API may omit options/validation; the domain type promises them. */
+function normaliseField(field: Field): Field {
+  return { ...field, options: field.options ?? {}, validation: field.validation ?? {} };
+}
+
 function recordQuery(params: RecordListParams): string {
   const query = new URLSearchParams();
   query.append('table_id', params.table_id);
@@ -31,7 +36,7 @@ function recordQuery(params: RecordListParams): string {
   if (params.search) query.append('search', params.search);
   if (params.sort) query.append('sort', params.sort);
   if (params.sort_dir) query.append('sort_dir', params.sort_dir);
-  if (params.filters && Object.keys(params.filters).length > 0) {
+  if (params.filters && params.filters.length > 0) {
     query.append('filters', JSON.stringify(params.filters));
   }
   return query.toString();
@@ -42,7 +47,7 @@ export const httpRepository: HapRepository = {
     list: () => apiClient.get<Database[]>('/databases'),
     get: (id) => apiClient.get<Database>(`/databases/${id}`),
     create: (input) => apiClient.post<Database>('/databases', input),
-    mapPoints: (databaseId) => apiClient.get<unknown[]>(`/databases/${databaseId}/map-points`),
+    mapPoints: (databaseId) => apiClient.get(`/databases/${databaseId}/map-points`),
   },
 
   tables: {
@@ -58,9 +63,10 @@ export const httpRepository: HapRepository = {
   },
 
   fields: {
-    listByTable: (tableId) => apiClient.get<Field[]>(`/fields?table_id=${tableId}`),
-    create: (input) => apiClient.post<Field>('/fields', input),
-    update: (id, input) => apiClient.put<Field>(`/fields/${id}`, input),
+    listByTable: async (tableId) =>
+      (await apiClient.get<Field[]>(`/fields?table_id=${tableId}`)).map(normaliseField),
+    create: async (input) => normaliseField(await apiClient.post<Field>('/fields', input)),
+    update: async (id, input) => normaliseField(await apiClient.put<Field>(`/fields/${id}`, input)),
     remove: (id, confirmationToken) =>
       apiClient.delete(`/fields/${id}`, { confirmation_token: confirmationToken }),
     previewImpact: (id) => apiClient.get<SchemaImpact>(`/fields/${id}/preview-impact`),
@@ -109,8 +115,7 @@ export const httpRepository: HapRepository = {
 
   shares: {
     listByDatabase: (databaseId) => apiClient.get<Share[]>(`/databases/${databaseId}/shares`),
-    create: (databaseId, input) =>
-      apiClient.post<Share & { token?: string }>(`/databases/${databaseId}/shares`, input),
+    create: (databaseId, input) => apiClient.post<Share>(`/databases/${databaseId}/shares`, input),
     remove: (id) => apiClient.delete(`/shares/${id}`),
     getByToken: (token) => apiClient.get<unknown>(`/shares/${token}`),
   },

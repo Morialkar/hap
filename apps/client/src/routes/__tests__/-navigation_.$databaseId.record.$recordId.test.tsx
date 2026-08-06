@@ -80,7 +80,8 @@ describe('SingleRecordPage Route', () => {
         return Promise.resolve(mockFields);
       }
       if (url.startsWith('/views')) {
-        return Promise.resolve({ data: [] });
+        // Bare array, as the API returns it.
+        return Promise.resolve([]);
       }
       return Promise.reject(new Error(`Unexpected URL: ${url}`));
     });
