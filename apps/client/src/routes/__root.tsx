@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useI18n } from '../contexts/I18nContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -17,6 +17,7 @@ function RootLayout() {
   const { isAuthenticated, isLoading, logout } = useAuth();
   const { t, locale, setLocale } = useI18n();
   const navigate = useNavigate();
+  const repository = useRepository();
   const location = useLocation();
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
 
@@ -40,13 +41,13 @@ function RootLayout() {
 
   const databasesQuery = useQuery<Database[], Error>({
     queryKey: ['databases'],
-    queryFn: () => apiClient.get('/databases'),
+    queryFn: () => repository.databases.list(),
     enabled: isAuthenticated,
   });
 
   const tablesQuery = useQuery<Table[], Error>({
     queryKey: ['tables'],
-    queryFn: () => apiClient.get('/tables'),
+    queryFn: () => repository.tables.list(),
     enabled: isAuthenticated,
   });
 

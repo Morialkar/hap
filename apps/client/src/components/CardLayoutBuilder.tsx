@@ -20,7 +20,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import { FIELD_TYPES, type BuilderField } from '../lib/fieldTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 
@@ -92,6 +92,7 @@ function snapshotLayout(
 export function CardLayoutBuilder({ tableId, fields, onDirtyChange }: CardLayoutBuilderProps) {
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const repository = useRepository();
 
   const [selectedViewId, setSelectedViewId] = useState<string | null>(null);
   const [newViewName, setNewViewName] = useState('');
@@ -115,7 +116,7 @@ export function CardLayoutBuilder({ tableId, fields, onDirtyChange }: CardLayout
   // Fetch views for this table
   const viewsQuery = useQuery<View[], Error>({
     queryKey: ['views', tableId],
-    queryFn: () => apiClient.get(`/views?table_id=${tableId}`),
+    queryFn: () => repository.views.listByTable(tableId),
   });
 
   const cardViews = useMemo(() => {
@@ -237,7 +238,7 @@ export function CardLayoutBuilder({ tableId, fields, onDirtyChange }: CardLayout
   // API mutations
   const createViewMutation = useMutation({
     mutationFn: (name: string) =>
-      apiClient.post<View>('/views', {
+      repository.views.create({
         table_id: tableId,
         name,
         type: 'card',
@@ -260,9 +261,7 @@ export function CardLayoutBuilder({ tableId, fields, onDirtyChange }: CardLayout
       hiddenLabels?: Record<string, boolean>;
     }) => {
       if (!selectedViewId) return Promise.reject(new Error('No view selected'));
-      return apiClient.put(`/views/${selectedViewId}`, {
-        config,
-      });
+      return repository.views.update(selectedViewId, { config });
     },
     onSuccess: (_data, config) => {
       queryClient.invalidateQueries({ queryKey: ['views', tableId] });
@@ -275,7 +274,7 @@ export function CardLayoutBuilder({ tableId, fields, onDirtyChange }: CardLayout
 
   const toggleDefaultMutation = useMutation({
     mutationFn: (payload: { is_default?: boolean; is_single_default?: boolean }) =>
-      apiClient.put<View>(`/views/${selectedViewId}`, payload),
+      repository.views.update(selectedViewId!, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['views', tableId] });
       showToast(t('layout.defaultSetSuccess'));
@@ -283,7 +282,7 @@ export function CardLayoutBuilder({ tableId, fields, onDirtyChange }: CardLayout
   });
 
   const deleteViewMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/views/${id}`),
+    mutationFn: (id: string) => repository.views.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['views', tableId] });
       setSelectedViewId(null);

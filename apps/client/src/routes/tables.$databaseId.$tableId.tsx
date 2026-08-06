@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import type { ApiErrorLike, ApiRecord, DeleteConflictData } from '../lib/apiTypes';
 import { type BuilderField } from '../lib/fieldTypes';
 import { RecordForm } from '../components/RecordForm';
@@ -57,6 +57,7 @@ function TableRecordsPage() {
   const search = useSearch({ from: '/tables/$databaseId/$tableId' });
   const navigate = useNavigate({ from: '/tables/$databaseId/$tableId' });
   const { t } = useI18n();
+  const repository = useRepository();
   const queryClient = useQueryClient();
 
   // Route Form State
@@ -100,50 +101,42 @@ function TableRecordsPage() {
   // Queries
   const databaseQuery = useQuery<Database, Error>({
     queryKey: ['databases', databaseId],
-    queryFn: () => apiClient.get(`/databases/${databaseId}`),
+    queryFn: () => repository.databases.get(databaseId),
   });
 
   const tableQuery = useQuery<Table, Error>({
     queryKey: ['tables', tableId],
-    queryFn: () => apiClient.get(`/tables/${tableId}`),
+    queryFn: () => repository.tables.get(tableId),
   });
 
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', tableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
+    queryFn: () => repository.fields.listByTable(tableId),
   });
 
   const viewsQuery = useQuery<any[], Error>({
     queryKey: ['views', tableId],
-    queryFn: () => apiClient.get(`/views?table_id=${tableId}`),
+    queryFn: () => repository.views.listByTable(tableId),
   });
 
   // Query records dynamically based on search, filter, and sort states
   const recordsQuery = useQuery<{ data: RecordData[] }, Error>({
     queryKey: ['records', tableId, searchQuery, filters, sortBy, sortDir],
     queryFn: () => {
-      const qParams = new URLSearchParams();
-      qParams.append('table_id', tableId);
-      qParams.append('per_page', '100');
-
-      if (searchQuery.trim()) {
-        qParams.append('search', searchQuery.trim());
-      }
-      if (filters.length > 0) {
-        qParams.append('filters', JSON.stringify(filters));
-      }
-      if (sortBy) {
-        qParams.append('sort', sortBy);
-        qParams.append('sort_dir', sortDir);
-      }
-
-      return apiClient.get(`/records?${qParams.toString()}`);
+      return repository.records.list({
+        table_id: tableId,
+        per_page: 100,
+        search: searchQuery.trim() || undefined,
+        filters: filters.length > 0 ? filters : undefined,
+        sort: sortBy || undefined,
+        sort_dir: sortBy ? sortDir : undefined,
+      });
     },
   });
 
   // Mutations
   const deleteRecordMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/records/${id}`),
+    mutationFn: (id: string) => repository.records.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       queryClient.invalidateQueries({ queryKey: ['records-select'] });

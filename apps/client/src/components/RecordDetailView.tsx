@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import type { ApiRecord, ApiRecordData } from '../lib/apiTypes';
 import { parseGpsValue } from '../lib/fieldDisplay';
 import { type BuilderField } from '../lib/fieldTypes';
@@ -33,17 +33,18 @@ export function RecordDetailView({
   recordId,
   databaseId: propsDatabaseId,
 }: RecordDetailViewProps) {
+  const repository = useRepository();
   const [activeLightboxHash, setActiveLightboxHash] = useState<string | null>(null);
 
   // Queries
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', tableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
+    queryFn: () => repository.fields.listByTable(tableId),
   });
 
-  const viewsQuery = useQuery<{ data: ViewSchema[] }, Error>({
+  const viewsQuery = useQuery<ViewSchema[], Error>({
     queryKey: ['views', tableId],
-    queryFn: () => apiClient.get(`/views?table_id=${tableId}`),
+    queryFn: () => repository.views.listByTable(tableId),
   });
 
   interface RecordData {
@@ -55,7 +56,7 @@ export function RecordDetailView({
 
   const recordQuery = useQuery<RecordData, Error>({
     queryKey: ['records', recordId],
-    queryFn: () => apiClient.get(`/records/${recordId}`),
+    queryFn: () => repository.records.get(recordId),
     enabled: !!recordId,
   });
 
@@ -63,7 +64,7 @@ export function RecordDetailView({
 
   const tablesQuery = useQuery<{ id: string; name: string }[], Error>({
     queryKey: ['tables', databaseId],
-    queryFn: () => apiClient.get(`/tables?database_id=${databaseId}`),
+    queryFn: () => repository.tables.list(databaseId),
     enabled: !!databaseId,
   });
 
@@ -73,14 +74,16 @@ export function RecordDetailView({
 
   const referencingQuery = useQuery<{ data: ReferencingRecordItem[] }, Error>({
     queryKey: ['records', recordId, 'referencing'],
-    queryFn: () => apiClient.get(`/records/${recordId}/referencing-records`),
+    queryFn: () => repository.records.referencingRecords(recordId),
     enabled: !!recordId,
   });
 
   const referencingRecords = referencingQuery.data?.data || [];
 
   const activeView = useMemo(() => {
-    const list = viewsQuery.data?.data || [];
+    // The endpoint answers with a bare array; reading `.data` off it silently
+    // yielded undefined, so this list was always empty and no card view ever applied.
+    const list = viewsQuery.data || [];
     const singleDefault = list.find((v) => v.is_single_default);
     if (singleDefault) return singleDefault;
     const cardView = list.find((v) => v.type === 'card');
@@ -317,9 +320,10 @@ function ReferenceLabel({
   className?: string;
   databaseId: string;
 }) {
+  const repository = useRepository();
   const recordQuery = useQuery<ApiRecord, Error>({
     queryKey: ['records', targetRecordId],
-    queryFn: () => apiClient.get(`/records/${targetRecordId}`),
+    queryFn: () => repository.records.get(targetRecordId),
     enabled: !!targetRecordId && targetRecordId !== '--',
   });
 
@@ -327,7 +331,7 @@ function ReferenceLabel({
 
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', targetTableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${targetTableId}`),
+    queryFn: () => repository.fields.listByTable(targetTableId!),
     enabled: !!targetTableId,
   });
 
@@ -431,9 +435,10 @@ function ReferencingRecordRow({
   databaseId?: string;
   tableName?: string;
 }) {
+  const repository = useRepository();
   const fieldsQuery = useQuery<BuilderField[], Error>({
     queryKey: ['fields', tableId],
-    queryFn: () => apiClient.get(`/fields?table_id=${tableId}`),
+    queryFn: () => repository.fields.listByTable(tableId),
     enabled: !!tableId,
   });
 

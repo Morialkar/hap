@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { apiClient } from '../lib/apiClient';
+import type { CsvImportResult } from '@hap/core';
+import { useRepository } from '../contexts/RepositoryContext';
 import type { BuilderField, FieldType } from '../lib/fieldTypes';
 import { FIELD_TYPE_ORDER } from '../lib/fieldTypes';
 
@@ -22,17 +23,6 @@ interface ColumnMapping {
   match_or_create?: boolean;
 }
 
-interface CsvImportResult {
-  detected_encoding: string;
-  delimiter: string;
-  row_count: number;
-  accepted_count: number;
-  rejected_count: number;
-  warnings: string[];
-  accepted_rows: Array<{ row: number; data: Record<string, unknown>; record_id?: string }>;
-  rejected_rows: Array<{ row: number; errors: Record<string, string[]> }>;
-}
-
 function sniffHeaders(text: string): string[] {
   const firstLine = text.split(/\r?\n/).find((line) => line.trim() !== '') ?? '';
   const delimiters = [',', ';', '\t'];
@@ -47,6 +37,7 @@ function sniffHeaders(text: string): string[] {
 }
 
 export function CsvImportModal({ tableId, fields, onClose, onImported }: CsvImportModalProps) {
+  const repository = useRepository();
   const [file, setFile] = useState<File | null>(null);
   const [headers, setHeaders] = useState<string[]>([]);
   const [mapping, setMapping] = useState<Record<string, ColumnMapping>>({});
@@ -66,14 +57,12 @@ export function CsvImportModal({ tableId, fields, onClose, onImported }: CsvImpo
   };
 
   const dryRunMutation = useMutation({
-    mutationFn: () =>
-      apiClient.postForm<CsvImportResult>(`/tables/${tableId}/csv-import/dry-run`, buildFormData()),
+    mutationFn: () => repository.tables.csvImportDryRun(tableId, buildFormData()),
     onSuccess: setResult,
   });
 
   const importMutation = useMutation({
-    mutationFn: () =>
-      apiClient.postForm<CsvImportResult>(`/tables/${tableId}/csv-import`, buildFormData()),
+    mutationFn: () => repository.tables.csvImport(tableId, buildFormData()),
     onSuccess: (data) => {
       setResult(data);
       onImported();

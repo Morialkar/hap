@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '../contexts/I18nContext';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import type { ApiErrorLike, ApiRecordData, DeleteConflictData } from '../lib/apiTypes';
 import { LoadingSpinner } from './LoadingSpinner';
 
@@ -24,17 +24,18 @@ export function TrashManagerModal({
   onClose,
   onDeleteConflict,
 }: TrashManagerModalProps) {
+  const repository = useRepository();
   const { t } = useI18n();
   const queryClient = useQueryClient();
 
   const trashQuery = useQuery<{ data: TrashedRecord[] }, Error>({
     queryKey: ['records-trash', tableId],
-    queryFn: () => apiClient.get(`/records/trash?table_id=${tableId}`),
+    queryFn: () => repository.records.trash(tableId),
     enabled: isOpen && !!tableId,
   });
 
   const restoreMutation = useMutation({
-    mutationFn: (id: string) => apiClient.post(`/records/${id}/restore`),
+    mutationFn: (id: string) => repository.records.restore(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['records'] });
       queryClient.invalidateQueries({ queryKey: ['records-trash', tableId] });
@@ -43,7 +44,7 @@ export function TrashManagerModal({
   });
 
   const purgeMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/records/${id}/purge`),
+    mutationFn: (id: string) => repository.records.purge(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['records-trash', tableId] });
     },

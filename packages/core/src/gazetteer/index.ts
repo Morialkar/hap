@@ -1,15 +1,17 @@
-export { GazetteerResolver } from './GazetteerResolver';
-import { GazetteerResolver } from './GazetteerResolver';
+export { GazetteerResolver } from "./GazetteerResolver";
+import { GazetteerResolver } from "./GazetteerResolver";
 
 let bundledResolver: Promise<GazetteerResolver> | null = null;
 
 export async function loadBundledGazetteer() {
-  const { bundledGazetteerDataset } = await import('./data');
+  const { bundledGazetteerDataset } = await import("./data");
   return bundledGazetteerDataset;
 }
 
 export function loadBundledGazetteerResolver() {
-  bundledResolver ??= loadBundledGazetteer().then((dataset) => new GazetteerResolver(dataset));
+  bundledResolver ??= loadBundledGazetteer().then(
+    (dataset) => new GazetteerResolver(dataset),
+  );
   return bundledResolver;
 }
 export type {
@@ -21,4 +23,4 @@ export type {
   GazetteerSearchResult,
   GpsPoint,
   LocalitySnapshot,
-} from './types';
+} from "./types";

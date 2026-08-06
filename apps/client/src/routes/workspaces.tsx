@@ -3,8 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useI18n } from '../contexts/I18nContext';
 import { useAuth } from '../contexts/AuthContext';
-import { apiClient } from '../lib/apiClient';
-import type { ApiValue } from '../lib/apiTypes';
+import type { Template } from '@hap/core';
+import { useRepository } from '../contexts/RepositoryContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { generateId } from '../lib/id';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -28,24 +28,6 @@ interface Table {
   is_front_facing?: boolean;
 }
 
-interface Template {
-  id: string;
-  name: string;
-  description: string;
-  format_version: number;
-  template_version: string;
-  payload: TemplatePayload;
-  includes_demo_records: boolean;
-}
-
-interface TemplatePayload {
-  database?: {
-    name?: string;
-    [key: string]: ApiValue | undefined;
-  };
-  [key: string]: ApiValue | { name?: string; [key: string]: ApiValue | undefined } | undefined;
-}
-
 interface WorkspaceMember {
   workspace_id: string;
   role: string;
@@ -59,6 +41,7 @@ function Workspaces() {
   const { t } = useI18n();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const repository = useRepository();
   const [newDatabaseName, setNewDatabaseName] = useState('');
   const [templateDbNames, setTemplateDbNames] = useState<Record<string, string>>({});
   const [newTableNameByDatabase, setNewTableNameByDatabase] = useState<Record<string, string>>({});
@@ -68,17 +51,17 @@ function Workspaces() {
 
   const databasesQuery = useQuery<Database[], Error>({
     queryKey: ['databases'],
-    queryFn: () => apiClient.get('/databases'),
+    queryFn: () => repository.databases.list(),
   });
 
   const tablesQuery = useQuery<Table[], Error>({
     queryKey: ['tables'],
-    queryFn: () => apiClient.get('/tables'),
+    queryFn: () => repository.tables.list(),
   });
 
   const templatesQuery = useQuery<Template[], Error>({
     queryKey: ['templates'],
-    queryFn: () => apiClient.get('/templates'),
+    queryFn: () => repository.templates.list(),
   });
 
   // Find user owner workspace, fallback to first workspace or generate a new workspace UUID
@@ -90,8 +73,7 @@ function Workspaces() {
     workspaceMember?.workspace_id || databasesQuery.data?.[0]?.workspace_id || generateId();
 
   const createDatabase = useMutation({
-    mutationFn: (name: string) =>
-      apiClient.post<Database>('/databases', { name, workspace_id: workspaceId }),
+    mutationFn: (name: string) => repository.databases.create({ name, workspace_id: workspaceId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['databases'] });
       setSuccessMsg(null);
@@ -106,7 +88,7 @@ function Workspaces() {
     mutationFn: ({ template, dbName }: { template: Template; dbName: string }) => {
       const payload = { ...template.payload };
       payload.database = { ...payload.database, name: dbName };
-      return apiClient.post<Database>(`/workspaces/${workspaceId}/install-template`, {
+      return repository.templates.install(workspaceId, {
         format_version: template.format_version,
         template_version: template.template_version,
         name: dbName,
@@ -127,7 +109,7 @@ function Workspaces() {
 
   const createTable = useMutation({
     mutationFn: ({ databaseId, name }: { databaseId: string; name: string }) =>
-      apiClient.post<Table>('/tables', { name, database_id: databaseId }),
+      repository.tables.create({ name, database_id: databaseId }),
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       setNewTableNameByDatabase((prev) => ({ ...prev, [vars.databaseId]: '' }));
@@ -136,7 +118,7 @@ function Workspaces() {
 
   const updateTable = useMutation({
     mutationFn: ({ id, isFrontFacing }: { id: string; isFrontFacing: boolean }) =>
-      apiClient.put<Table>(`/tables/${id}`, { is_front_facing: isFrontFacing }),
+      repository.tables.update(id, { is_front_facing: isFrontFacing }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
     },

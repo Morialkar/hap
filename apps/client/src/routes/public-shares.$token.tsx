@@ -1,7 +1,7 @@
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { apiClient } from '../lib/apiClient';
+import { useRepository } from '../contexts/RepositoryContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { SurfaceCard } from '../components/ui/SurfaceCard';
 import { GpsMapPicker } from '../components/GpsMapPicker';
@@ -19,6 +19,7 @@ interface BuilderField {
 }
 
 function PublicShareView() {
+  const repository = useRepository();
   const { token } = useParams({ from: '/public-shares/$token' });
   const [searchQuery, setSearchQuery] = useState('');
   const [activeImageHash, setActiveImageHash] = useState<string | null>(null);
@@ -26,7 +27,7 @@ function PublicShareView() {
   // Fetch public share dataset
   const shareQuery = useQuery<any, any>({
     queryKey: ['public-share', token],
-    queryFn: () => apiClient.get(`/shares/${token}`),
+    queryFn: () => repository.shares.getByToken(token),
     retry: false,
   });
 

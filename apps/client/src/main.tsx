@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { routeTree } from './routeTree.gen';
 import { AuthProvider } from './contexts/AuthContext';
 import { I18nProvider } from './contexts/I18nContext';
+import { RepositoryProvider } from './contexts/RepositoryContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './styles/app.scss';
@@ -41,7 +42,9 @@ async function bootstrap() {
           <I18nProvider>
             <AuthProvider>
               <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router} />
+                <RepositoryProvider>
+                  <RouterProvider router={router} />
+                </RepositoryProvider>
               </QueryClientProvider>
             </AuthProvider>
           </I18nProvider>
